@@ -216,6 +216,7 @@ function toggleReviewMenu(){
 }
 function toggleLang(){
   lang=document.getElementById('langToggle').checked?'es':'en';
+  if(user) user.lang=lang;
   if(google&&google.script&&google.script.run)google.script.run.saveLang(lang);
   localStorage.setItem('lang',lang);
   applyTranslations();
