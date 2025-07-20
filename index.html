@@ -24,6 +24,7 @@ input[type=text],textarea{width:100%;padding:8px;margin-top:4px;border:1px solid
 select{padding:8px;}
  .rating-group label{display:inline-block;margin-right:10px;}
 button.primary{background:#6200ee;color:white;border:none;border-radius:4px;padding:8px 16px;cursor:pointer;}
+#submitMsg{margin-left:8px;font-weight:bold;}
 /* Loading bar styles */
 .loading-bar{height:4px;background:#eee;position:relative;overflow:hidden;}
 .loading-bar span{display:block;height:100%;background:#6200ee;width:100%;animation:loadAnim 1.2s linear infinite;}
@@ -33,6 +34,8 @@ button.primary{background:#6200ee;color:white;border:none;border-radius:4px;padd
 let user=null,config={},lang=localStorage.getItem('lang')||'en';
 let loadingReviews=false;
 let pendingSection=null;
+let currentReviewId=null;
+let autoSaveTimeout=null;
 
 const defaultQuestions=[
   {id:'attendance',en:'Attendance & Punctuality',es:'Asistencia y Puntualidad',extras:[
@@ -65,6 +68,7 @@ const translations={
     finalExpTitle:'Final Performance Expectation',belowExp:'Below Expectations',meetsExp:'Meets Expectations',exceedsExp:'Exceeds Expectations',
     below:'Below',meets:'Meets',exceeds:'Exceeds',
     notesPlaceholder:'Notes',contactQuestions:'Contact Sea Khun with questions.',empSignature:'Employee Signature',mgrSignature:'Manager Signature',submitReview:'Submit Review',
+    reviewSaved:'Review saved',saveFailed:'Failed to save review',
     intro:`<b>Dublin Cleaners 2025 Employee Annual Reviews – Your Opportunity to Shine</b><br><b>Purpose</b> – Highlight achievements, live our core values, and explain why you deserve a pay increase while receiving growth feedback.<br><b>Core Values</b> Accountable · Attention to Details · Team Player · Tactical Risk Taker · Better than Yesterday · Value Reputation<br><b>Rating System</b> 1 = Below Expectations · 2 = Meets Expectations · 3 = Exceeds Expectations (Attendance &amp; punctuality, Q1, is weighted higher)<br><b>Review Process</b> July reviews → submit form → Manager/Assistant adds notes → schedule 20-min meeting (half-hour slots) ≥ 1 week after submission. Schedule outside regular hours; compensated if on day off/outside shift.<br>Please Message HR about how long your meeting was so they can Add your hours into UKG<br><b>Raises take effect on the first pay period in August.</b>`
   },
   es:{
@@ -78,6 +82,7 @@ const translations={
     finalExpTitle:'Expectativa de desempeño final',belowExp:'Debajo de las expectativas',meetsExp:'Cumple con las expectativas',exceedsExp:'Supera las expectativas',
     below:'Debajo',meets:'Cumple',exceeds:'Supera',
     notesPlaceholder:'Notas',contactQuestions:'Contacte a Sea Khun con preguntas.',empSignature:'Firma del empleado',mgrSignature:'Firma del gerente',submitReview:'Enviar revisión',
+    reviewSaved:'Revisión guardada',saveFailed:'No se pudo guardar la revisión',
     intro:`<b>Dublin Cleaners Evaluaciones Anuales de Empleados 2025 – Tu oportunidad para destacar</b><br><b>Propósito</b> – Destacar logros, vivir nuestros valores fundamentales y explicar por qué mereces un aumento mientras recibes comentarios para crecer.<br><b>Valores fundamentales</b> Responsabilidad · Atención al detalle · Trabajo en equipo · Tomador de riesgos táctico · Mejor que ayer · Valorar la reputación<br><b>Sistema de calificación</b> 1 = Por debajo de las expectativas · 2 = Cumple con las expectativas · 3 = Supera las expectativas (Asistencia y puntualidad, P1, tiene mayor peso)<br><b>Proceso de revisión</b> Revisiones de julio → enviar formulario → el gerente/asistente agrega notas → programar una reunión de 20 minutos (bloques de media hora) ≥ 1 semana después de la entrega. Programar fuera del horario habitual; se compensa si es día libre/fuera del turno.<br>Informe a RRHH cuánto duró la reunión para que puedan agregar sus horas a UKG<br><b>Los aumentos entran en vigor en el primer periodo de pago de agosto.</b>`
   }
 };
@@ -132,6 +137,8 @@ function init(){
   show('home');
   applyTranslations();
   loadQuestions();
+  const revSection=document.getElementById('reviews');
+  if(revSection) revSection.addEventListener('input',scheduleAutoSave);
   google.script.run.withSuccessHandler(c=>{config=c;loadSession();}).loadConfig();
 }
 function loadSession(){
@@ -184,6 +191,7 @@ function login(){
 function navLogin(){
   const loginDiv=document.getElementById('login');
   if(user){
+    saveDraftReview();
     google.script.run.logout();
     user=null;
     loginDiv.classList.add('hidden');
@@ -295,6 +303,7 @@ function fillSavedAnswers(){
   if(!user||!reviews||!reviews.length) return;
   const rev=reviews.find(r=>r.type==='SELF'&&r.employeeId==user.id);
   if(!rev||!rev.data||!rev.data.answers) return;
+  currentReviewId=rev.id;
   const ans=rev.data.answers;
   Object.keys(ans).forEach(qid=>{
     const qDiv=document.querySelector('#questionList .q[data-id="'+qid+'"]');
@@ -328,7 +337,7 @@ function fillSavedAnswers(){
   }
 }
 function calcPct(){const c=parseFloat(document.getElementById('curWage').value||0);const n=parseFloat(document.getElementById('newWage').value||0);const pct=document.getElementById('pctInc');pct.textContent=c?(((n-c)/c)*100).toFixed(2):'0';}
-function submitReview(){
+function gatherAnswers(){
   const ans={};
   document.querySelectorAll('#questionList .q').forEach(d=>{
     const id=d.dataset.id;
@@ -344,8 +353,27 @@ function submitReview(){
     }
     ans[id]={score:rating,extra:extra};
   });
-  const review={employeeId:user.id,type:'SELF',data:{answers:ans}};
+  return ans;
+}
+function saveDraftReview(){
+  if(!user) return;
+  const ans=gatherAnswers();
+  const review={id:currentReviewId,employeeId:user.id,type:'SELF',data:{answers:ans},status:'DRAFT'};
   google.script.run.withSuccessHandler(r=>{
+    currentReviewId=r.id;
+    const exp={result:document.querySelector('input[name=finalExp]:checked')?.value||'',notes:document.getElementById('finalNotes').value,empSign:{name:document.getElementById('empSign').value,ts:new Date().toISOString()},mgrSign:{name:document.getElementById('mgrSign').value,ts:new Date().toISOString()}};
+    google.script.run.saveFinalExpectation(r.id,exp);
+  }).saveReview(review);
+}
+function scheduleAutoSave(){
+  clearTimeout(autoSaveTimeout);
+  autoSaveTimeout=setTimeout(saveDraftReview,1000);
+}
+function submitReview(){
+  const ans=gatherAnswers();
+  const review={id:currentReviewId,employeeId:user.id,type:'SELF',data:{answers:ans}};
+  google.script.run.withSuccessHandler(r=>{
+    currentReviewId=r.id;
     const adjBlock=document.getElementById('compAdjust');
     if(!adjBlock.classList.contains('hidden')){
       const adj={employeeId:user.id,current:document.getElementById('curWage').value,new:document.getElementById('newWage').value,pct:document.getElementById('pctInc').textContent};
@@ -354,8 +382,12 @@ function submitReview(){
     const exp={result:document.querySelector('input[name=finalExp]:checked')?.value||'',notes:document.getElementById('finalNotes').value,empSign:{name:document.getElementById('empSign').value,ts:new Date().toISOString()},mgrSign:{name:document.getElementById('mgrSign').value,ts:new Date().toISOString()}};
     google.script.run.saveFinalExpectation(r.id,exp);
     loadReviews();
-    alert('Saved');
-  }).saveReview(review);
+    document.getElementById('submitMsg').textContent=t('reviewSaved');
+  })
+  .withFailureHandler(err=>{
+    document.getElementById('submitMsg').textContent=err.message||t('saveFailed');
+  })
+  .saveReview(review);
 }
 
 function addNewUser(){
@@ -418,7 +450,7 @@ document.addEventListener('DOMContentLoaded',init);
 <label><span data-i18n-key="empSignature">Employee Signature</span><input type="text" id="empSign"></label>
 <label><span data-i18n-key="mgrSignature">Manager Signature</span><input type="text" id="mgrSign"></label>
 </div>
-<button class="primary" onclick="submitReview()" data-i18n-key="submitReview">Submit Review</button>
+<button class="primary" onclick="submitReview()" data-i18n-key="submitReview">Submit Review</button><span id="submitMsg"></span>
 </section>
 <section id="schedule" class="hidden">
 <p data-i18n-key="comingSoon">Coming soon...</p>
