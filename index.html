@@ -7,6 +7,13 @@
 body{font-family:Roboto,Arial,sans-serif;margin:0;padding:0;background:#fafafa;color:#333;}
 nav{display:flex;gap:10px;background:#6200ee;color:white;padding:10px;}
 nav button{background:none;border:none;color:white;font-size:16px;cursor:pointer;padding:6px 12px;}
+.lang-switch{display:flex;align-items:center;margin-left:auto;gap:4px;}
+.switch{position:relative;display:inline-block;width:34px;height:18px;}
+.switch input{opacity:0;width:0;height:0;}
+.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#ccc;transition:.4s;border-radius:34px;}
+.slider:before{position:absolute;content:"";height:14px;width:14px;left:2px;bottom:2px;background:white;transition:.4s;border-radius:50%;}
+.switch input:checked + .slider{background:#2196F3;}
+.switch input:checked + .slider:before{transform:translateX(16px);}
 section{padding:20px;}
 .card{background:white;padding:15px;margin-bottom:10px;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,0.2);} 
 .hidden{display:none;}
@@ -65,10 +72,15 @@ function t(key){
 }
 function show(id){document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');if(id==='reviews'){loadQuestions();}}
 function applyTranslations(){
-  document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n);});
-  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{el.placeholder=t(el.dataset.i18nPlaceholder);});
-  document.querySelectorAll('[data-i18n-html]').forEach(el=>{el.innerHTML=t(el.dataset.i18nHtml);});
-  document.getElementById('langBtn').textContent=lang.toUpperCase();
+  document.querySelectorAll('[data-i18n-key]').forEach(el=>{
+    const key=el.dataset.i18nKey;
+    if(el.hasAttribute('data-i18n-placeholder'))el.placeholder=t(key);
+    else if(el.hasAttribute('data-i18n-html'))el.innerHTML=t(key);
+    else if(el.hasAttribute('data-i18n-alt'))el.alt=t(key);
+    else el.textContent=t(key);
+  });
+  const toggle=document.getElementById('langToggle');
+  if(toggle)toggle.checked=lang==='es';
 }
 function init(){
   show('home');
@@ -108,7 +120,13 @@ function login(){
     }
   }).login(e,p);
 }
-function saveLang(){lang=lang==='en'?'es':'en';google.script.run.saveLang(lang);localStorage.setItem('lang',lang);applyTranslations();renderReviews();}
+function toggleLang(){
+  lang=document.getElementById('langToggle').checked?'es':'en';
+  if(google&&google.script&&google.script.run)google.script.run.saveLang(lang);
+  localStorage.setItem('lang',lang);
+  applyTranslations();
+  renderReviews();
+}
 let reviews=[];
 function loadReviews(){google.script.run.withSuccessHandler(r=>{reviews=r;renderReviews();}).listReviews();}
 function renderReviews(){const c=document.getElementById('reviewsList');if(!c)return;c.innerHTML='';reviews.forEach(rv=>{const div=document.createElement('div');div.className='card';div.innerHTML='<b>'+rv.type+'</b> '+rv.status+'<br>'+JSON.stringify(rv.data);c.appendChild(div);});}
@@ -209,45 +227,49 @@ document.addEventListener('DOMContentLoaded',init);
 </head>
 <body>
 <nav>
-<button onclick="show('home')" data-i18n="home">Home</button>
-<button onclick="show('reviews')" data-i18n="reviews">Reviews</button>
-<button onclick="show('schedule')" data-i18n="schedule">Schedule</button>
-<button id="langBtn" onclick="saveLang()">EN</button>
+<button onclick="show('home')" data-i18n-key="home">Home</button>
+<button onclick="show('reviews')" data-i18n-key="reviews">Reviews</button>
+<button onclick="show('schedule')" data-i18n-key="schedule">Schedule</button>
+<div class="lang-switch">
+  <span>EN</span>
+  <label class="switch"><input type="checkbox" id="langToggle" onchange="toggleLang()"><span class="slider"></span></label>
+  <span>ES</span>
+</div>
 </nav>
 <section id="home" class="hidden">
-<h2 data-i18n="welcomeTitle">Welcome to the Employee Review Portal</h2>
-<p data-i18n="welcomeMsg">Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.</p>
+<h2 data-i18n-key="welcomeTitle">Welcome to the Employee Review Portal</h2>
+<p data-i18n-key="welcomeMsg">Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.</p>
 <div id="reviewsList"></div>
 </section>
 <section id="reviews" class="hidden">
-<div class="card" style="max-height:160px;overflow:auto;" data-i18n-html="intro"></div>
+<div class="card" style="max-height:160px;overflow:auto;" data-i18n-key="intro" data-i18n-html></div>
 <div id="questionList"></div>
 <div id="compAdjust" class="card hidden">
-<label><span data-i18n="curWage">Current Wage</span><input type="number" id="curWage"></label>
-<label><span data-i18n="newWage">New Wage</span><input type="number" id="newWage" oninput="calcPct()"></label>
-<div><span data-i18n="pctIncrease">% Increase:</span> <span id="pctInc">0</span>%</div>
+<label><span data-i18n-key="curWage">Current Wage</span><input type="number" id="curWage"></label>
+<label><span data-i18n-key="newWage">New Wage</span><input type="number" id="newWage" oninput="calcPct()"></label>
+<div><span data-i18n-key="pctIncrease">% Increase:</span> <span id="pctInc">0</span>%</div>
 </div>
 <div id="finalBlock" class="card">
-<p data-i18n="finalExpTitle">Final Performance Expectation</p>
-<label><input type="radio" name="finalExp" value="below"> <span data-i18n="belowExp">Below Expectations</span></label>
-<label><input type="radio" name="finalExp" value="meets"> <span data-i18n="meetsExp">Meets Expectations</span></label>
-<label><input type="radio" name="finalExp" value="exceeds"> <span data-i18n="exceedsExp">Exceeds Expectations</span></label>
-<textarea id="finalNotes" data-i18n-placeholder="notesPlaceholder" placeholder="Notes"></textarea>
-<small data-i18n="contactQuestions">Contact Sea Khun with questions.</small>
+<p data-i18n-key="finalExpTitle">Final Performance Expectation</p>
+<label><input type="radio" name="finalExp" value="below"> <span data-i18n-key="belowExp">Below Expectations</span></label>
+<label><input type="radio" name="finalExp" value="meets"> <span data-i18n-key="meetsExp">Meets Expectations</span></label>
+<label><input type="radio" name="finalExp" value="exceeds"> <span data-i18n-key="exceedsExp">Exceeds Expectations</span></label>
+<textarea id="finalNotes" data-i18n-key="notesPlaceholder" data-i18n-placeholder placeholder="Notes"></textarea>
+<small data-i18n-key="contactQuestions">Contact Sea Khun with questions.</small>
 </div>
 <div class="card">
-<label><span data-i18n="empSignature">Employee Signature</span><input type="text" id="empSign"></label>
-<label><span data-i18n="mgrSignature">Manager Signature</span><input type="text" id="mgrSign"></label>
+<label><span data-i18n-key="empSignature">Employee Signature</span><input type="text" id="empSign"></label>
+<label><span data-i18n-key="mgrSignature">Manager Signature</span><input type="text" id="mgrSign"></label>
 </div>
-<button class="primary" onclick="submitReview()" data-i18n="submitReview">Submit Review</button>
+<button class="primary" onclick="submitReview()" data-i18n-key="submitReview">Submit Review</button>
 </section>
 <section id="schedule" class="hidden">
-<p data-i18n="comingSoon">Coming soon...</p>
+<p data-i18n-key="comingSoon">Coming soon...</p>
 </section>
 <div id="login" class="hidden">
-<label><span data-i18n="email">Email</span><input type="text" id="email" data-i18n-placeholder="email"></label>
-<label><span data-i18n="password">Password</span><input type="password" id="pw" data-i18n-placeholder="password"></label>
-<button class="primary" onclick="login()" data-i18n="login">Login</button>
+<label><span data-i18n-key="email">Email</span><input type="text" id="email" data-i18n-key="email" data-i18n-placeholder></label>
+<label><span data-i18n-key="password">Password</span><input type="password" id="pw" data-i18n-key="password" data-i18n-placeholder></label>
+<button class="primary" onclick="login()" data-i18n-key="login">Login</button>
 </div>
 </body>
 </html>
