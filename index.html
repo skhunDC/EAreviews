@@ -258,7 +258,18 @@ function updateReviewMenu(){
 
 function selectReviewYear(y){
   selectedYear=y;
-  loadReviews();
+  if(typeof google==='undefined'||!google.script||!google.script.run){
+    fillSavedAnswers();
+  }else{
+    google.script.run.withSuccessHandler(rv=>{
+      if(rv){
+        reviews=reviews.filter(r=>!(r.type==='SELF'&&r.employeeId==user.id&&Number(r.data.year)==Number(y)));
+        reviews.push(rv);
+      }
+      fillSavedAnswers();
+      updateReviewMenu();
+    }).getReviewByYear(y);
+  }
   const menu=document.getElementById('reviewMenu');
   if(menu) menu.classList.remove('show');
 }
