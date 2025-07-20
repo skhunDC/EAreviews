@@ -57,7 +57,7 @@ const translations={
     home:'Home',reviews:'Reviews',schedule:'Schedule',navTitle:'Employee Annual Reviews',
     welcomeTitle:'Welcome to the Employee Review Portal',
     welcomeMsg:'Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.',
-    comingSoon:'Coming soon...',email:'Email',password:'Password',login:'Login',loginFail:'login fail',
+    comingSoon:'Coming soon...',email:'Email',login:'Login',loginFail:'login fail',
     curWage:'Current Wage',newWage:'New Wage',pctIncrease:'% Increase:',
     finalExpTitle:'Final Performance Expectation',belowExp:'Below Expectations',meetsExp:'Meets Expectations',exceedsExp:'Exceeds Expectations',
     below:'Below',meets:'Meets',exceeds:'Exceeds',
@@ -68,7 +68,7 @@ const translations={
     home:'Inicio',reviews:'Reseñas',schedule:'Agenda',navTitle:'Revisiones Anuales de Empleados',
     welcomeTitle:'Bienvenido al Portal de Evaluaciones',
     welcomeMsg:'Seleccione una opción en la barra de navegación para ver sus evaluaciones o programar una reunión. Use el botón de idioma para cambiar entre inglés y español.',
-    comingSoon:'Próximamente...',email:'Correo electrónico',password:'Contraseña',login:'Iniciar sesión',loginFail:'Error al iniciar sesión',
+    comingSoon:'Próximamente...',email:'Correo electrónico',login:'Iniciar sesión',loginFail:'Error al iniciar sesión',
     curWage:'Salario actual',newWage:'Nuevo salario',pctIncrease:'% Aumento:',
     finalExpTitle:'Expectativa de desempeño final',belowExp:'Debajo de las expectativas',meetsExp:'Cumple con las expectativas',exceedsExp:'Supera las expectativas',
     below:'Debajo',meets:'Cumple',exceeds:'Supera',
@@ -138,7 +138,6 @@ function loadSession(){
 }
 function login(){
   const e=document.getElementById('email').value;
-  const p=document.getElementById('pw').value;
   google.script.run.withSuccessHandler(r=>{
     if(r.success){
       user=r.user;
@@ -152,7 +151,7 @@ function login(){
     }else{
       alert(t('loginFail'));
     }
-  }).login(e,p);
+    }).login(e);
 }
 function toggleLang(){
   lang=document.getElementById('langToggle').checked?'es':'en';
@@ -349,7 +348,6 @@ document.addEventListener('DOMContentLoaded',init);
 </section>
 <div id="login" class="hidden">
 <label><span data-i18n-key="email">Email</span><input type="text" id="email" data-i18n-key="email" data-i18n-placeholder></label>
-<label><span data-i18n-key="password">Password</span><input type="password" id="pw" data-i18n-key="password" data-i18n-placeholder></label>
 <button class="primary" onclick="login()" data-i18n-key="login">Login</button>
 </div>
 </body>
