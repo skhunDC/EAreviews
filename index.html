@@ -22,9 +22,14 @@ input[type=text],textarea{width:100%;padding:8px;margin-top:4px;border:1px solid
 select{padding:8px;}
  .rating-group label{display:inline-block;margin-right:10px;}
 button.primary{background:#6200ee;color:white;border:none;border-radius:4px;padding:8px 16px;cursor:pointer;}
+/* Loading bar styles */
+.loading-bar{height:4px;background:#eee;position:relative;overflow:hidden;}
+.loading-bar span{display:block;height:100%;background:#6200ee;width:100%;animation:loadAnim 1.2s linear infinite;}
+@keyframes loadAnim{from{transform:translateX(-100%);}to{transform:translateX(100%);}}
 </style>
 <script>
 let user=null,config={},lang=localStorage.getItem('lang')||'en';
+let loadingReviews=false;
 
 const defaultQuestions=[
   {id:'attendance',en:'Attendance & Punctuality',es:'Asistencia y Puntualidad',extras:[
@@ -70,7 +75,27 @@ function t(key){
   if(translations[lang]&&translations[lang][key])return translations[lang][key];
   return key;
 }
-function show(id){document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');if(id==='reviews'){loadQuestions();}}
+function startLoading(){
+  document.body.style.background='#fff';
+  const lb=document.getElementById('loadingBar');
+  if(lb)lb.classList.remove('hidden');
+  loadingReviews=true;
+}
+function stopLoading(){
+  document.body.style.background='';
+  const lb=document.getElementById('loadingBar');
+  if(lb)lb.classList.add('hidden');
+  loadingReviews=false;
+}
+function show(id){
+  document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
+  if(id==='reviews'){
+    startLoading();
+    loadQuestions();
+  }else{
+    document.getElementById(id).classList.remove('hidden');
+  }
+}
 function applyTranslations(){
   document.querySelectorAll('[data-i18n-key]').forEach(el=>{
     const key=el.dataset.i18nKey;
@@ -191,6 +216,10 @@ function renderQuestionList(){
   if(user&&user.role&&(['MANAGER','HR','DEV'].indexOf(user.role)!==-1)){
     document.getElementById('compAdjust').classList.remove('hidden');
   }
+  if(loadingReviews){
+    document.getElementById('reviews').classList.remove('hidden');
+    stopLoading();
+  }
 }
 function calcPct(){const c=parseFloat(document.getElementById('curWage').value||0);const n=parseFloat(document.getElementById('newWage').value||0);const pct=document.getElementById('pctInc');pct.textContent=c?(((n-c)/c)*100).toFixed(2):'0';}
 function submitReview(){
@@ -236,6 +265,7 @@ document.addEventListener('DOMContentLoaded',init);
   <span>ES</span>
 </div>
 </nav>
+<div id="loadingBar" class="loading-bar hidden"><span></span></div>
 <section id="home" class="hidden">
 <h2 data-i18n-key="welcomeTitle">Welcome to the Employee Review Portal</h2>
 <p data-i18n-key="welcomeMsg">Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.</p>
