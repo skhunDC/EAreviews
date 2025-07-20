@@ -30,6 +30,7 @@ button.primary{background:#6200ee;color:white;border:none;border-radius:4px;padd
 <script>
 let user=null,config={},lang=localStorage.getItem('lang')||'en';
 let loadingReviews=false;
+const devEmails=['skhun@dublincleaners.com','ss.sku@protonmail.com'];
 
 const defaultQuestions=[
   {id:'attendance',en:'Attendance & Punctuality',es:'Asistencia y Puntualidad',extras:[
@@ -92,6 +93,7 @@ function stopLoading(){
   loadingReviews=false;
 }
 function show(id){
+  if(id==='devPanel' && (!user || devEmails.indexOf(user.email)===-1)) return;
   document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
   if(id==='reviews'){
     startLoading();
@@ -124,11 +126,13 @@ function loadSession(){
       lang=u.lang;
       localStorage.setItem('lang',lang);
       applyTranslations();
+      showDevButton();
       loadReviews();
       show('home');
     }else{
       document.getElementById('login').classList.remove('hidden');
       applyTranslations();
+      showDevButton();
     }
   }).getSession();
 }
@@ -142,6 +146,7 @@ function login(){
       localStorage.setItem('lang',lang);
       document.getElementById('login').classList.add('hidden');
       applyTranslations();
+      showDevButton();
       loadReviews();
       show('home');
     }else{
@@ -160,6 +165,18 @@ function toggleLang(){
 let reviews=[];
 function loadReviews(){google.script.run.withSuccessHandler(r=>{reviews=r;renderReviews();}).listReviews();}
 function renderReviews(){const c=document.getElementById('reviewsList');if(!c)return;c.innerHTML='';reviews.forEach(rv=>{const div=document.createElement('div');div.className='card';div.innerHTML='<b>'+rv.type+'</b> '+rv.status+'<br>'+JSON.stringify(rv.data);c.appendChild(div);});}
+
+function showDevButton(){
+  const btn=document.getElementById('devBtn');
+  if(!btn)return;
+  if(user&&devEmails.indexOf(user.email)!==-1){
+    btn.classList.remove('hidden');
+    btn.disabled=false;
+  }else{
+    btn.classList.add('hidden');
+    btn.disabled=true;
+  }
+}
 
 let questions=[];
 function loadQuestions(){
@@ -256,6 +273,12 @@ function submitReview(){
     alert('Saved');
   }).saveReview(review);
 }
+
+function addNewUser(){
+  const em=document.getElementById('newUserEmail').value;
+  const role=document.getElementById('newUserRole').value;
+  google.script.run.withSuccessHandler(()=>{alert('Added');document.getElementById('newUserEmail').value='';document.getElementById('newUserRole').value='';}).addNewUser({email:em,role:role});
+}
 document.addEventListener('DOMContentLoaded',init);
 </script>
 </head>
@@ -269,6 +292,7 @@ document.addEventListener('DOMContentLoaded',init);
   <label class="switch"><input type="checkbox" id="langToggle" onchange="toggleLang()"><span class="slider"></span></label>
   <span>ES</span>
 </div>
+<button id="devBtn" class="hidden" onclick="show('devPanel')">Dev</button>
 </nav>
 <div id="loadingBar" class="loading-bar hidden"><span></span></div>
 <section id="home" class="hidden">
@@ -300,6 +324,12 @@ document.addEventListener('DOMContentLoaded',init);
 </section>
 <section id="schedule" class="hidden">
 <p data-i18n-key="comingSoon">Coming soon...</p>
+</section>
+<section id="devPanel" class="hidden">
+  <h3>Admin Panel</h3>
+  <label>Email<input type="text" id="newUserEmail"></label>
+  <label>Role<input type="text" id="newUserRole"></label>
+  <button class="primary" onclick="addNewUser()">Add User</button>
 </section>
 <div id="login" class="hidden">
 <label><span data-i18n-key="email">Email</span><input type="text" id="email" data-i18n-key="email" data-i18n-placeholder></label>
