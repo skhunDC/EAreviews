@@ -29,7 +29,7 @@ button.primary{background:#6200ee;color:white;border:none;border-radius:4px;padd
 .dropdown{position:relative;}
 .dropdown-content{display:none;position:absolute;top:100%;left:0;background:#6200ee;color:white;min-width:80px;z-index:10;}
 .dropdown-content button{background:none;border:none;color:white;cursor:pointer;display:block;width:100%;padding:6px 12px;text-align:left;}
-.dropdown:hover .dropdown-content{display:block;}
+.dropdown-content.show{display:block;}
 /* Loading bar styles */
 .loading-bar{height:4px;background:#eee;position:relative;overflow:hidden;}
 .loading-bar span{display:block;height:100%;background:#6200ee;width:100%;animation:loadAnim 1.2s linear infinite;}
@@ -211,6 +211,12 @@ function navLogin(){
     loginDiv.classList.toggle('hidden');
   }
 }
+
+function toggleReviewMenu(){
+  show('reviews');
+  const menu=document.getElementById('reviewMenu');
+  if(menu) menu.classList.toggle('show');
+}
 function toggleLang(){
   lang=document.getElementById('langToggle').checked?'es':'en';
   if(google&&google.script&&google.script.run)google.script.run.saveLang(lang);
@@ -250,6 +256,8 @@ function updateReviewMenu(){
 function selectReviewYear(y){
   selectedYear=y;
   fillSavedAnswers();
+  const menu=document.getElementById('reviewMenu');
+  if(menu) menu.classList.remove('show');
 }
 
 function showDevButton(){
@@ -409,6 +417,7 @@ function saveDraftReview(){
     currentReviewId=r.id;
     const exp={result:document.querySelector('input[name=finalExp]:checked')?.value||'',notes:document.getElementById('finalNotes').value,empSign:{name:document.getElementById('empSign').value,ts:new Date().toISOString()},mgrSign:{name:document.getElementById('mgrSign').value,ts:new Date().toISOString()}};
     google.script.run.saveFinalExpectation(r.id,exp);
+    loadReviews();
   }).saveReview(review);
 }
 function scheduleAutoSave(){
@@ -459,8 +468,8 @@ document.addEventListener('DOMContentLoaded',init);
 <nav>
 <img src="https://www.dublincleaners.com/wp-content/uploads/2024/12/Dublin-Logos-stacked.png" alt="Logo" class="logo">
 <button onclick="show('home')" data-i18n-key="home">Home</button>
-<div class="dropdown">
-<button onclick="show('reviews')" data-i18n-key="reviews">Reviews</button>
+<div id="reviewDropdown" class="dropdown">
+<button onclick="toggleReviewMenu()" data-i18n-key="reviews">Reviews</button>
 <div id="reviewMenu" class="dropdown-content"></div>
 </div>
 <button onclick="show('schedule')" data-i18n-key="schedule">Schedule</button>
