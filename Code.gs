@@ -4,6 +4,8 @@ const USERS_SHEET = 'USERS';
 const REVIEWS_SHEET = 'REVIEWS';
 const MEETINGS_SHEET = 'MEETINGS';
 const CONFIG_SHEET = 'CONFIG';
+const QUESTIONS_SHEET = 'QUESTIONS';
+const COMP_SHEET = 'COMP_ADJUST';
 const CACHE_KEY = 'SESSION';
 const SESSION_DURATION = 60 * 60 * 8; // 8 hours
 const DEV_PASSWORD = 'changeme'; // replace in prod
@@ -219,4 +221,65 @@ function dailyNotifications() {
       }
     }
   });
+}
+
+/** Retrieve review questions */
+function getQuestions() {
+  const ss = SpreadsheetApp.getActive();
+  let sheet = ss.getSheetByName(QUESTIONS_SHEET);
+  if (!sheet) return [];
+  const rows = sheet.getDataRange().getValues();
+  const list = [];
+  rows.forEach((r,i)=>{ if(i>0) list.push({id:r[0], en:r[1], es:r[2], extra:r[3]}); });
+  return list;
+}
+
+/** Overwrite questions list (DEV only) */
+function saveQuestions(list) {
+  const user = getSession();
+  if (!user || user.role !== 'DEV') throw new Error('denied');
+  const ss = SpreadsheetApp.getActive();
+  let sheet = ss.getSheetByName(QUESTIONS_SHEET);
+  if (!sheet) {
+    sheet = ss.insertSheet(QUESTIONS_SHEET);
+    sheet.appendRow(['ID','EN','ES','EXTRA']);
+  }
+  sheet.getRange(2,1,sheet.getLastRow(),4).clearContent();
+  list.forEach((q,i)=>{
+    sheet.getRange(i+2,1,1,4).setValues([[q.id||('q'+(i+1)), q.en, q.es, q.extra||'']]);
+  });
+  return true;
+}
+
+/** Save compensation adjustment for a review */
+function saveCompAdjustment(reviewId, adj) {
+  const user = getSession();
+  if (!user || (['MANAGER','HR','DEV'].indexOf(user.role)===-1)) throw new Error('denied');
+  const ss = SpreadsheetApp.getActive();
+  let sheet = ss.getSheetByName(COMP_SHEET);
+  if(!sheet){
+    sheet = ss.insertSheet(COMP_SHEET);
+    sheet.appendRow(['ReviewID','EmployeeID','Current','New','Pct','ManagerID','Timestamp']);
+  }
+  sheet.appendRow([reviewId, adj.employeeId, adj.current, adj.new, adj.pct, user.id, new Date()]);
+  return true;
+}
+
+/** Save final expectation for a review */
+function saveFinalExpectation(reviewId, exp) {
+  const user = getSession();
+  if (!user) throw new Error('not auth');
+  const ss = SpreadsheetApp.getActive();
+  const sheet = ss.getSheetByName(REVIEWS_SHEET);
+  const rows = sheet.getDataRange().getValues();
+  for(let i=1;i<rows.length;i++){
+    if(rows[i][0]==reviewId){
+      const data = JSON.parse(rows[i][3]||'{}');
+      data.finalExpectation = exp;
+      sheet.getRange(i+1,4).setValue(JSON.stringify(data));
+      sheet.getRange(i+1,6).setValue(new Date());
+      return true;
+    }
+  }
+  throw new Error('review not found');
 }

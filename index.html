@@ -18,15 +18,15 @@ button.primary{background:#6200ee;color:white;border:none;border-radius:4px;padd
 <script>
 let user=null,config={},lang=localStorage.getItem('lang')||'en';
 const translations={
-  en:{home:'Home',schedule:'Schedule',welcomeTitle:'Welcome to the Employee Review Portal',welcomeMsg:'Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.',comingSoon:'Coming soon...',email:'Email',password:'Password',login:'Login',loginFail:'login fail'},
-  es:{home:'Inicio',schedule:'Agenda',welcomeTitle:'Bienvenido al Portal de Evaluaciones',welcomeMsg:'Seleccione una opción en la barra de navegación para ver sus evaluaciones o programar una reunión. Use el botón de idioma para cambiar entre inglés y español.',comingSoon:'Próximamente...',email:'Correo electrónico',password:'Contraseña',login:'Iniciar sesión',loginFail:'Error al iniciar sesión'}
+  en:{home:'Home',reviews:'Reviews',schedule:'Schedule',welcomeTitle:'Welcome to the Employee Review Portal',welcomeMsg:'Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.',comingSoon:'Coming soon...',email:'Email',password:'Password',login:'Login',loginFail:'login fail'},
+  es:{home:'Inicio',reviews:'Reseñas',schedule:'Agenda',welcomeTitle:'Bienvenido al Portal de Evaluaciones',welcomeMsg:'Seleccione una opción en la barra de navegación para ver sus evaluaciones o programar una reunión. Use el botón de idioma para cambiar entre inglés y español.',comingSoon:'Próximamente...',email:'Correo electrónico',password:'Contraseña',login:'Iniciar sesión',loginFail:'Error al iniciar sesión'}
 };
 function t(key){
   if(config[key]&&config[key][lang])return config[key][lang];
   if(translations[lang]&&translations[lang][key])return translations[lang][key];
   return key;
 }
-function show(id){document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');}
+function show(id){document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');if(id==='reviews'){loadQuestions();}}
 function applyTranslations(){
   document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n);});
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{el.placeholder=t(el.dataset.i18nPlaceholder);});
@@ -72,20 +72,56 @@ function login(){
 function saveLang(){lang=lang==='en'?'es':'en';google.script.run.saveLang(lang);localStorage.setItem('lang',lang);applyTranslations();renderReviews();}
 let reviews=[];
 function loadReviews(){google.script.run.withSuccessHandler(r=>{reviews=r;renderReviews();}).listReviews();}
-function renderReviews(){const c=document.getElementById('reviews');c.innerHTML='';reviews.forEach(rv=>{const div=document.createElement('div');div.className='card';div.innerHTML='<b>'+rv.type+'</b> '+rv.status+'<br>'+JSON.stringify(rv.data);c.appendChild(div);});}
+function renderReviews(){const c=document.getElementById('reviewsList');if(!c)return;c.innerHTML='';reviews.forEach(rv=>{const div=document.createElement('div');div.className='card';div.innerHTML='<b>'+rv.type+'</b> '+rv.status+'<br>'+JSON.stringify(rv.data);c.appendChild(div);});}
+
+let questions=[];
+function loadQuestions(){google.script.run.withSuccessHandler(q=>{questions=q;renderQuestionList();}).getQuestions();}
+function renderQuestionList(){const qd=document.getElementById('questionList');if(!qd)return;qd.innerHTML='';questions.forEach(q=>{const div=document.createElement('div');div.className='card q';div.dataset.id=q.id;let html='<label>'+q[lang]+'</label><select class="rating"><option value=""></option><option>1</option><option>2</option><option>3</option></select>';if(q.extra==='textarea'){html+='<textarea class="extra"></textarea>';}if(q.extra==='number'){html+='<input type="number" class="extra">';}div.innerHTML=html;qd.appendChild(div);});if(user&&user.role&&(['MANAGER','HR','DEV'].indexOf(user.role)!==-1)){document.getElementById('compAdjust').classList.remove('hidden');}}
+function calcPct(){const c=parseFloat(document.getElementById('curWage').value||0);const n=parseFloat(document.getElementById('newWage').value||0);const pct=document.getElementById('pctInc');pct.textContent=c?(((n-c)/c)*100).toFixed(2):'0';}
+function submitReview(){const ans={};document.querySelectorAll('#questionList .q').forEach(d=>{const id=d.dataset.id;ans[id]={score:d.querySelector('.rating').value,extra:(d.querySelector('.extra')||{}).value||''};});const review={employeeId:user.id,type:'SELF',data:{answers:ans}};google.script.run.withSuccessHandler(r=>{const adjBlock=document.getElementById('compAdjust');if(!adjBlock.classList.contains('hidden')){const adj={employeeId:user.id,current:document.getElementById('curWage').value,new:document.getElementById('newWage').value,pct:document.getElementById('pctInc').textContent};google.script.run.saveCompAdjustment(r.id,adj);}const exp={result:document.querySelector('input[name=finalExp]:checked')?.value||'',notes:document.getElementById('finalNotes').value,empSign:{name:document.getElementById('empSign').value,ts:new Date().toISOString()},mgrSign:{name:document.getElementById('mgrSign').value,ts:new Date().toISOString()}};google.script.run.saveFinalExpectation(r.id,exp);loadReviews();alert('Saved');}).saveReview(review);}
 document.addEventListener('DOMContentLoaded',init);
 </script>
 </head>
 <body>
 <nav>
 <button onclick="show('home')" data-i18n="home">Home</button>
+<button onclick="show('reviews')" data-i18n="reviews">Reviews</button>
 <button onclick="show('schedule')" data-i18n="schedule">Schedule</button>
 <button id="langBtn" onclick="saveLang()">EN</button>
 </nav>
 <section id="home" class="hidden">
 <h2 data-i18n="welcomeTitle">Welcome to the Employee Review Portal</h2>
 <p data-i18n="welcomeMsg">Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.</p>
-<div id="reviews"></div>
+<div id="reviewsList"></div>
+</section>
+<section id="reviews" class="hidden">
+<div class="card" style="max-height:160px;overflow:auto;">
+<b>Dublin Cleaners 2025 Employee Annual Reviews – Your Opportunity to Shine</b><br>
+<b>Purpose</b> – Highlight achievements, live our core values, and explain why you deserve a pay increase while receiving growth feedback.<br>
+<b>Core Values</b> Accountable · Attention to Details · Team Player · Tactical Risk Taker · Better than Yesterday · Value Reputation<br>
+<b>Rating System</b> 1 = Below Expectations · 2 = Meets Expectations · 3 = Exceeds Expectations (Attendance &amp; punctuality, Q1, is weighted higher)<br>
+<b>Review Process</b> July reviews → submit form → Manager/Assistant adds notes → schedule 20-min meeting (half-hour slots) ≥ 1 week after submission. Schedule outside regular hours; compensated if on day off/outside shift.<br>
+<b>Raises take effect on the first pay period in August.</b>
+</div>
+<div id="questionList"></div>
+<div id="compAdjust" class="card hidden">
+<label>Current Wage<input type="number" id="curWage"></label>
+<label>New Wage<input type="number" id="newWage" oninput="calcPct()"></label>
+<div>% Increase: <span id="pctInc">0</span>%</div>
+</div>
+<div id="finalBlock" class="card">
+<p>Final Performance Expectation</p>
+<label><input type="radio" name="finalExp" value="below"> Below Expectations / Debajo</label>
+<label><input type="radio" name="finalExp" value="meets"> Meets Expectations / Cumple</label>
+<label><input type="radio" name="finalExp" value="exceeds"> Exceeds Expectations / Supera</label>
+<textarea id="finalNotes" placeholder="Notes"></textarea>
+<small>Contact Sea Khun with questions.</small>
+</div>
+<div class="card">
+<label>Employee Signature<input type="text" id="empSign"></label>
+<label>Manager Signature<input type="text" id="mgrSign"></label>
+</div>
+<button class="primary" onclick="submitReview()">Submit Review</button>
 </section>
 <section id="schedule" class="hidden">
 <p data-i18n="comingSoon">Coming soon...</p>
