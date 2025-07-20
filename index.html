@@ -114,10 +114,22 @@ function renderReviews(){const c=document.getElementById('reviewsList');if(!c)re
 
 let questions=[];
 function loadQuestions(){
-  google.script.run.withSuccessHandler(q=>{
-    questions=(q&&q.length)?q:defaultQuestions;
+  if(typeof google==='undefined'||!google.script||!google.script.run){
+    questions=defaultQuestions;
     renderQuestionList();
-  }).getQuestions();
+    return;
+  }
+  google.script.run
+    .withSuccessHandler(q=>{
+      questions=(q&&q.length)?q:defaultQuestions;
+      renderQuestionList();
+    })
+    .withFailureHandler(err=>{
+      console.error('loadQuestions failed',err);
+      questions=defaultQuestions;
+      renderQuestionList();
+    })
+    .getQuestions();
 }
 function renderQuestionList(){
   const qd=document.getElementById('questionList');
