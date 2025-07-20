@@ -11,12 +11,37 @@ const SESSION_DURATION = 60 * 60 * 8; // 8 hours
 const DEV_PASSWORD = 'changeme'; // replace in prod
 const ADMIN_SHEET_ID = '17lpaLBAL9XidYqiMhKNWRhZdEIqa0OzuVP7SYYc6VfQ';
 const DEV_USERS = ['skhun@dublincleaners.com','ss.sku@protonmail.com'];
+const REVIEW_FOLDER_NAME = 'EAReviewData';
 
 /** Return the spreadsheet used by the app */
 function getSpreadsheet(){
   const ss = SpreadsheetApp.getActive();
   if (ss) return ss;
   return SpreadsheetApp.openById(ADMIN_SHEET_ID);
+}
+
+/** Retrieve or create the Drive folder that stores review data */
+function getReviewFolder(){
+  const folders = DriveApp.getFoldersByName(REVIEW_FOLDER_NAME);
+  if(folders.hasNext()) return folders.next();
+  return DriveApp.createFolder(REVIEW_FOLDER_NAME);
+}
+
+/** Load all review objects from Drive */
+function loadAllReviews(){
+  const folder = getReviewFolder();
+  const files = folder.getFiles();
+  const list = [];
+  while(files.hasNext()){
+    const f = files.next();
+    try{
+      const obj = JSON.parse(f.getBlob().getDataAsString());
+      list.push(obj);
+    }catch(e){
+      // ignore malformed file
+    }
+  }
+  return list;
 }
 
 /** Create salted password hash */
@@ -127,19 +152,11 @@ function loadConfig() {
 function listReviews() {
   const user = getSession();
   if (!user) throw new Error('not auth');
-  const ss = getSpreadsheet();
-  let sheet = ss.getSheetByName(REVIEWS_SHEET);
-  if(!sheet){
-    sheet = ss.insertSheet(REVIEWS_SHEET);
-    sheet.appendRow(['ID','EMPLOYEE_ID','TYPE','DATA','STATUS','TIMESTAMP']);
-  }
-  const rows = sheet.getDataRange().getValues();
+  const all = loadAllReviews();
   const res = [];
-  rows.forEach((r,i)=>{
-    if (i===0) return;
-    const [id, employeeId, type, data, status, ts] = r;
-    if (user.role === 'HR' || user.role === 'DEV' || employeeId == user.id || (user.role === 'MANAGER' && employeeId in getDirectReports(user.id))) {
-      res.push({id:id, employeeId:employeeId, type:type, data:JSON.parse(data||'{}'), status:status, ts:ts});
+  all.forEach(r => {
+    if (user.role === 'HR' || user.role === 'DEV' || r.employeeId == user.id || (user.role === 'MANAGER' && r.employeeId in getDirectReports(user.id))) {
+      res.push(r);
     }
   });
   return res;
@@ -148,16 +165,12 @@ function listReviews() {
 /** Get a specific year's self review for the session user */
 function getReviewByYear(year){
   const user = getSession();
-  if(!user) throw new Error("not auth");
-  const ss = getSpreadsheet();
-  const sheet = ss.getSheetByName(REVIEWS_SHEET);
-  if(!sheet) return null;
-  const rows = sheet.getDataRange().getValues();
-  for(let i=1;i<rows.length;i++){
-    const [id, empId, type, dataStr, status, ts] = rows[i];
-    if(empId == user.id && type === "SELF"){
-      const data = JSON.parse(dataStr || "{}");
-      if(Number(data.year) === Number(year)) return {id:id, employeeId:empId, type:type, data:data, status:status, ts:ts};
+  if(!user) throw new Error('not auth');
+  const all = loadAllReviews();
+  for(let i=0;i<all.length;i++){
+    const r = all[i];
+    if(r.employeeId == user.id && r.type === 'SELF' && Number(r.data.year) === Number(year)){
+      return r;
     }
   }
   return null;
@@ -177,31 +190,32 @@ function getDirectReports(managerId) {
 function saveReview(review) {
   const user = getSession();
   if (!user) throw new Error('not auth');
-  const ss = getSpreadsheet();
-  let sheet = ss.getSheetByName(REVIEWS_SHEET);
-  if (!sheet) {
-    sheet = ss.insertSheet(REVIEWS_SHEET);
-    sheet.appendRow(['ID','EMPLOYEE_ID','TYPE','DATA','STATUS','TIMESTAMP']);
-  }
-  const rows = sheet.getDataRange().getValues();
-  let rowIndex = -1;
-  for (let i=1;i<rows.length;i++) {
-    const [id, emp, type, dataStr] = rows[i];
-    const data = JSON.parse(dataStr||'{}');
-    if(id==review.id || (emp==review.employeeId && type==review.type && data.year==review.data.year)) {
-      rowIndex = i;
-      review.id = id;
-      break;
+  const folder = getReviewFolder();
+  let file = null;
+  if(review.id){
+    const files = folder.getFilesByName(review.id + '.json');
+    if(files.hasNext()) file = files.next();
+  } else {
+    const files = folder.getFiles();
+    while(files.hasNext()){
+      const f = files.next();
+      try{
+        const data = JSON.parse(f.getBlob().getDataAsString());
+        if(data.employeeId == review.employeeId && data.type == review.type && data.data.year == review.data.year){
+          file = f;
+          review.id = data.id;
+          break;
+        }
+      }catch(e){}
     }
   }
-  const dataStr = JSON.stringify(review.data);
-  if (rowIndex>0) {
-    sheet.getRange(rowIndex+1,3,1,3).setValues([[review.type,dataStr,review.status]]);
-    sheet.getRange(rowIndex+1,6).setValue(new Date());
+  review.ts = new Date();
+  const content = JSON.stringify(review);
+  if(file){
+    file.setContent(content);
   } else {
-    const id = new Date().getTime();
-    sheet.appendRow([id, review.employeeId, review.type, dataStr, review.status, new Date()]);
-    review.id = id;
+    review.id = review.id || new Date().getTime();
+    folder.createFile(review.id + '.json', content, 'application/json');
   }
   return review;
 }
@@ -237,33 +251,32 @@ function scheduleMeeting(mtg) {
 function getDashboard() {
   const user = getSession();
   if (!user || (user.role !== 'HR' && user.role !== 'DEV')) throw new Error('denied');
-  const ss = getSpreadsheet();
-  const sheet = ss.getSheetByName(REVIEWS_SHEET);
-  const rows = sheet.getDataRange().getValues();
-  let completed = 0; let total = 0;
+  const reviews = loadAllReviews();
+  let completed = 0; let total = reviews.length;
   const scores = {};
-  rows.forEach((r,i)=>{
-    if (i===0) return;
-    const data = JSON.parse(r[3]||'{}');
-    if (r[4]==='FINAL') completed++;
-    total++;
+  reviews.forEach(r=>{
+    const data = r.data || {};
+    if (r.status === 'FINAL') completed++;
     Object.keys(data).forEach(k=>{
-      scores[k]=scores[k]||[]; scores[k].push(+data[k].score||0);
+      scores[k]=scores[k]||[];
+      scores[k].push(+data[k].score||0);
     });
   });
   const avgScores = {};
   Object.keys(scores).forEach(k=>{
     const arr=scores[k]; avgScores[k]=arr.reduce((a,b)=>a+b,0)/arr.length;
   });
-  return {completion: completed/total, avgScores: avgScores};
+  return {completion: total ? completed/total : 0, avgScores: avgScores};
 }
 
 /** Export reviews CSV */
 function exportCSV() {
-  const ss = getSpreadsheet();
-  const sheet = ss.getSheetByName(REVIEWS_SHEET);
-  const csv = sheet.getDataRange().getDisplayValues().map(r=>r.join(',')).join('\n');
-  return csv;
+  const reviews = loadAllReviews();
+  const header = ['ID','EMPLOYEE_ID','TYPE','DATA','STATUS','TIMESTAMP'];
+  const rows = reviews.map(r=>[r.id,r.employeeId,r.type,JSON.stringify(r.data),r.status,r.ts]);
+  const csvRows = [header.join(',')];
+  rows.forEach(r=>{ csvRows.push(r.join(',')); });
+  return csvRows.join('\n');
 }
 
 /** Simple admin to add user (DEV only) */
@@ -303,21 +316,18 @@ function addNewUser(user) {
 /** Trigger daily to send reminders */
 function dailyNotifications() {
   const ss = getSpreadsheet();
-  const reviewSheet = ss.getSheetByName(REVIEWS_SHEET);
   const usersSheet = ss.getSheetByName(USERS_SHEET);
-  const reviews = reviewSheet.getDataRange().getValues();
   const users = usersSheet.getDataRange().getValues();
   const userMap = {};
   users.forEach((r,i)=>{ if(i>0) userMap[r[0]]=r; });
 
+  const reviews = loadAllReviews();
   const now = new Date();
-  reviews.forEach((r,i)=>{
-    if(i===0) return;
-    const [id, employeeId, type, data, status, ts] = r;
-    const user = userMap[employeeId];
+  reviews.forEach(r=>{
+    const user = userMap[r.employeeId];
     if(!user) return;
-    if(type==='SELF' && status!=='FINAL'){
-      const openDate = new Date(ts);
+    if(r.type==='SELF' && r.status!=='FINAL'){
+      const openDate = new Date(r.ts);
       if((now-openDate)/(1000*60*60*24) > 7){
         GmailApp.sendEmail(user[1], 'Reminder to submit self-review', 'Please submit your self-review.');
       }
@@ -371,17 +381,19 @@ function saveCompAdjustment(reviewId, adj) {
 function saveFinalExpectation(reviewId, exp) {
   const user = getSession();
   if (!user) throw new Error('not auth');
-  const ss = getSpreadsheet();
-  const sheet = ss.getSheetByName(REVIEWS_SHEET);
-  const rows = sheet.getDataRange().getValues();
-  for(let i=1;i<rows.length;i++){
-    if(rows[i][0]==reviewId){
-      const data = JSON.parse(rows[i][3]||'{}');
-      data.finalExpectation = exp;
-      sheet.getRange(i+1,4).setValue(JSON.stringify(data));
-      sheet.getRange(i+1,6).setValue(new Date());
-      return true;
-    }
+  const folder = getReviewFolder();
+  const files = folder.getFilesByName(reviewId + '.json');
+  if(!files.hasNext()) throw new Error('review not found');
+  const file = files.next();
+  let data;
+  try{
+    data = JSON.parse(file.getBlob().getDataAsString());
+  }catch(e){
+    data = {id:reviewId};
   }
-  throw new Error('review not found');
+  data.data = data.data || {};
+  data.data.finalExpectation = exp;
+  data.ts = new Date();
+  file.setContent(JSON.stringify(data));
+  return true;
 }
