@@ -73,6 +73,7 @@ function applyTranslations(){
 function init(){
   show('home');
   applyTranslations();
+  loadQuestions();
   google.script.run.withSuccessHandler(c=>{config=c;loadSession();}).loadConfig();
 }
 function loadSession(){
