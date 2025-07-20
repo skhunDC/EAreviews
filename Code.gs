@@ -12,22 +12,47 @@ const DEV_PASSWORD = 'changeme'; // replace in prod
 const ADMIN_SHEET_ID = '17lpaLBAL9XidYqiMhKNWRhZdEIqa0OzuVP7SYYc6VfQ';
 const DEV_USERS = ['skhun@dublincleaners.com','ss.sku@protonmail.com'];
 
+/** Create salted password hash */
+function createHash(pwd) {
+  const salt = Utilities.getUuid();
+  const digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, salt + pwd, Utilities.Charset.UTF_8);
+  const hashHex = digest.map(b=>('0'+(b&0xff).toString(16)).slice(-2)).join('');
+  return {saltHex:salt, hashHex:hashHex};
+}
+
+/** Verify password against stored salt/hash */
+function verifyPwd(pwd, salt, hash) {
+  const digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, salt + pwd, Utilities.Charset.UTF_8);
+  const hex = digest.map(b=>('0'+(b&0xff).toString(16)).slice(-2)).join('');
+  return hex === hash;
+}
+
+/** Create session token and store */
+function createSession(uid) {
+  const token = Utilities.getUuid();
+  const cache = CacheService.getScriptCache();
+  cache.put('sid_'+token, uid, SESSION_DURATION);
+  PropertiesService.getScriptProperties().setProperty('sid_'+token, uid);
+  return token;
+}
+
 /** Serve the web app */
 function doGet() {
   return HtmlService.createHtmlOutputFromFile('index');
 }
 
 /** Authenticate user by email */
-function login(email) {
+function login(email, pwd) {
   const ss = SpreadsheetApp.getActive();
   const sheet = ss.getSheetByName(USERS_SHEET);
   const rows = sheet.getDataRange().getValues();
   for (let i = 1; i < rows.length; i++) {
-    const [id, em, name, role, managerId, lang] = rows[i];
-    if (em === email) {
+    const [id, em, name, role, managerId, lang, hash, salt] = rows[i];
+    if (em === email && verifyPwd(pwd, salt, hash)) {
       const cache = CacheService.getUserCache();
       cache.put(CACHE_KEY, JSON.stringify({id:id, email:em, name:name, role:role, managerId:managerId, lang:lang}), SESSION_DURATION);
-      return {success:true, user:{id:id,email:em,name:name,role:role,lang:lang}};
+      const token = createSession(id);
+      return {success:true, token:token, user:{id:id,email:em,name:name,role:role,lang:lang}};
     }
   }
   return {success:false};
@@ -217,12 +242,11 @@ function isAuthorizedDev() {
 /** Admin panel API to add simple user entry */
 function addNewUser(user) {
   if (!isAuthorizedDev()) throw new Error('denied');
-  const ss = SpreadsheetApp.openById(ADMIN_SHEET_ID);
-  const sheet = ss.getSheets()[0];
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(['Email','Role','CreatedAt']);
-  }
-  sheet.appendRow([user.email, user.role, new Date()]);
+  const ss = SpreadsheetApp.getActive();
+  const sheet = ss.getSheetByName(USERS_SHEET);
+  const id = new Date().getTime();
+  const h = createHash(user.password);
+  sheet.appendRow([id, user.email, user.name || '', user.role, user.managerId || '', user.lang || 'en', h.hashHex, h.saltHex, new Date()]);
   return true;
 }
 
