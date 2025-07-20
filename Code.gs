@@ -22,7 +22,7 @@ function login(email, password) {
     const [id, em, name, role, managerId, lang, salt, hash] = rows[i];
     if (em === email) {
       const sha = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, salt + password);
-      const hashStr = sha.map(function(b){return ('0' + (b & 0xFF).toString(16)).slice(-2);}).join('');
+      const hashStr = Array.from(sha, b => ('0' + (b & 0xFF).toString(16)).slice(-2)).join('');
       if (hashStr === hash) {
         const cache = CacheService.getUserCache();
         cache.put(CACHE_KEY, JSON.stringify({id:id, email:em, name:name, role:role, managerId:managerId, lang:lang}), SESSION_DURATION);
@@ -191,7 +191,7 @@ function addUser(user) {
   const sheet = ss.getSheetByName(USERS_SHEET);
   const salt = Utilities.getUuid();
   const sha = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, salt + user.password);
-  const hash = sha.map(function(b){return ('0' + (b & 0xFF).toString(16)).slice(-2);}).join('');
+  const hash = Array.from(sha, b => ('0' + (b & 0xFF).toString(16)).slice(-2)).join('');
   const id = new Date().getTime();
   sheet.appendRow([id, user.email, user.name, user.role, user.managerId||'', user.lang||'en', salt, hash]);
 }
