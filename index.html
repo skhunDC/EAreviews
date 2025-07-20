@@ -20,8 +20,34 @@ let user=null,config={},lang='en';
 function t(key){return (config[key]?config[key][lang]||key:key);} 
 function show(id){document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');}
 function init(){google.script.run.withSuccessHandler(c=>{config=c;loadSession();}).loadConfig();}
-function loadSession(){google.script.run.withSuccessHandler(u=>{if(u){user=u;lang=u.lang;document.getElementById('langBtn').textContent=lang.toUpperCase();loadReviews();}else{document.getElementById('login').classList.remove('hidden');}}).getSession();}
-function login(){const e=document.getElementById('email').value;const p=document.getElementById('pw').value;google.script.run.withSuccessHandler(r=>{if(r.success){user=r.user;lang=user.lang;document.getElementById('login').classList.add('hidden');loadReviews();}else{alert('login fail');}}).login(e,p);}
+function loadSession(){
+  google.script.run.withSuccessHandler(u=>{
+    if(u){
+      user=u;
+      lang=u.lang;
+      document.getElementById('langBtn').textContent=lang.toUpperCase();
+      loadReviews();
+      show('home');
+    }else{
+      document.getElementById('login').classList.remove('hidden');
+    }
+  }).getSession();
+}
+function login(){
+  const e=document.getElementById('email').value;
+  const p=document.getElementById('pw').value;
+  google.script.run.withSuccessHandler(r=>{
+    if(r.success){
+      user=r.user;
+      lang=user.lang;
+      document.getElementById('login').classList.add('hidden');
+      loadReviews();
+      show('home');
+    }else{
+      alert('login fail');
+    }
+  }).login(e,p);
+}
 function saveLang(){lang=lang==='en'?'es':'en';google.script.run.saveLang(lang);localStorage.setItem('lang',lang);document.getElementById('langBtn').textContent=lang.toUpperCase();renderReviews();}
 let reviews=[];
 function loadReviews(){google.script.run.withSuccessHandler(r=>{reviews=r;renderReviews();}).listReviews();}
