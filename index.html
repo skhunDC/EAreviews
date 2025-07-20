@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Employee Reviews</title>
+<style>
+body{font-family:Roboto,Arial,sans-serif;margin:0;padding:0;background:#fafafa;color:#333;}
+nav{display:flex;gap:10px;background:#6200ee;color:white;padding:10px;}
+nav button{background:none;border:none;color:white;font-size:16px;cursor:pointer;padding:6px 12px;}
+section{padding:20px;}
+.card{background:white;padding:15px;margin-bottom:10px;border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,0.2);} 
+.hidden{display:none;}
+label{display:block;margin-top:10px;}
+input[type=text],textarea{width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:4px;}
+select{padding:8px;}
+button.primary{background:#6200ee;color:white;border:none;border-radius:4px;padding:8px 16px;cursor:pointer;}
+</style>
+<script>
+let user=null,config={},lang='en';
+function t(key){return (config[key]?config[key][lang]||key:key);} 
+function show(id){document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');}
+function init(){google.script.run.withSuccessHandler(c=>{config=c;loadSession();}).loadConfig();}
+function loadSession(){google.script.run.withSuccessHandler(u=>{if(u){user=u;lang=u.lang;document.getElementById('langBtn').textContent=lang.toUpperCase();loadReviews();}else{document.getElementById('login').classList.remove('hidden');}}).getSession();}
+function login(){const e=document.getElementById('email').value;const p=document.getElementById('pw').value;google.script.run.withSuccessHandler(r=>{if(r.success){user=r.user;lang=user.lang;document.getElementById('login').classList.add('hidden');loadReviews();}else{alert('login fail');}}).login(e,p);}
+function saveLang(){lang=lang==='en'?'es':'en';google.script.run.saveLang(lang);localStorage.setItem('lang',lang);document.getElementById('langBtn').textContent=lang.toUpperCase();renderReviews();}
+let reviews=[];
+function loadReviews(){google.script.run.withSuccessHandler(r=>{reviews=r;renderReviews();}).listReviews();}
+function renderReviews(){const c=document.getElementById('reviews');c.innerHTML='';reviews.forEach(rv=>{const div=document.createElement('div');div.className='card';div.innerHTML='<b>'+rv.type+'</b> '+rv.status+'<br>'+JSON.stringify(rv.data);c.appendChild(div);});}
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</head>
+<body>
+<nav>
+<button onclick="show('home')">Home</button>
+<button onclick="show('schedule')">Schedule</button>
+<button id="langBtn" onclick="saveLang()">EN</button>
+</nav>
+<section id="home" class="hidden">
+<div id="reviews"></div>
+</section>
+<section id="schedule" class="hidden">
+<p>Coming soon...</p>
+</section>
+<div id="login" class="hidden">
+<label>Email<input type="text" id="email"></label>
+<label>Password<input type="password" id="pw"></label>
+<button class="primary" onclick="login()">Login</button>
+</div>
+</body>
+</html>
