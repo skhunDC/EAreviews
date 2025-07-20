@@ -57,7 +57,7 @@ const translations={
     home:'Home',reviews:'Reviews',schedule:'Schedule',navTitle:'Employee Annual Reviews',
     welcomeTitle:'Welcome to the Employee Review Portal',
     welcomeMsg:'Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.',
-    comingSoon:'Coming soon...',email:'Email',password:'Password',login:'Login',loginFail:'login fail',
+    comingSoon:'Coming soon...',userId:'User ID',password:'Password',login:'Login',logout:'Logout',loginFail:'login fail',
     curWage:'Current Wage',newWage:'New Wage',pctIncrease:'% Increase:',
     finalExpTitle:'Final Performance Expectation',belowExp:'Below Expectations',meetsExp:'Meets Expectations',exceedsExp:'Exceeds Expectations',
     below:'Below',meets:'Meets',exceeds:'Exceeds',
@@ -68,7 +68,7 @@ const translations={
     home:'Inicio',reviews:'Reseñas',schedule:'Agenda',navTitle:'Revisiones Anuales de Empleados',
     welcomeTitle:'Bienvenido al Portal de Evaluaciones',
     welcomeMsg:'Seleccione una opción en la barra de navegación para ver sus evaluaciones o programar una reunión. Use el botón de idioma para cambiar entre inglés y español.',
-    comingSoon:'Próximamente...',email:'Correo electrónico',password:'Contraseña',login:'Iniciar sesión',loginFail:'Error al iniciar sesión',
+    comingSoon:'Próximamente...',userId:'ID de usuario',password:'Contraseña',login:'Iniciar sesión',logout:'Cerrar sesión',loginFail:'Error al iniciar sesión',
     curWage:'Salario actual',newWage:'Nuevo salario',pctIncrease:'% Aumento:',
     finalExpTitle:'Expectativa de desempeño final',belowExp:'Debajo de las expectativas',meetsExp:'Cumple con las expectativas',exceedsExp:'Supera las expectativas',
     below:'Debajo',meets:'Cumple',exceeds:'Supera',
@@ -112,6 +112,8 @@ function applyTranslations(){
   });
   const toggle=document.getElementById('langToggle');
   if(toggle)toggle.checked=lang==='es';
+  const loginBtn=document.getElementById('navLoginBtn');
+  if(loginBtn)loginBtn.textContent=user?t('logout'):t('login');
 }
 function init(){
   show('home');
@@ -130,14 +132,13 @@ function loadSession(){
       loadReviews();
       show('home');
     }else{
-      document.getElementById('login').classList.remove('hidden');
       applyTranslations();
       showDevButton();
     }
   }).getSession();
 }
 function login(){
-  const e=document.getElementById('email').value;
+  const e=document.getElementById('userId').value;
   const p=document.getElementById('password').value;
   google.script.run.withSuccessHandler(r=>{
     if(r.success){
@@ -145,6 +146,7 @@ function login(){
       lang=user.lang;
       localStorage.setItem('lang',lang);
       document.getElementById('login').classList.add('hidden');
+      document.getElementById('navLoginBtn').textContent=t('logout');
       applyTranslations();
       showDevButton();
       loadReviews();
@@ -153,6 +155,19 @@ function login(){
       alert(t('loginFail'));
     }
     }).login(e,p);
+}
+
+function navLogin(){
+  const loginDiv=document.getElementById('login');
+  if(user){
+    google.script.run.logout();
+    user=null;
+    loginDiv.classList.add('hidden');
+    document.getElementById('navLoginBtn').textContent=t('login');
+    show('home');
+  }else{
+    loginDiv.classList.toggle('hidden');
+  }
 }
 function toggleLang(){
   lang=document.getElementById('langToggle').checked?'es':'en';
@@ -283,20 +298,20 @@ function submitReview(){
 }
 
 function addNewUser(){
-  const em=document.getElementById('newUserEmail').value;
+  const uid=document.getElementById('newUserId').value;
   const role=document.getElementById('newUserRole').value;
   const pwd=document.getElementById('newUserPwd').value;
   google.script.run
     .withSuccessHandler(()=>{
       alert('Account created');
-      document.getElementById('newUserEmail').value='';
+      document.getElementById('newUserId').value='';
       document.getElementById('newUserRole').value='';
       document.getElementById('newUserPwd').value='';
     })
     .withFailureHandler(err=>{
       alert('Failed to create account: '+err.message);
     })
-    .addNewUser({email:em,role:role,password:pwd});
+    .addNewUser({userId:uid,role:role,password:pwd});
 }
 document.addEventListener('DOMContentLoaded',init);
 </script>
@@ -313,6 +328,7 @@ document.addEventListener('DOMContentLoaded',init);
   <label class="switch"><input type="checkbox" id="langToggle" onchange="toggleLang()"><span class="slider"></span></label>
   <span>ES</span>
 </div>
+<button id="navLoginBtn" onclick="navLogin()">Login</button>
 <button id="devBtn" onclick="openDevPanel()">Dev</button>
 </nav>
 <div id="loadingBar" class="loading-bar hidden"><span></span></div>
@@ -348,13 +364,13 @@ document.addEventListener('DOMContentLoaded',init);
 </section>
 <section id="devPanel" class="hidden">
   <h3>Admin Panel</h3>
-  <label>Email<input type="text" id="newUserEmail"></label>
+  <label>UserID<input type="text" id="newUserId"></label>
   <label>Role<input type="text" id="newUserRole"></label>
   <label>Password<input type="password" id="newUserPwd"></label>
   <button class="primary" onclick="addNewUser()">Add User</button>
 </section>
 <div id="login" class="hidden">
-<label><span data-i18n-key="email">Email</span><input type="text" id="email" data-i18n-key="email" data-i18n-placeholder></label>
+<label><span data-i18n-key="userId">User ID</span><input type="text" id="userId" data-i18n-key="userId" data-i18n-placeholder></label>
 <label><span data-i18n-key="password">Password</span><input type="password" id="password" data-i18n-key="password" data-i18n-placeholder></label>
 <button class="primary" onclick="login()" data-i18n-key="login">Login</button>
 </div>

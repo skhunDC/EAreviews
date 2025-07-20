@@ -41,18 +41,18 @@ function doGet() {
   return HtmlService.createHtmlOutputFromFile('index');
 }
 
-/** Authenticate user by email */
-function login(email, pwd) {
+/** Authenticate user by user ID */
+function login(userId, pwd) {
   const ss = SpreadsheetApp.getActive();
   const sheet = ss.getSheetByName(USERS_SHEET);
   const rows = sheet.getDataRange().getValues();
   for (let i = 1; i < rows.length; i++) {
-    const [id, em, name, role, managerId, lang, hash, salt] = rows[i];
-    if (em === email && verifyPwd(pwd, salt, hash)) {
+    const [id, uid, name, role, managerId, lang, hash, salt] = rows[i];
+    if (uid === userId && verifyPwd(pwd, salt, hash)) {
       const cache = CacheService.getUserCache();
-      cache.put(CACHE_KEY, JSON.stringify({id:id, email:em, name:name, role:role, managerId:managerId, lang:lang}), SESSION_DURATION);
+      cache.put(CACHE_KEY, JSON.stringify({id:id, userId:uid, name:name, role:role, managerId:managerId, lang:lang}), SESSION_DURATION);
       const token = createSession(id);
-      return {success:true, token:token, user:{id:id,email:em,name:name,role:role,lang:lang}};
+      return {success:true, token:token, user:{id:id,userId:uid,name:name,role:role,lang:lang}};
     }
   }
   return {success:false};
@@ -74,9 +74,9 @@ function getSession() {
     const sheet = ss.getSheetByName(USERS_SHEET);
     const rows = sheet.getDataRange().getValues();
     for (let i = 1; i < rows.length; i++) {
-      const [id, em, name, role, managerId, lang] = rows[i];
-      if (em === email) {
-        const user = {id:id,email:em,name:name,role:role,managerId:managerId,lang:lang};
+      const [id, uid, name, role, managerId, lang] = rows[i];
+      if (uid === email) {
+        const user = {id:id,userId:uid,name:name,role:role,managerId:managerId,lang:lang};
         cache.put(CACHE_KEY, JSON.stringify(user), SESSION_DURATION);
         return user;
       }
@@ -230,7 +230,7 @@ function addUser(user) {
   const ss = SpreadsheetApp.getActive();
   const sheet = ss.getSheetByName(USERS_SHEET);
   const id = new Date().getTime();
-  sheet.appendRow([id, user.email, user.name, user.role, user.managerId||'', user.lang||'en']);
+  sheet.appendRow([id, user.userId, user.name, user.role, user.managerId||'', user.lang||'en']);
 }
 
 /** Check if session user is in DEV_USERS */
@@ -242,7 +242,7 @@ function isAuthorizedDev() {
 /** Admin panel API to add simple user entry */
 function addNewUser(user) {
   if (!isAuthorizedDev()) throw new Error('denied');
-  if (!user.email || !user.password || !user.role) {
+  if (!user.userId || !user.password || !user.role) {
     throw new Error('missing required fields');
   }
   const ss = SpreadsheetApp.openById(ADMIN_SHEET_ID);
@@ -253,7 +253,7 @@ function addNewUser(user) {
   }
   const id = new Date().getTime();
   const h = createHash(user.password);
-  sheet.appendRow([id, user.email, user.name || '', user.role, user.managerId || '', user.lang || 'en', h.hashHex, h.saltHex, new Date()]);
+  sheet.appendRow([id, user.userId, user.name || '', user.role, user.managerId || '', user.lang || 'en', h.hashHex, h.saltHex, new Date()]);
   return {id:id};
 }
 
