@@ -32,6 +32,7 @@ button.primary{background:#6200ee;color:white;border:none;border-radius:4px;padd
 <script>
 let user=null,config={},lang=localStorage.getItem('lang')||'en';
 let loadingReviews=false;
+let pendingSection=null;
 
 const defaultQuestions=[
   {id:'attendance',en:'Attendance & Punctuality',es:'Asistencia y Puntualidad',extras:[
@@ -94,9 +95,17 @@ function stopLoading(){
   loadingReviews=false;
 }
 function show(id){
+  if((id==='reviews' || id==='schedule') && !user){
+    pendingSection=id;
+    document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
+    document.getElementById('login').classList.remove('hidden');
+    return;
+  }
+  document.getElementById('login').classList.add('hidden');
   document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
   if(id==='reviews'){
     startLoading();
+    if(user) loadReviews();
     loadQuestions();
   }else{
     document.getElementById(id).classList.remove('hidden');
@@ -150,7 +159,9 @@ function login(){
       applyTranslations();
       showDevButton();
       loadReviews();
-      show('home');
+      const target=pendingSection||'home';
+      pendingSection=null;
+      show(target);
     }else{
       alert(t('loginFail'));
     }
@@ -257,12 +268,50 @@ function renderQuestionList(){
     div.innerHTML=html;
     qd.appendChild(div);
   });
+  fillSavedAnswers();
   if(user&&user.role&&(['MANAGER','HR','DEV'].indexOf(user.role)!==-1)){
     document.getElementById('compAdjust').classList.remove('hidden');
   }
   if(loadingReviews){
     document.getElementById('reviews').classList.remove('hidden');
     stopLoading();
+  }
+}
+
+function fillSavedAnswers(){
+  if(!user||!reviews||!reviews.length) return;
+  const rev=reviews.find(r=>r.type==='SELF'&&r.employeeId==user.id);
+  if(!rev||!rev.data||!rev.data.answers) return;
+  const ans=rev.data.answers;
+  Object.keys(ans).forEach(qid=>{
+    const qDiv=document.querySelector('#questionList .q[data-id="'+qid+'"]');
+    if(!qDiv) return;
+    const val=ans[qid];
+    if(val.score){
+      const radio=qDiv.querySelector('input.rating[value="'+val.score+'"]');
+      if(radio) radio.checked=true;
+    }
+    if(val.extra!==undefined){
+      if(typeof val.extra==='object'){
+        Object.keys(val.extra).forEach(k=>{
+          const el=qDiv.querySelector('.extra[data-sub="'+k+'"]');
+          if(el) el.value=val.extra[k];
+        });
+      }else{
+        const el=qDiv.querySelector('.extra');
+        if(el) el.value=val.extra;
+      }
+    }
+  });
+  if(rev.data.finalExpectation){
+    const fe=rev.data.finalExpectation;
+    if(fe.result){
+      const r=document.querySelector('#finalBlock input[name=finalExp][value="'+fe.result+'"]');
+      if(r) r.checked=true;
+    }
+    if(fe.notes) document.getElementById('finalNotes').value=fe.notes;
+    if(fe.empSign) document.getElementById('empSign').value=fe.empSign.name||'';
+    if(fe.mgrSign) document.getElementById('mgrSign').value=fe.mgrSign.name||'';
   }
 }
 function calcPct(){const c=parseFloat(document.getElementById('curWage').value||0);const n=parseFloat(document.getElementById('newWage').value||0);const pct=document.getElementById('pctInc');pct.textContent=c?(((n-c)/c)*100).toFixed(2):'0';}
