@@ -20,9 +20,9 @@ let user=null,config={},lang=localStorage.getItem('lang')||'en';
 
 const defaultQuestions=[
   {id:'attendance',en:'Attendance & Punctuality',es:'Asistencia y Puntualidad',extras:[
-    {id:'absences',label:'Absences without notice (days)',type:'number'},
-    {id:'late',label:'Late arrivals (days)',type:'number'},
-    {id:'comments',label:'Comments',type:'textarea'}]},
+    {id:'absences',label:'Absences without notice (days)',label_es:'Ausencias sin aviso (días)',type:'number'},
+    {id:'late',label:'Late arrivals (days)',label_es:'Llegadas tarde (días)',type:'number'},
+    {id:'comments',label:'Comments',label_es:'Comentarios',type:'textarea'}]},
   {id:'performance',en:'Performance Improvements: What did you do more, better, or more efficiently last year, up till now?',es:'Mejoras de rendimiento',extra:'textarea'},
   {id:'values',en:'Living Our Core Values: How have you embodied our core values? Provide specific examples.',es:'Vivir nuestros valores',extra:'textarea'},
   {id:'growth',en:'Personal Growth: How did you improve your knowledge or skills last year, up till now?',es:'Crecimiento personal',extra:'textarea'},
@@ -33,13 +33,29 @@ const defaultQuestions=[
   {id:'proactive',en:'Proactive Contributions: How did you proactively use downtime to tackle additional tasks?',es:'Contribuciones proactivas',extra:'textarea'},
   {id:'innovation',en:'Innovation & Process Improvement: Have you suggested or implemented improvements to our processes, services, or workplace? Describe your idea and its impact.',es:'Innovaci\u00f3n y mejora de procesos',extra:'textarea'},
   {id:'crossshadow',en:'Cross Shadowing Program Participation',es:'Programa Cross Shadowing',rating:false,extras:[
-    {id:'participation',label:'Did you participate? (Yes/No/Partial)',type:'select',options:['Yes','No','Partial']},
-    {id:'comments',label:'Comments',type:'textarea'}]},
+    {id:'participation',label:'Did you participate? (Yes/No/Partial)',label_es:'¿Participaste? (Sí/No/Parcial)',type:'select',options:['Yes','No','Partial']},
+    {id:'comments',label:'Comments',label_es:'Comentarios',type:'textarea'}]},
   {id:'future',en:'Future Interests: Is there another role or skill you\u2019d like to explore in the future?',es:'Intereses futuros',rating:false,extra:'textarea'}
 ];
 const translations={
-  en:{home:'Home',reviews:'Reviews',schedule:'Schedule',welcomeTitle:'Welcome to the Employee Review Portal',welcomeMsg:'Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.',comingSoon:'Coming soon...',email:'Email',password:'Password',login:'Login',loginFail:'login fail'},
-  es:{home:'Inicio',reviews:'Reseñas',schedule:'Agenda',welcomeTitle:'Bienvenido al Portal de Evaluaciones',welcomeMsg:'Seleccione una opción en la barra de navegación para ver sus evaluaciones o programar una reunión. Use el botón de idioma para cambiar entre inglés y español.',comingSoon:'Próximamente...',email:'Correo electrónico',password:'Contraseña',login:'Iniciar sesión',loginFail:'Error al iniciar sesión'}
+  en:{
+    home:'Home',reviews:'Reviews',schedule:'Schedule',
+    welcomeTitle:'Welcome to the Employee Review Portal',
+    welcomeMsg:'Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.',
+    comingSoon:'Coming soon...',email:'Email',password:'Password',login:'Login',loginFail:'login fail',
+    curWage:'Current Wage',newWage:'New Wage',pctIncrease:'% Increase:',
+    finalExpTitle:'Final Performance Expectation',belowExp:'Below Expectations',meetsExp:'Meets Expectations',exceedsExp:'Exceeds Expectations',notesPlaceholder:'Notes',contactQuestions:'Contact Sea Khun with questions.',empSignature:'Employee Signature',mgrSignature:'Manager Signature',submitReview:'Submit Review',
+    intro:`<b>Dublin Cleaners 2025 Employee Annual Reviews – Your Opportunity to Shine</b><br><b>Purpose</b> – Highlight achievements, live our core values, and explain why you deserve a pay increase while receiving growth feedback.<br><b>Core Values</b> Accountable · Attention to Details · Team Player · Tactical Risk Taker · Better than Yesterday · Value Reputation<br><b>Rating System</b> 1 = Below Expectations · 2 = Meets Expectations · 3 = Exceeds Expectations (Attendance &amp; punctuality, Q1, is weighted higher)<br><b>Review Process</b> July reviews → submit form → Manager/Assistant adds notes → schedule 20-min meeting (half-hour slots) ≥ 1 week after submission. Schedule outside regular hours; compensated if on day off/outside shift.<br>Please Message HR about how long your meeting was so they can Add your hours into UKG<br><b>Raises take effect on the first pay period in August.</b>`
+  },
+  es:{
+    home:'Inicio',reviews:'Reseñas',schedule:'Agenda',
+    welcomeTitle:'Bienvenido al Portal de Evaluaciones',
+    welcomeMsg:'Seleccione una opción en la barra de navegación para ver sus evaluaciones o programar una reunión. Use el botón de idioma para cambiar entre inglés y español.',
+    comingSoon:'Próximamente...',email:'Correo electrónico',password:'Contraseña',login:'Iniciar sesión',loginFail:'Error al iniciar sesión',
+    curWage:'Salario actual',newWage:'Nuevo salario',pctIncrease:'% Aumento:',
+    finalExpTitle:'Expectativa de desempeño final',belowExp:'Debajo de las expectativas',meetsExp:'Cumple con las expectativas',exceedsExp:'Supera las expectativas',notesPlaceholder:'Notas',contactQuestions:'Contacte a Sea Khun con preguntas.',empSignature:'Firma del empleado',mgrSignature:'Firma del gerente',submitReview:'Enviar revisión',
+    intro:`<b>Dublin Cleaners Evaluaciones Anuales de Empleados 2025 – Tu oportunidad para destacar</b><br><b>Propósito</b> – Destacar logros, vivir nuestros valores fundamentales y explicar por qué mereces un aumento mientras recibes comentarios para crecer.<br><b>Valores fundamentales</b> Responsabilidad · Atención al detalle · Trabajo en equipo · Tomador de riesgos táctico · Mejor que ayer · Valorar la reputación<br><b>Sistema de calificación</b> 1 = Por debajo de las expectativas · 2 = Cumple con las expectativas · 3 = Supera las expectativas (Asistencia y puntualidad, P1, tiene mayor peso)<br><b>Proceso de revisión</b> Revisiones de julio → enviar formulario → el gerente/asistente agrega notas → programar una reunión de 20 minutos (bloques de media hora) ≥ 1 semana después de la entrega. Programar fuera del horario habitual; se compensa si es día libre/fuera del turno.<br>Informe a RRHH cuánto duró la reunión para que puedan agregar sus horas a UKG<br><b>Los aumentos entran en vigor en el primer periodo de pago de agosto.</b>`
+  }
 };
 function t(key){
   if(config[key]&&config[key][lang])return config[key][lang];
@@ -50,6 +66,7 @@ function show(id){document.querySelectorAll('section').forEach(s=>s.classList.ad
 function applyTranslations(){
   document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n);});
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{el.placeholder=t(el.dataset.i18nPlaceholder);});
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{el.innerHTML=t(el.dataset.i18nHtml);});
   document.getElementById('langBtn').textContent=lang.toUpperCase();
 }
 function init(){
@@ -117,7 +134,8 @@ function renderQuestionList(){
     }
     if(Array.isArray(q.extras)){
       q.extras.forEach(ex=>{
-        html+='<label>'+ex.label;
+        const lbl=ex['label_'+lang]||ex.label;
+        html+='<label>'+lbl;
         if(ex.type==='textarea')html+='<textarea class="extra" data-sub="'+ex.id+'"></textarea>';
         else if(ex.type==='select'){
           html+='<select class="extra" data-sub="'+ex.id+'">';
@@ -183,34 +201,26 @@ document.addEventListener('DOMContentLoaded',init);
 <div id="reviewsList"></div>
 </section>
 <section id="reviews" class="hidden">
-<div class="card" style="max-height:160px;overflow:auto;">
-<b>Dublin Cleaners 2025 Employee Annual Reviews – Your Opportunity to Shine</b><br>
-<b>Purpose</b> – Highlight achievements, live our core values, and explain why you deserve a pay increase while receiving growth feedback.<br>
-<b>Core Values</b> Accountable · Attention to Details · Team Player · Tactical Risk Taker · Better than Yesterday · Value Reputation<br>
-<b>Rating System</b> 1 = Below Expectations · 2 = Meets Expectations · 3 = Exceeds Expectations (Attendance &amp; punctuality, Q1, is weighted higher)<br>
-<b>Review Process</b> July reviews → submit form → Manager/Assistant adds notes → schedule 20-min meeting (half-hour slots) ≥ 1 week after submission. Schedule outside regular hours; compensated if on day off/outside shift. 
-Please Message HR about how long your meeting was so they can Add your hours into UKG<br>
-<b>Raises take effect on the first pay period in August.</b>
-</div>
+<div class="card" style="max-height:160px;overflow:auto;" data-i18n-html="intro"></div>
 <div id="questionList"></div>
 <div id="compAdjust" class="card hidden">
-<label>Current Wage<input type="number" id="curWage"></label>
-<label>New Wage<input type="number" id="newWage" oninput="calcPct()"></label>
-<div>% Increase: <span id="pctInc">0</span>%</div>
+<label><span data-i18n="curWage">Current Wage</span><input type="number" id="curWage"></label>
+<label><span data-i18n="newWage">New Wage</span><input type="number" id="newWage" oninput="calcPct()"></label>
+<div><span data-i18n="pctIncrease">% Increase:</span> <span id="pctInc">0</span>%</div>
 </div>
 <div id="finalBlock" class="card">
-<p>Final Performance Expectation</p>
-<label><input type="radio" name="finalExp" value="below"> Below Expectations / Debajo</label>
-<label><input type="radio" name="finalExp" value="meets"> Meets Expectations / Cumple</label>
-<label><input type="radio" name="finalExp" value="exceeds"> Exceeds Expectations / Supera</label>
-<textarea id="finalNotes" placeholder="Notes"></textarea>
-<small>Contact Sea Khun with questions.</small>
+<p data-i18n="finalExpTitle">Final Performance Expectation</p>
+<label><input type="radio" name="finalExp" value="below"> <span data-i18n="belowExp">Below Expectations</span></label>
+<label><input type="radio" name="finalExp" value="meets"> <span data-i18n="meetsExp">Meets Expectations</span></label>
+<label><input type="radio" name="finalExp" value="exceeds"> <span data-i18n="exceedsExp">Exceeds Expectations</span></label>
+<textarea id="finalNotes" data-i18n-placeholder="notesPlaceholder" placeholder="Notes"></textarea>
+<small data-i18n="contactQuestions">Contact Sea Khun with questions.</small>
 </div>
 <div class="card">
-<label>Employee Signature<input type="text" id="empSign"></label>
-<label>Manager Signature<input type="text" id="mgrSign"></label>
+<label><span data-i18n="empSignature">Employee Signature</span><input type="text" id="empSign"></label>
+<label><span data-i18n="mgrSignature">Manager Signature</span><input type="text" id="mgrSign"></label>
 </div>
-<button class="primary" onclick="submitReview()">Submit Review</button>
+<button class="primary" onclick="submitReview()" data-i18n="submitReview">Submit Review</button>
 </section>
 <section id="schedule" class="hidden">
 <p data-i18n="comingSoon">Coming soon...</p>
