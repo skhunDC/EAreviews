@@ -44,6 +44,7 @@ let loadingReviews=false;
 let pendingSection=null;
 let currentReviewId=null;
 let selectedYear=new Date().getFullYear();
+let availableYears=[selectedYear];
 
 const defaultQuestions=[
   {id:'attendance',en:'Attendance & Punctuality',es:'Asistencia y Puntualidad',extras:[
@@ -243,9 +244,10 @@ function updateReviewMenu(){
       .map(r=>Number(r.data&&r.data.year))
       .filter(y=>y)
   )];
-  if(!years.includes(Number(selectedYear))) years.push(Number(selectedYear));
-  years.sort();
-  years.forEach(y=>{
+  availableYears=[...new Set([...availableYears,...years])];
+  if(!availableYears.includes(Number(selectedYear))) availableYears.push(Number(selectedYear));
+  availableYears.sort();
+  availableYears.forEach(y=>{
     const b=document.createElement('button');
     b.textContent=y;
     if(y===Number(selectedYear)) b.classList.add('active');
@@ -257,17 +259,22 @@ function updateReviewMenu(){
 
 function selectReviewYear(y){
   selectedYear=y;
+  if(!availableYears.includes(Number(y))) availableYears.push(Number(y));
+  fillSavedAnswers();
   if(typeof google==='undefined'||!google.script||!google.script.run){
-    fillSavedAnswers();
+    updateReviewMenu();
   }else{
-    google.script.run.withSuccessHandler(rv=>{
-      if(rv){
-        reviews=reviews.filter(r=>!(r.type==='SELF'&&r.employeeId==user.id&&Number(r.data.year)==Number(y)));
-        reviews.push(rv);
-      }
-      fillSavedAnswers();
-      updateReviewMenu();
-    }).getReviewByYear(y);
+    google.script.run
+      .withSuccessHandler(rv=>{
+        if(rv){
+          reviews=reviews.filter(r=>!(r.type==='SELF'&&r.employeeId==user.id&&Number(r.data.year)==Number(y)));
+          reviews.push(rv);
+        }
+        fillSavedAnswers();
+        updateReviewMenu();
+      })
+      .withFailureHandler(()=>{updateReviewMenu();})
+      .getReviewByYear(y);
   }
   const menu=document.getElementById('reviewYearsNav');
   if(menu){
