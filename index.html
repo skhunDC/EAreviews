@@ -241,8 +241,13 @@ function updateReviewMenu(){
   if(!menu) return;
   menu.innerHTML='';
   if(!user){menu.style.display='none';return;}
-  const years=[...new Set(reviews.filter(r=>r.type==='SELF'&&r.employeeId==user.id).map(r=>r.data&&r.data.year).filter(y=>y))];
-  if(years.indexOf(selectedYear)===-1) years.push(selectedYear);
+  const years=[...new Set(
+    reviews
+      .filter(r=>r.type==='SELF' && r.employeeId==user.id)
+      .map(r=>Number(r.data&&r.data.year))
+      .filter(y=>y)
+  )];
+  if(!years.includes(Number(selectedYear))) years.push(Number(selectedYear));
   years.sort();
   years.forEach(y=>{
     const b=document.createElement('button');
@@ -355,8 +360,14 @@ function fillSavedAnswers(){
   document.getElementById('mgrSign').value='';
   currentReviewId=null;
   if(!user||!reviews||!reviews.length) return;
-  const rev=reviews.find(r=>r.type==='SELF'&&r.employeeId==user.id&&r.data&&r.data.year==selectedYear);
-  if(!rev||!rev.data||!rev.data.answers) return;
+  const matches=reviews.filter(r=>
+    r.type==='SELF' &&
+    r.employeeId==user.id &&
+    r.data && Number(r.data.year)==Number(selectedYear)
+  );
+  if(!matches.length) return;
+  const rev=matches.sort((a,b)=>new Date(b.ts)-new Date(a.ts))[0];
+  if(!rev.data || !rev.data.answers) return;
   currentReviewId=rev.id;
   const ans=rev.data.answers;
   Object.keys(ans).forEach(qid=>{
