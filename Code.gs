@@ -128,7 +128,11 @@ function listReviews() {
   const user = getSession();
   if (!user) throw new Error('not auth');
   const ss = getSpreadsheet();
-  const sheet = ss.getSheetByName(REVIEWS_SHEET);
+  let sheet = ss.getSheetByName(REVIEWS_SHEET);
+  if(!sheet){
+    sheet = ss.insertSheet(REVIEWS_SHEET);
+    sheet.appendRow(['ID','EMPLOYEE_ID','TYPE','DATA','STATUS','TIMESTAMP']);
+  }
   const rows = sheet.getDataRange().getValues();
   const res = [];
   rows.forEach((r,i)=>{
@@ -156,7 +160,11 @@ function saveReview(review) {
   const user = getSession();
   if (!user) throw new Error('not auth');
   const ss = getSpreadsheet();
-  const sheet = ss.getSheetByName(REVIEWS_SHEET);
+  let sheet = ss.getSheetByName(REVIEWS_SHEET);
+  if (!sheet) {
+    sheet = ss.insertSheet(REVIEWS_SHEET);
+    sheet.appendRow(['ID','EMPLOYEE_ID','TYPE','DATA','STATUS','TIMESTAMP']);
+  }
   const rows = sheet.getDataRange().getValues();
   let rowIndex = -1;
   for (let i=1;i<rows.length;i++) {
