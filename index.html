@@ -30,9 +30,6 @@ button.primary{background:#6200ee;color:white;border:none;border-radius:4px;padd
 .dropdown-content{display:none;position:absolute;top:100%;left:0;background:#6200ee;color:white;min-width:80px;z-index:10;}
 .dropdown-content button{background:none;border:none;color:white;cursor:pointer;display:block;width:100%;padding:6px 12px;text-align:left;}
 .dropdown-content.show{display:block;}
-/* Sub-navigation for review years */
-.subnav{display:flex;gap:10px;background:#ececec;padding:6px;}
-.subnav button.active{background:#6200ee;color:#fff;}
 /* Loading bar styles */
 .loading-bar{height:4px;background:#eee;position:relative;overflow:hidden;}
 .loading-bar span{display:block;height:100%;background:#6200ee;width:100%;animation:loadAnim 1.2s linear infinite;}
@@ -44,7 +41,6 @@ let loadingReviews=false;
 let pendingSection=null;
 let currentReviewId=null;
 let selectedYear=new Date().getFullYear();
-let availableYears=[selectedYear];
 
 const defaultQuestions=[
   {id:'attendance',en:'Attendance & Punctuality',es:'Asistencia y Puntualidad',extras:[
@@ -157,13 +153,11 @@ function loadSession(){
       localStorage.setItem('lang',lang);
       applyTranslations();
       showDevButton();
-      updateReviewMenu();
       loadReviews();
       show('home');
     }else{
       applyTranslations();
       showDevButton();
-      updateReviewMenu();
     }
   }).getSession();
 }
@@ -180,7 +174,6 @@ function login(){
         document.getElementById('navLoginBtn').textContent=t('logout');
         applyTranslations();
         showDevButton();
-        updateReviewMenu();
         loadReviews();
       const target=pendingSection||'reviews';
       pendingSection=null;
@@ -206,7 +199,6 @@ function navLogin(){
     user=null;
     loginDiv.classList.add('hidden');
     document.getElementById('navLoginBtn').textContent=t('login');
-    updateReviewMenu();
     show('home');
   }else{
     loginDiv.classList.toggle('hidden');
@@ -227,63 +219,10 @@ function loadReviews(){
   google.script.run.withSuccessHandler(r=>{
     reviews=r;
     renderReviews();
-    updateReviewMenu();
     fillSavedAnswers();
   }).listReviews();
 }
 function renderReviews(){const c=document.getElementById('reviewsList');if(!c)return;c.innerHTML='';reviews.forEach(rv=>{const div=document.createElement('div');div.className='card';div.innerHTML='<b>'+rv.type+'</b> '+rv.status+'<br>'+JSON.stringify(rv.data);c.appendChild(div);});}
-
-function updateReviewMenu(){
-  const menu=document.getElementById('reviewYearsNav');
-  if(!menu) return;
-  menu.innerHTML='';
-  if(!user){menu.classList.add('hidden');return;}
-  const years=[...new Set(
-    reviews
-      .filter(r=>r.type==='SELF' && r.employeeId==user.id)
-      .map(r=>Number(r.data&&r.data.year))
-      .filter(y=>y)
-  )];
-  availableYears=[...new Set([...availableYears,...years])];
-  if(!availableYears.includes(Number(selectedYear))) availableYears.push(Number(selectedYear));
-  availableYears.sort();
-  availableYears.forEach(y=>{
-    const b=document.createElement('button');
-    b.textContent=y;
-    if(y===Number(selectedYear)) b.classList.add('active');
-    b.onclick=()=>{selectReviewYear(y);};
-    menu.appendChild(b);
-  });
-  menu.classList.remove('hidden');
-}
-
-function selectReviewYear(y){
-  selectedYear=y;
-  if(!availableYears.includes(Number(y))) availableYears.push(Number(y));
-  fillSavedAnswers();
-  if(typeof google==='undefined'||!google.script||!google.script.run){
-    updateReviewMenu();
-  }else{
-    google.script.run
-      .withSuccessHandler(rv=>{
-        if(rv){
-          reviews=reviews.filter(r=>!(r.type==='SELF'&&r.employeeId==user.id&&Number(r.data.year)==Number(y)));
-          reviews.push(rv);
-        }
-        fillSavedAnswers();
-        updateReviewMenu();
-      })
-      .withFailureHandler(()=>{updateReviewMenu();})
-      .getReviewByYear(y);
-  }
-  const menu=document.getElementById('reviewYearsNav');
-  if(menu){
-    menu.classList.remove('show');
-    menu.querySelectorAll('button').forEach(btn=>{
-      btn.classList.toggle('active', Number(btn.textContent)===Number(y));
-    });
-  }
-}
 
 function showDevButton(){
   const btn=document.getElementById('devBtn');
@@ -498,7 +437,6 @@ document.addEventListener('DOMContentLoaded',init);
 <button id="navLoginBtn" onclick="navLogin()">Login</button>
 <button id="devBtn" onclick="openDevPanel()">Dev</button>
 </nav>
-<div id="reviewYearsNav" class="subnav hidden"></div>
 <div id="loadingBar" class="loading-bar hidden"><span></span></div>
 <section id="home" class="hidden">
 <h2 data-i18n-key="welcomeTitle">Welcome to the Employee Review Portal</h2>
