@@ -5,9 +5,11 @@
 <title>Employee Reviews</title>
 <style>
 body{font-family:Roboto,Arial,sans-serif;margin:0;padding:0;background:#fafafa;color:#333;}
-nav{display:flex;gap:10px;background:#6200ee;color:white;padding:10px;}
+nav{display:flex;gap:10px;background:#6200ee;color:white;padding:10px;align-items:center;position:relative;}
 nav button{background:none;border:none;color:white;font-size:16px;cursor:pointer;padding:6px 12px;}
 .lang-switch{display:flex;align-items:center;margin-left:auto;gap:4px;}
+.logo{width:75px;height:75px;}
+.nav-title{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:24px;font-weight:bold;}
 .switch{position:relative;display:inline-block;width:34px;height:18px;}
 .switch input{opacity:0;width:0;height:0;}
 .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#ccc;transition:.4s;border-radius:34px;}
@@ -53,7 +55,7 @@ const defaultQuestions=[
 ];
 const translations={
   en:{
-    home:'Home',reviews:'Reviews',schedule:'Schedule',
+    home:'Home',reviews:'Reviews',schedule:'Schedule',navTitle:'Employee Annual Reviews',
     welcomeTitle:'Welcome to the Employee Review Portal',
     welcomeMsg:'Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.',
     comingSoon:'Coming soon...',email:'Email',password:'Password',login:'Login',loginFail:'login fail',
@@ -64,7 +66,7 @@ const translations={
     intro:`<b>Dublin Cleaners 2025 Employee Annual Reviews – Your Opportunity to Shine</b><br><b>Purpose</b> – Highlight achievements, live our core values, and explain why you deserve a pay increase while receiving growth feedback.<br><b>Core Values</b> Accountable · Attention to Details · Team Player · Tactical Risk Taker · Better than Yesterday · Value Reputation<br><b>Rating System</b> 1 = Below Expectations · 2 = Meets Expectations · 3 = Exceeds Expectations (Attendance &amp; punctuality, Q1, is weighted higher)<br><b>Review Process</b> July reviews → submit form → Manager/Assistant adds notes → schedule 20-min meeting (half-hour slots) ≥ 1 week after submission. Schedule outside regular hours; compensated if on day off/outside shift.<br>Please Message HR about how long your meeting was so they can Add your hours into UKG<br><b>Raises take effect on the first pay period in August.</b>`
   },
   es:{
-    home:'Inicio',reviews:'Reseñas',schedule:'Agenda',
+    home:'Inicio',reviews:'Reseñas',schedule:'Agenda',navTitle:'Revisiones Anuales de Empleados',
     welcomeTitle:'Bienvenido al Portal de Evaluaciones',
     welcomeMsg:'Seleccione una opción en la barra de navegación para ver sus evaluaciones o programar una reunión. Use el botón de idioma para cambiar entre inglés y español.',
     comingSoon:'Próximamente...',email:'Correo electrónico',password:'Contraseña',login:'Iniciar sesión',loginFail:'Error al iniciar sesión',
@@ -284,9 +286,11 @@ document.addEventListener('DOMContentLoaded',init);
 </head>
 <body>
 <nav>
+<img src="https://www.dublincleaners.com/wp-content/uploads/2024/12/Dublin-Logos-stacked.png" alt="Logo" class="logo">
 <button onclick="show('home')" data-i18n-key="home">Home</button>
 <button onclick="show('reviews')" data-i18n-key="reviews">Reviews</button>
 <button onclick="show('schedule')" data-i18n-key="schedule">Schedule</button>
+<div class="nav-title" data-i18n-key="navTitle">Employee Annual Reviews</div>
 <div class="lang-switch">
   <span>EN</span>
   <label class="switch"><input type="checkbox" id="langToggle" onchange="toggleLang()"><span class="slider"></span></label>
