@@ -209,12 +209,14 @@ function saveReview(review) {
       }catch(e){}
     }
   }
+  if(!review.id){
+    review.id = new Date().getTime();
+  }
   review.ts = new Date();
   const content = JSON.stringify(review);
   if(file){
     file.setContent(content);
   } else {
-    review.id = review.id || new Date().getTime();
     folder.createFile(review.id + '.json', content, 'application/json');
   }
   return review;
