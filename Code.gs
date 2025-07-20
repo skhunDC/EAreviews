@@ -145,6 +145,24 @@ function listReviews() {
   return res;
 }
 
+/** Get a specific year's self review for the session user */
+function getReviewByYear(year){
+  const user = getSession();
+  if(!user) throw new Error("not auth");
+  const ss = getSpreadsheet();
+  const sheet = ss.getSheetByName(REVIEWS_SHEET);
+  if(!sheet) return null;
+  const rows = sheet.getDataRange().getValues();
+  for(let i=1;i<rows.length;i++){
+    const [id, empId, type, dataStr, status, ts] = rows[i];
+    if(empId == user.id && type === "SELF"){
+      const data = JSON.parse(dataStr || "{}");
+      if(Number(data.year) === Number(year)) return {id:id, employeeId:empId, type:type, data:data, status:status, ts:ts};
+    }
+  }
+  return null;
+}
+
 /** Helper to get direct reports */
 function getDirectReports(managerId) {
   const ss = getSpreadsheet();
