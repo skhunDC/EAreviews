@@ -30,6 +30,9 @@ button.primary{background:#6200ee;color:white;border:none;border-radius:4px;padd
 .dropdown-content{display:none;position:absolute;top:100%;left:0;background:#6200ee;color:white;min-width:80px;z-index:10;}
 .dropdown-content button{background:none;border:none;color:white;cursor:pointer;display:block;width:100%;padding:6px 12px;text-align:left;}
 .dropdown-content.show{display:block;}
+/* Sub-navigation for review years */
+.subnav{display:flex;gap:10px;background:#ececec;padding:6px;}
+.subnav button.active{background:#6200ee;color:#fff;}
 /* Loading bar styles */
 .loading-bar{height:4px;background:#eee;position:relative;overflow:hidden;}
 .loading-bar span{display:block;height:100%;background:#6200ee;width:100%;animation:loadAnim 1.2s linear infinite;}
@@ -209,11 +212,6 @@ function navLogin(){
   }
 }
 
-function toggleReviewMenu(){
-  show('reviews');
-  const menu=document.getElementById('reviewMenu');
-  if(menu) menu.classList.toggle('show');
-}
 function toggleLang(){
   lang=document.getElementById('langToggle').checked?'es':'en';
   if(user) user.lang=lang;
@@ -235,10 +233,10 @@ function loadReviews(){
 function renderReviews(){const c=document.getElementById('reviewsList');if(!c)return;c.innerHTML='';reviews.forEach(rv=>{const div=document.createElement('div');div.className='card';div.innerHTML='<b>'+rv.type+'</b> '+rv.status+'<br>'+JSON.stringify(rv.data);c.appendChild(div);});}
 
 function updateReviewMenu(){
-  const menu=document.getElementById('reviewMenu');
+  const menu=document.getElementById('reviewYearsNav');
   if(!menu) return;
   menu.innerHTML='';
-  if(!user){menu.style.display='none';return;}
+  if(!user){menu.classList.add('hidden');return;}
   const years=[...new Set(
     reviews
       .filter(r=>r.type==='SELF' && r.employeeId==user.id)
@@ -250,10 +248,11 @@ function updateReviewMenu(){
   years.forEach(y=>{
     const b=document.createElement('button');
     b.textContent=y;
+    if(y===Number(selectedYear)) b.classList.add('active');
     b.onclick=()=>{selectReviewYear(y);};
     menu.appendChild(b);
   });
-  menu.style.display='block';
+  menu.classList.remove('hidden');
 }
 
 function selectReviewYear(y){
@@ -270,8 +269,13 @@ function selectReviewYear(y){
       updateReviewMenu();
     }).getReviewByYear(y);
   }
-  const menu=document.getElementById('reviewMenu');
-  if(menu) menu.classList.remove('show');
+  const menu=document.getElementById('reviewYearsNav');
+  if(menu){
+    menu.classList.remove('show');
+    menu.querySelectorAll('button').forEach(btn=>{
+      btn.classList.toggle('active', Number(btn.textContent)===Number(y));
+    });
+  }
 }
 
 function showDevButton(){
@@ -476,10 +480,7 @@ document.addEventListener('DOMContentLoaded',init);
 <nav>
 <img src="https://www.dublincleaners.com/wp-content/uploads/2024/12/Dublin-Logos-stacked.png" alt="Logo" class="logo">
 <button onclick="show('home')" data-i18n-key="home">Home</button>
-<div id="reviewDropdown" class="dropdown">
-<button onclick="toggleReviewMenu()" data-i18n-key="reviews">Reviews</button>
-<div id="reviewMenu" class="dropdown-content"></div>
-</div>
+<button onclick="show('reviews')" data-i18n-key="reviews">Reviews</button>
 <button onclick="show('schedule')" data-i18n-key="schedule">Schedule</button>
 <div class="nav-title" data-i18n-key="navTitle">Employee Annual Reviews</div>
 <div class="lang-switch">
@@ -490,6 +491,7 @@ document.addEventListener('DOMContentLoaded',init);
 <button id="navLoginBtn" onclick="navLogin()">Login</button>
 <button id="devBtn" onclick="openDevPanel()">Dev</button>
 </nav>
+<div id="reviewYearsNav" class="subnav hidden"></div>
 <div id="loadingBar" class="loading-bar hidden"><span></span></div>
 <section id="home" class="hidden">
 <h2 data-i18n-key="welcomeTitle">Welcome to the Employee Review Portal</h2>
