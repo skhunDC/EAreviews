@@ -125,6 +125,10 @@ function show(id){
     }
     loadQuestions();
   }else{
+    if(id==='home'){
+      const list=document.getElementById('reviewsList');
+      if(list)list.innerHTML='';
+    }
     document.getElementById(id).classList.remove('hidden');
   }
 }
