@@ -167,16 +167,10 @@ function renderReviews(){const c=document.getElementById('reviewsList');if(!c)re
 
 function showDevButton(){
   const btn=document.getElementById('devBtn');
-  if(!btn||!google||!google.script||!google.script.run)return;
-  google.script.run.withSuccessHandler(isDev=>{
-    if(isDev){
-      btn.classList.remove('hidden');
-      btn.disabled=false;
-    }else{
-      btn.classList.add('hidden');
-      btn.disabled=true;
-    }
-  }).isAuthorizedDev();
+  if(btn){
+    btn.classList.remove('hidden');
+    btn.disabled=false;
+  }
 }
 
 function openDevPanel(){
@@ -307,7 +301,7 @@ document.addEventListener('DOMContentLoaded',init);
   <label class="switch"><input type="checkbox" id="langToggle" onchange="toggleLang()"><span class="slider"></span></label>
   <span>ES</span>
 </div>
-<button id="devBtn" class="hidden" onclick="openDevPanel()">Dev</button>
+<button id="devBtn" onclick="openDevPanel()">Dev</button>
 </nav>
 <div id="loadingBar" class="loading-bar hidden"><span></span></div>
 <section id="home" class="hidden">
