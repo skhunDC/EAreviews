@@ -153,27 +153,32 @@ function loadSession(){
 function login(){
   const e=document.getElementById('userId').value;
   const p=document.getElementById('password').value;
-  google.script.run.withSuccessHandler(r=>{
-    if(r.success){
-      user=r.user;
-      lang=user.lang;
-      localStorage.setItem('lang',lang);
-      document.getElementById('login').classList.add('hidden');
-      document.getElementById('navLoginBtn').textContent=t('logout');
-      applyTranslations();
-      showDevButton();
-      loadReviews();
-      const target=pendingSection||'home';
+  google.script.run
+    .withSuccessHandler(r=>{
+      if(r.success){
+        user=r.user;
+        lang=user.lang;
+        localStorage.setItem('lang',lang);
+        document.getElementById('login').classList.add('hidden');
+        document.getElementById('navLoginBtn').textContent=t('logout');
+        applyTranslations();
+        showDevButton();
+        loadReviews();
+      const target=pendingSection||'reviews';
       pendingSection=null;
       show(target);
-    }else{
-      let msg='';
-      if(r.error==='invalid_password')msg=t('invalidPwd');
-      else if(r.error==='user_not_found')msg=t('noAccount');
-      else msg=t('loginFail');
-      alert(msg);
+      }else{
+        let msg='';
+        if(r.error==='invalid_password')msg=t('invalidPwd');
+        else if(r.error==='user_not_found')msg=t('noAccount');
+        else msg=t('loginFail');
+        alert(msg);
     }
-    }).login(e,p);
+    })
+    .withFailureHandler(err=>{
+      alert(err.message||t('loginFail'));
+    })
+    .login(e,p);
 }
 
 function navLogin(){
