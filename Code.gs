@@ -210,12 +210,6 @@ function addUser(user) {
 
 /** Check if session user is in DEV_USERS */
 function isAuthorizedDev() {
-  const session = getSession();
-  if (session) {
-    if (session.role === 'DEV' || DEV_USERS.indexOf(session.email) !== -1) {
-      return true;
-    }
-  }
   const email = Session.getActiveUser().getEmail();
   return DEV_USERS.indexOf(email) !== -1;
 }
