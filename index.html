@@ -40,7 +40,6 @@ let user=null,config={},lang=localStorage.getItem('lang')||'en';
 let loadingReviews=false;
 let pendingSection=null;
 let currentReviewId=null;
-let autoSaveTimeout=null;
 let selectedYear=new Date().getFullYear();
 
 const defaultQuestions=[
@@ -144,7 +143,6 @@ function init(){
   applyTranslations();
   loadQuestions();
   const revSection=document.getElementById('reviews');
-  if(revSection) revSection.addEventListener('input',scheduleAutoSave);
   google.script.run.withSuccessHandler(c=>{config=c;loadSession();}).loadConfig();
 }
 function loadSession(){
@@ -200,7 +198,6 @@ function login(){
 function navLogin(){
   const loginDiv=document.getElementById('login');
   if(user){
-    saveDraftReview();
     google.script.run.logout();
     user=null;
     loginDiv.classList.add('hidden');
@@ -260,8 +257,7 @@ function updateReviewMenu(){
 
 function selectReviewYear(y){
   selectedYear=y;
-  fillSavedAnswers();
-loadReviews();
+  loadReviews();
   const menu=document.getElementById('reviewMenu');
   if(menu) menu.classList.remove('show');
 }
@@ -421,24 +417,10 @@ function gatherAnswers(){
   });
   return ans;
 }
-function saveDraftReview(){
-  if(!user) return;
-  const ans=gatherAnswers();
-  const review={id:currentReviewId,employeeId:user.id,type:'SELF',data:{year:selectedYear,answers:ans},status:'DRAFT'};
-  google.script.run.withSuccessHandler(r=>{
-    currentReviewId=r.id;
-    const exp={result:document.querySelector('input[name=finalExp]:checked')?.value||'',notes:document.getElementById('finalNotes').value,empSign:{name:document.getElementById('empSign').value,ts:new Date().toISOString()},mgrSign:{name:document.getElementById('mgrSign').value,ts:new Date().toISOString()}};
-    google.script.run.saveFinalExpectation(r.id,exp);
-    loadReviews();
-  }).saveReview(review);
-}
-function scheduleAutoSave(){
-  clearTimeout(autoSaveTimeout);
-  autoSaveTimeout=setTimeout(saveDraftReview,1000);
-}
 function submitReview(){
   const ans=gatherAnswers();
   const review={id:currentReviewId,employeeId:user.id,type:'SELF',data:{year:selectedYear,answers:ans}};
+  document.body.style.cursor='wait';
   google.script.run.withSuccessHandler(r=>{
     currentReviewId=r.id;
     const adjBlock=document.getElementById('compAdjust');
@@ -450,9 +432,11 @@ function submitReview(){
     google.script.run.saveFinalExpectation(r.id,exp);
     loadReviews();
     document.getElementById('submitMsg').textContent=t('reviewSaved');
+    document.body.style.cursor='';
   })
   .withFailureHandler(err=>{
     document.getElementById('submitMsg').textContent=err.message||t('saveFailed');
+    document.body.style.cursor='';
   })
   .saveReview(review);
 }
