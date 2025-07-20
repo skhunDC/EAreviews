@@ -73,7 +73,7 @@ const translations={
     finalExpTitle:'Final Performance Expectation',belowExp:'Below Expectations',meetsExp:'Meets Expectations',exceedsExp:'Exceeds Expectations',
     below:'Below',meets:'Meets',exceeds:'Exceeds',
     notesPlaceholder:'Notes',contactQuestions:'Contact Sea Khun with questions.',empSignature:'Employee Signature',mgrSignature:'Manager Signature',submitReview:'Submit Review',
-    reviewSaved:'Review saved',saveFailed:'Failed to save review',
+    reviewSaved:'Review saved',saveFailed:'Failed to save review',saving:'Saving...',
     intro:`<b>Dublin Cleaners 2025 Employee Annual Reviews – Your Opportunity to Shine</b><br><b>Purpose</b> – Highlight achievements, live our core values, and explain why you deserve a pay increase while receiving growth feedback.<br><b>Core Values</b> Accountable · Attention to Details · Team Player · Tactical Risk Taker · Better than Yesterday · Value Reputation<br><b>Rating System</b> 1 = Below Expectations · 2 = Meets Expectations · 3 = Exceeds Expectations (Attendance &amp; punctuality, Q1, is weighted higher)<br><b>Review Process</b> July reviews → submit form → Manager/Assistant adds notes → schedule 20-min meeting (half-hour slots) ≥ 1 week after submission. Schedule outside regular hours; compensated if on day off/outside shift.<br>Please Message HR about how long your meeting was so they can Add your hours into UKG<br><b>Raises take effect on the first pay period in August.</b>`
   },
   es:{
@@ -87,7 +87,7 @@ const translations={
     finalExpTitle:'Expectativa de desempeño final',belowExp:'Debajo de las expectativas',meetsExp:'Cumple con las expectativas',exceedsExp:'Supera las expectativas',
     below:'Debajo',meets:'Cumple',exceeds:'Supera',
     notesPlaceholder:'Notas',contactQuestions:'Contacte a Sea Khun con preguntas.',empSignature:'Firma del empleado',mgrSignature:'Firma del gerente',submitReview:'Enviar revisión',
-    reviewSaved:'Revisión guardada',saveFailed:'No se pudo guardar la revisión',
+    reviewSaved:'Revisión guardada',saveFailed:'No se pudo guardar la revisión',saving:'Guardando...',
     intro:`<b>Dublin Cleaners Evaluaciones Anuales de Empleados 2025 – Tu oportunidad para destacar</b><br><b>Propósito</b> – Destacar logros, vivir nuestros valores fundamentales y explicar por qué mereces un aumento mientras recibes comentarios para crecer.<br><b>Valores fundamentales</b> Responsabilidad · Atención al detalle · Trabajo en equipo · Tomador de riesgos táctico · Mejor que ayer · Valorar la reputación<br><b>Sistema de calificación</b> 1 = Por debajo de las expectativas · 2 = Cumple con las expectativas · 3 = Supera las expectativas (Asistencia y puntualidad, P1, tiene mayor peso)<br><b>Proceso de revisión</b> Revisiones de julio → enviar formulario → el gerente/asistente agrega notas → programar una reunión de 20 minutos (bloques de media hora) ≥ 1 semana después de la entrega. Programar fuera del horario habitual; se compensa si es día libre/fuera del turno.<br>Informe a RRHH cuánto duró la reunión para que puedan agregar sus horas a UKG<br><b>Los aumentos entran en vigor en el primer periodo de pago de agosto.</b>`
   }
 };
@@ -403,24 +403,36 @@ function submitReview(){
   const ans=gatherAnswers();
   const review={id:currentReviewId,employeeId:user.id,type:'SELF',data:{year:selectedYear,answers:ans}};
   document.body.style.cursor='wait';
-  google.script.run.withSuccessHandler(r=>{
-    currentReviewId=r.id;
-    const adjBlock=document.getElementById('compAdjust');
-    if(!adjBlock.classList.contains('hidden')){
-      const adj={employeeId:user.id,current:document.getElementById('curWage').value,new:document.getElementById('newWage').value,pct:document.getElementById('pctInc').textContent};
-      google.script.run.saveCompAdjustment(r.id,adj);
-    }
-    const exp={result:document.querySelector('input[name=finalExp]:checked')?.value||'',notes:document.getElementById('finalNotes').value,empSign:{name:document.getElementById('empSign').value,ts:new Date().toISOString()},mgrSign:{name:document.getElementById('mgrSign').value,ts:new Date().toISOString()}};
-    google.script.run.saveFinalExpectation(r.id,exp);
+  document.getElementById('submitMsg').textContent=t('saving');
+
+  const fail=err=>{
+    document.getElementById('submitMsg').textContent=err.message||t('saveFailed');
+    document.body.style.cursor='';
+  };
+
+  const finalize=()=>{
     loadReviews();
     document.getElementById('submitMsg').textContent=t('reviewSaved');
     document.body.style.cursor='';
-  })
-  .withFailureHandler(err=>{
-    document.getElementById('submitMsg').textContent=err.message||t('saveFailed');
-    document.body.style.cursor='';
-  })
-  .saveReview(review);
+  };
+
+  const saveFinal=(id)=>{
+    const exp={result:document.querySelector('input[name=finalExp]:checked')?.value||'',notes:document.getElementById('finalNotes').value,empSign:{name:document.getElementById('empSign').value,ts:new Date().toISOString()},mgrSign:{name:document.getElementById('mgrSign').value,ts:new Date().toISOString()}};
+    google.script.run.withSuccessHandler(finalize).withFailureHandler(fail).saveFinalExpectation(id,exp);
+  };
+
+  const afterReview=id=>{
+    currentReviewId=id;
+    const adjBlock=document.getElementById('compAdjust');
+    if(!adjBlock.classList.contains('hidden')){
+      const adj={employeeId:user.id,current:document.getElementById('curWage').value,new:document.getElementById('newWage').value,pct:document.getElementById('pctInc').textContent};
+      google.script.run.withSuccessHandler(()=>saveFinal(id)).withFailureHandler(fail).saveCompAdjustment(id,adj);
+    } else {
+      saveFinal(id);
+    }
+  };
+
+  google.script.run.withSuccessHandler(r=>afterReview(r.id)).withFailureHandler(fail).saveReview(review);
 }
 
 function addNewUser(){
