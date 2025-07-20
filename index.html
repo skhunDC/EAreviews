@@ -16,20 +16,39 @@ select{padding:8px;}
 button.primary{background:#6200ee;color:white;border:none;border-radius:4px;padding:8px 16px;cursor:pointer;}
 </style>
 <script>
-let user=null,config={},lang='en';
-function t(key){return (config[key]?config[key][lang]||key:key);} 
+let user=null,config={},lang=localStorage.getItem('lang')||'en';
+const translations={
+  en:{home:'Home',schedule:'Schedule',welcomeTitle:'Welcome to the Employee Review Portal',welcomeMsg:'Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.',comingSoon:'Coming soon...',email:'Email',password:'Password',login:'Login',loginFail:'login fail'},
+  es:{home:'Inicio',schedule:'Agenda',welcomeTitle:'Bienvenido al Portal de Evaluaciones',welcomeMsg:'Seleccione una opción en la barra de navegación para ver sus evaluaciones o programar una reunión. Use el botón de idioma para cambiar entre inglés y español.',comingSoon:'Próximamente...',email:'Correo electrónico',password:'Contraseña',login:'Iniciar sesión',loginFail:'Error al iniciar sesión'}
+};
+function t(key){
+  if(config[key]&&config[key][lang])return config[key][lang];
+  if(translations[lang]&&translations[lang][key])return translations[lang][key];
+  return key;
+}
 function show(id){document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');}
-function init(){google.script.run.withSuccessHandler(c=>{config=c;loadSession();}).loadConfig();}
+function applyTranslations(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n);});
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{el.placeholder=t(el.dataset.i18nPlaceholder);});
+  document.getElementById('langBtn').textContent=lang.toUpperCase();
+}
+function init(){
+  show('home');
+  applyTranslations();
+  google.script.run.withSuccessHandler(c=>{config=c;loadSession();}).loadConfig();
+}
 function loadSession(){
   google.script.run.withSuccessHandler(u=>{
     if(u){
       user=u;
       lang=u.lang;
-      document.getElementById('langBtn').textContent=lang.toUpperCase();
+      localStorage.setItem('lang',lang);
+      applyTranslations();
       loadReviews();
       show('home');
     }else{
       document.getElementById('login').classList.remove('hidden');
+      applyTranslations();
     }
   }).getSession();
 }
@@ -40,15 +59,17 @@ function login(){
     if(r.success){
       user=r.user;
       lang=user.lang;
+      localStorage.setItem('lang',lang);
       document.getElementById('login').classList.add('hidden');
+      applyTranslations();
       loadReviews();
       show('home');
     }else{
-      alert('login fail');
+      alert(t('loginFail'));
     }
   }).login(e,p);
 }
-function saveLang(){lang=lang==='en'?'es':'en';google.script.run.saveLang(lang);localStorage.setItem('lang',lang);document.getElementById('langBtn').textContent=lang.toUpperCase();renderReviews();}
+function saveLang(){lang=lang==='en'?'es':'en';google.script.run.saveLang(lang);localStorage.setItem('lang',lang);applyTranslations();renderReviews();}
 let reviews=[];
 function loadReviews(){google.script.run.withSuccessHandler(r=>{reviews=r;renderReviews();}).listReviews();}
 function renderReviews(){const c=document.getElementById('reviews');c.innerHTML='';reviews.forEach(rv=>{const div=document.createElement('div');div.className='card';div.innerHTML='<b>'+rv.type+'</b> '+rv.status+'<br>'+JSON.stringify(rv.data);c.appendChild(div);});}
@@ -57,22 +78,22 @@ document.addEventListener('DOMContentLoaded',init);
 </head>
 <body>
 <nav>
-<button onclick="show('home')">Home</button>
-<button onclick="show('schedule')">Schedule</button>
+<button onclick="show('home')" data-i18n="home">Home</button>
+<button onclick="show('schedule')" data-i18n="schedule">Schedule</button>
 <button id="langBtn" onclick="saveLang()">EN</button>
 </nav>
 <section id="home" class="hidden">
-<h2>Welcome to the Employee Review Portal</h2>
-<p>Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.</p>
+<h2 data-i18n="welcomeTitle">Welcome to the Employee Review Portal</h2>
+<p data-i18n="welcomeMsg">Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.</p>
 <div id="reviews"></div>
 </section>
 <section id="schedule" class="hidden">
-<p>Coming soon...</p>
+<p data-i18n="comingSoon">Coming soon...</p>
 </section>
 <div id="login" class="hidden">
-<label>Email<input type="text" id="email"></label>
-<label>Password<input type="password" id="pw"></label>
-<button class="primary" onclick="login()">Login</button>
+<label><span data-i18n="email">Email</span><input type="text" id="email" data-i18n-placeholder="email"></label>
+<label><span data-i18n="password">Password</span><input type="password" id="pw" data-i18n-placeholder="password"></label>
+<button class="primary" onclick="login()" data-i18n="login">Login</button>
 </div>
 </body>
 </html>
