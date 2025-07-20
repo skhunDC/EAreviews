@@ -17,6 +17,26 @@ button.primary{background:#6200ee;color:white;border:none;border-radius:4px;padd
 </style>
 <script>
 let user=null,config={},lang=localStorage.getItem('lang')||'en';
+
+const defaultQuestions=[
+  {id:'attendance',en:'Attendance & Punctuality',es:'Asistencia y Puntualidad',extras:[
+    {id:'absences',label:'Absences without notice (days)',type:'number'},
+    {id:'late',label:'Late arrivals (days)',type:'number'},
+    {id:'comments',label:'Comments',type:'textarea'}]},
+  {id:'performance',en:'Performance Improvements: What did you do more, better, or more efficiently last year, up till now?',es:'Mejoras de rendimiento',extra:'textarea'},
+  {id:'values',en:'Living Our Core Values: How have you embodied our core values? Provide specific examples.',es:'Vivir nuestros valores',extra:'textarea'},
+  {id:'growth',en:'Personal Growth: How did you improve your knowledge or skills last year, up till now?',es:'Crecimiento personal',extra:'textarea'},
+  {id:'learning',en:'Learning New Skills: Did you take or create opportunities to learn a new skill or enhance an existing one?',es:'Aprendizaje de nuevas habilidades',extra:'textarea'},
+  {id:'team',en:'Team Support: How did you support your teammates in developing their skills?',es:'Apoyo al equipo',extra:'textarea'},
+  {id:'flexibility',en:'Flexibility: When asked to cover for others, did you agree? Share an example.',es:'Flexibilidad',extra:'textarea'},
+  {id:'initiative',en:'Initiative: Describe a time you proactively improved a process or solved a problem without being asked.',es:'Iniciativa',extra:'textarea'},
+  {id:'proactive',en:'Proactive Contributions: How did you proactively use downtime to tackle additional tasks?',es:'Contribuciones proactivas',extra:'textarea'},
+  {id:'innovation',en:'Innovation & Process Improvement: Have you suggested or implemented improvements to our processes, services, or workplace? Describe your idea and its impact.',es:'Innovaci\u00f3n y mejora de procesos',extra:'textarea'},
+  {id:'crossshadow',en:'Cross Shadowing Program Participation',es:'Programa Cross Shadowing',rating:false,extras:[
+    {id:'participation',label:'Did you participate? (Yes/No/Partial)',type:'select',options:['Yes','No','Partial']},
+    {id:'comments',label:'Comments',type:'textarea'}]},
+  {id:'future',en:'Future Interests: Is there another role or skill you\u2019d like to explore in the future?',es:'Intereses futuros',rating:false,extra:'textarea'}
+];
 const translations={
   en:{home:'Home',reviews:'Reviews',schedule:'Schedule',welcomeTitle:'Welcome to the Employee Review Portal',welcomeMsg:'Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.',comingSoon:'Coming soon...',email:'Email',password:'Password',login:'Login',loginFail:'login fail'},
   es:{home:'Inicio',reviews:'Reseñas',schedule:'Agenda',welcomeTitle:'Bienvenido al Portal de Evaluaciones',welcomeMsg:'Seleccione una opción en la barra de navegación para ver sus evaluaciones o programar una reunión. Use el botón de idioma para cambiar entre inglés y español.',comingSoon:'Próximamente...',email:'Correo electrónico',password:'Contraseña',login:'Iniciar sesión',loginFail:'Error al iniciar sesión'}
@@ -75,10 +95,78 @@ function loadReviews(){google.script.run.withSuccessHandler(r=>{reviews=r;render
 function renderReviews(){const c=document.getElementById('reviewsList');if(!c)return;c.innerHTML='';reviews.forEach(rv=>{const div=document.createElement('div');div.className='card';div.innerHTML='<b>'+rv.type+'</b> '+rv.status+'<br>'+JSON.stringify(rv.data);c.appendChild(div);});}
 
 let questions=[];
-function loadQuestions(){google.script.run.withSuccessHandler(q=>{questions=q;renderQuestionList();}).getQuestions();}
-function renderQuestionList(){const qd=document.getElementById('questionList');if(!qd)return;qd.innerHTML='';questions.forEach(q=>{const div=document.createElement('div');div.className='card q';div.dataset.id=q.id;let html='<label>'+q[lang]+'</label><select class="rating"><option value=""></option><option>1</option><option>2</option><option>3</option></select>';if(q.extra==='textarea'){html+='<textarea class="extra"></textarea>';}if(q.extra==='number'){html+='<input type="number" class="extra">';}div.innerHTML=html;qd.appendChild(div);});if(user&&user.role&&(['MANAGER','HR','DEV'].indexOf(user.role)!==-1)){document.getElementById('compAdjust').classList.remove('hidden');}}
+function loadQuestions(){
+  google.script.run.withSuccessHandler(q=>{
+    questions=(q&&q.length)?q:defaultQuestions;
+    renderQuestionList();
+  }).getQuestions();
+}
+function renderQuestionList(){
+  const qd=document.getElementById('questionList');
+  if(!qd)return;
+  qd.innerHTML='';
+  questions.forEach(q=>{
+    const div=document.createElement('div');
+    div.className='card q';
+    div.dataset.id=q.id;
+    let html='<label>'+q[lang]+'</label>';
+    if(q.rating!==false){
+      html+='<select class="rating"><option value=""></option><option value="1">1 - Below</option><option value="2">2 - Meets</option><option value="3">3 - Exceeds</option></select>';
+    }else{
+      html+='<input type="hidden" class="rating" value="">';
+    }
+    if(Array.isArray(q.extras)){
+      q.extras.forEach(ex=>{
+        html+='<label>'+ex.label;
+        if(ex.type==='textarea')html+='<textarea class="extra" data-sub="'+ex.id+'"></textarea>';
+        else if(ex.type==='select'){
+          html+='<select class="extra" data-sub="'+ex.id+'">';
+          ex.options.forEach(o=>{html+='<option value="'+o+'">'+o+'</option>';});
+          html+='</select>';
+        }else html+='<input type="'+ex.type+'" class="extra" data-sub="'+ex.id+'">';
+        html+='</label>';
+      });
+    }else if(q.extra==='textarea'){
+      html+='<textarea class="extra"></textarea>';
+    }else if(q.extra==='number'){
+      html+='<input type="number" class="extra">';
+    }
+    div.innerHTML=html;
+    qd.appendChild(div);
+  });
+  if(user&&user.role&&(['MANAGER','HR','DEV'].indexOf(user.role)!==-1)){
+    document.getElementById('compAdjust').classList.remove('hidden');
+  }
+}
 function calcPct(){const c=parseFloat(document.getElementById('curWage').value||0);const n=parseFloat(document.getElementById('newWage').value||0);const pct=document.getElementById('pctInc');pct.textContent=c?(((n-c)/c)*100).toFixed(2):'0';}
-function submitReview(){const ans={};document.querySelectorAll('#questionList .q').forEach(d=>{const id=d.dataset.id;ans[id]={score:d.querySelector('.rating').value,extra:(d.querySelector('.extra')||{}).value||''};});const review={employeeId:user.id,type:'SELF',data:{answers:ans}};google.script.run.withSuccessHandler(r=>{const adjBlock=document.getElementById('compAdjust');if(!adjBlock.classList.contains('hidden')){const adj={employeeId:user.id,current:document.getElementById('curWage').value,new:document.getElementById('newWage').value,pct:document.getElementById('pctInc').textContent};google.script.run.saveCompAdjustment(r.id,adj);}const exp={result:document.querySelector('input[name=finalExp]:checked')?.value||'',notes:document.getElementById('finalNotes').value,empSign:{name:document.getElementById('empSign').value,ts:new Date().toISOString()},mgrSign:{name:document.getElementById('mgrSign').value,ts:new Date().toISOString()}};google.script.run.saveFinalExpectation(r.id,exp);loadReviews();alert('Saved');}).saveReview(review);}
+function submitReview(){
+  const ans={};
+  document.querySelectorAll('#questionList .q').forEach(d=>{
+    const id=d.dataset.id;
+    const rating=d.querySelector('.rating')?.value||'';
+    const extraEls=d.querySelectorAll('.extra');
+    let extra='';
+    if(extraEls.length===1 && !extraEls[0].dataset.sub){
+      extra=extraEls[0].value||'';
+    }else if(extraEls.length>0){
+      extra={};
+      extraEls.forEach(e=>{extra[e.dataset.sub||'value']=e.value;});
+    }
+    ans[id]={score:rating,extra:extra};
+  });
+  const review={employeeId:user.id,type:'SELF',data:{answers:ans}};
+  google.script.run.withSuccessHandler(r=>{
+    const adjBlock=document.getElementById('compAdjust');
+    if(!adjBlock.classList.contains('hidden')){
+      const adj={employeeId:user.id,current:document.getElementById('curWage').value,new:document.getElementById('newWage').value,pct:document.getElementById('pctInc').textContent};
+      google.script.run.saveCompAdjustment(r.id,adj);
+    }
+    const exp={result:document.querySelector('input[name=finalExp]:checked')?.value||'',notes:document.getElementById('finalNotes').value,empSign:{name:document.getElementById('empSign').value,ts:new Date().toISOString()},mgrSign:{name:document.getElementById('mgrSign').value,ts:new Date().toISOString()}};
+    google.script.run.saveFinalExpectation(r.id,exp);
+    loadReviews();
+    alert('Saved');
+  }).saveReview(review);
+}
 document.addEventListener('DOMContentLoaded',init);
 </script>
 </head>
