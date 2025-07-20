@@ -48,14 +48,18 @@ function login(userId, pwd) {
   const rows = sheet.getDataRange().getValues();
   for (let i = 1; i < rows.length; i++) {
     const [id, uid, name, role, managerId, lang, hash, salt] = rows[i];
-    if (uid === userId && verifyPwd(pwd, salt, hash)) {
-      const cache = CacheService.getUserCache();
-      cache.put(CACHE_KEY, JSON.stringify({id:id, userId:uid, name:name, role:role, managerId:managerId, lang:lang}), SESSION_DURATION);
-      const token = createSession(id);
-      return {success:true, token:token, user:{id:id,userId:uid,name:name,role:role,lang:lang}};
+    if (uid === userId) {
+      if (verifyPwd(pwd, salt, hash)) {
+        const cache = CacheService.getUserCache();
+        cache.put(CACHE_KEY, JSON.stringify({id:id, userId:uid, name:name, role:role, managerId:managerId, lang:lang}), SESSION_DURATION);
+        const token = createSession(id);
+        return {success:true, token:token, user:{id:id,userId:uid,name:name,role:role,lang:lang}};
+      } else {
+        return {success:false, error:'invalid_password'};
+      }
     }
   }
-  return {success:false};
+  return {success:false, error:'user_not_found'};
 }
 
 /** Logout */

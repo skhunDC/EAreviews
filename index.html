@@ -58,7 +58,9 @@ const translations={
     home:'Home',reviews:'Reviews',schedule:'Schedule',navTitle:'Employee Annual Reviews',
     welcomeTitle:'Welcome to the Employee Review Portal',
     welcomeMsg:'Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.',
-    comingSoon:'Coming soon...',userId:'User ID',password:'Password',login:'Login',logout:'Logout',loginFail:'login fail',
+    comingSoon:'Coming soon...',userId:'User ID',password:'Password',login:'Login',logout:'Logout',
+    loginFail:'Login failed',invalidPwd:'Invalid password.',
+    noAccount:'Account not found. Please reach out to Sea Khun to be added.',
     curWage:'Current Wage',newWage:'New Wage',pctIncrease:'% Increase:',
     finalExpTitle:'Final Performance Expectation',belowExp:'Below Expectations',meetsExp:'Meets Expectations',exceedsExp:'Exceeds Expectations',
     below:'Below',meets:'Meets',exceeds:'Exceeds',
@@ -69,7 +71,9 @@ const translations={
     home:'Inicio',reviews:'Reseñas',schedule:'Agenda',navTitle:'Revisiones Anuales de Empleados',
     welcomeTitle:'Bienvenido al Portal de Evaluaciones',
     welcomeMsg:'Seleccione una opción en la barra de navegación para ver sus evaluaciones o programar una reunión. Use el botón de idioma para cambiar entre inglés y español.',
-    comingSoon:'Próximamente...',userId:'ID de usuario',password:'Contraseña',login:'Iniciar sesión',logout:'Cerrar sesión',loginFail:'Error al iniciar sesión',
+    comingSoon:'Próximamente...',userId:'ID de usuario',password:'Contraseña',login:'Iniciar sesión',logout:'Cerrar sesión',
+    loginFail:'Error al iniciar sesión',invalidPwd:'Contraseña inválida.',
+    noAccount:'Cuenta no encontrada. Por favor contacte a Sea Khun para ser agregado.',
     curWage:'Salario actual',newWage:'Nuevo salario',pctIncrease:'% Aumento:',
     finalExpTitle:'Expectativa de desempeño final',belowExp:'Debajo de las expectativas',meetsExp:'Cumple con las expectativas',exceedsExp:'Supera las expectativas',
     below:'Debajo',meets:'Cumple',exceeds:'Supera',
@@ -163,7 +167,11 @@ function login(){
       pendingSection=null;
       show(target);
     }else{
-      alert(t('loginFail'));
+      let msg='';
+      if(r.error==='invalid_password')msg=t('invalidPwd');
+      else if(r.error==='user_not_found')msg=t('noAccount');
+      else msg=t('loginFail');
+      alert(msg);
     }
     }).login(e,p);
 }
