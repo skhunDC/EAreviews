@@ -13,6 +13,7 @@ section{padding:20px;}
 label{display:block;margin-top:10px;}
 input[type=text],textarea{width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:4px;}
 select{padding:8px;}
+ .rating-group label{display:inline-block;margin-right:10px;}
 button.primary{background:#6200ee;color:white;border:none;border-radius:4px;padding:8px 16px;cursor:pointer;}
 </style>
 <script>
@@ -111,7 +112,11 @@ function renderQuestionList(){
     div.dataset.id=q.id;
     let html='<label>'+q[lang]+'</label>';
     if(q.rating!==false){
-      html+='<select class="rating"><option value=""></option><option value="1">1 - Below</option><option value="2">2 - Meets</option><option value="3">3 - Exceeds</option></select>';
+      html+='<div class="rating-group">'
+        +'<label><input type="radio" class="rating" name="rating-'+q.id+'" value="1"> 1 - Below</label>'
+        +'<label><input type="radio" class="rating" name="rating-'+q.id+'" value="2"> 2 - Meets</label>'
+        +'<label><input type="radio" class="rating" name="rating-'+q.id+'" value="3"> 3 - Exceeds</label>'
+        +'</div>';
     }else{
       html+='<input type="hidden" class="rating" value="">';
     }
@@ -143,7 +148,8 @@ function submitReview(){
   const ans={};
   document.querySelectorAll('#questionList .q').forEach(d=>{
     const id=d.dataset.id;
-    const rating=d.querySelector('.rating')?.value||'';
+    const ratingEl=d.querySelector('input.rating:checked, select.rating');
+    const rating=ratingEl?ratingEl.value:'';
     const extraEls=d.querySelectorAll('.extra');
     let extra='';
     if(extraEls.length===1 && !extraEls[0].dataset.sub){
