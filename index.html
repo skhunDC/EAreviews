@@ -57,7 +57,9 @@ const translations={
     welcomeMsg:'Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.',
     comingSoon:'Coming soon...',email:'Email',password:'Password',login:'Login',loginFail:'login fail',
     curWage:'Current Wage',newWage:'New Wage',pctIncrease:'% Increase:',
-    finalExpTitle:'Final Performance Expectation',belowExp:'Below Expectations',meetsExp:'Meets Expectations',exceedsExp:'Exceeds Expectations',notesPlaceholder:'Notes',contactQuestions:'Contact Sea Khun with questions.',empSignature:'Employee Signature',mgrSignature:'Manager Signature',submitReview:'Submit Review',
+    finalExpTitle:'Final Performance Expectation',belowExp:'Below Expectations',meetsExp:'Meets Expectations',exceedsExp:'Exceeds Expectations',
+    below:'Below',meets:'Meets',exceeds:'Exceeds',
+    notesPlaceholder:'Notes',contactQuestions:'Contact Sea Khun with questions.',empSignature:'Employee Signature',mgrSignature:'Manager Signature',submitReview:'Submit Review',
     intro:`<b>Dublin Cleaners 2025 Employee Annual Reviews – Your Opportunity to Shine</b><br><b>Purpose</b> – Highlight achievements, live our core values, and explain why you deserve a pay increase while receiving growth feedback.<br><b>Core Values</b> Accountable · Attention to Details · Team Player · Tactical Risk Taker · Better than Yesterday · Value Reputation<br><b>Rating System</b> 1 = Below Expectations · 2 = Meets Expectations · 3 = Exceeds Expectations (Attendance &amp; punctuality, Q1, is weighted higher)<br><b>Review Process</b> July reviews → submit form → Manager/Assistant adds notes → schedule 20-min meeting (half-hour slots) ≥ 1 week after submission. Schedule outside regular hours; compensated if on day off/outside shift.<br>Please Message HR about how long your meeting was so they can Add your hours into UKG<br><b>Raises take effect on the first pay period in August.</b>`
   },
   es:{
@@ -66,7 +68,9 @@ const translations={
     welcomeMsg:'Seleccione una opción en la barra de navegación para ver sus evaluaciones o programar una reunión. Use el botón de idioma para cambiar entre inglés y español.',
     comingSoon:'Próximamente...',email:'Correo electrónico',password:'Contraseña',login:'Iniciar sesión',loginFail:'Error al iniciar sesión',
     curWage:'Salario actual',newWage:'Nuevo salario',pctIncrease:'% Aumento:',
-    finalExpTitle:'Expectativa de desempeño final',belowExp:'Debajo de las expectativas',meetsExp:'Cumple con las expectativas',exceedsExp:'Supera las expectativas',notesPlaceholder:'Notas',contactQuestions:'Contacte a Sea Khun con preguntas.',empSignature:'Firma del empleado',mgrSignature:'Firma del gerente',submitReview:'Enviar revisión',
+    finalExpTitle:'Expectativa de desempeño final',belowExp:'Debajo de las expectativas',meetsExp:'Cumple con las expectativas',exceedsExp:'Supera las expectativas',
+    below:'Debajo',meets:'Cumple',exceeds:'Supera',
+    notesPlaceholder:'Notas',contactQuestions:'Contacte a Sea Khun con preguntas.',empSignature:'Firma del empleado',mgrSignature:'Firma del gerente',submitReview:'Enviar revisión',
     intro:`<b>Dublin Cleaners Evaluaciones Anuales de Empleados 2025 – Tu oportunidad para destacar</b><br><b>Propósito</b> – Destacar logros, vivir nuestros valores fundamentales y explicar por qué mereces un aumento mientras recibes comentarios para crecer.<br><b>Valores fundamentales</b> Responsabilidad · Atención al detalle · Trabajo en equipo · Tomador de riesgos táctico · Mejor que ayer · Valorar la reputación<br><b>Sistema de calificación</b> 1 = Por debajo de las expectativas · 2 = Cumple con las expectativas · 3 = Supera las expectativas (Asistencia y puntualidad, P1, tiene mayor peso)<br><b>Proceso de revisión</b> Revisiones de julio → enviar formulario → el gerente/asistente agrega notas → programar una reunión de 20 minutos (bloques de media hora) ≥ 1 semana después de la entrega. Programar fuera del horario habitual; se compensa si es día libre/fuera del turno.<br>Informe a RRHH cuánto duró la reunión para que puedan agregar sus horas a UKG<br><b>Los aumentos entran en vigor en el primer periodo de pago de agosto.</b>`
   }
 };
@@ -151,6 +155,7 @@ function toggleLang(){
   localStorage.setItem('lang',lang);
   applyTranslations();
   renderReviews();
+  renderQuestionList();
 }
 let reviews=[];
 function loadReviews(){google.script.run.withSuccessHandler(r=>{reviews=r;renderReviews();}).listReviews();}
@@ -183,12 +188,12 @@ function renderQuestionList(){
     const div=document.createElement('div');
     div.className='card q';
     div.dataset.id=q.id;
-    let html='<label>'+q[lang]+'</label>';
+    let html='<label class="question-title">'+q[lang]+'</label>';
     if(q.rating!==false){
       html+='<div class="rating-group">'
-        +'<label><input type="radio" class="rating" name="rating-'+q.id+'" value="1"> 1 - Below</label>'
-        +'<label><input type="radio" class="rating" name="rating-'+q.id+'" value="2"> 2 - Meets</label>'
-        +'<label><input type="radio" class="rating" name="rating-'+q.id+'" value="3"> 3 - Exceeds</label>'
+        +'<label><input type="radio" class="rating" name="rating-'+q.id+'" value="1"> 1 - '+t('below')+'</label>'
+        +'<label><input type="radio" class="rating" name="rating-'+q.id+'" value="2"> 2 - '+t('meets')+'</label>'
+        +'<label><input type="radio" class="rating" name="rating-'+q.id+'" value="3"> 3 - '+t('exceeds')+'</label>'
         +'</div>';
     }else{
       html+='<input type="hidden" class="rating" value="">';
