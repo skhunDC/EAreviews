@@ -9,6 +9,8 @@ const COMP_SHEET = 'COMP_ADJUST';
 const CACHE_KEY = 'SESSION';
 const SESSION_DURATION = 60 * 60 * 8; // 8 hours
 const DEV_PASSWORD = 'changeme'; // replace in prod
+const ADMIN_SHEET_ID = '17lpaLBAL9XidYqiMhKNWRhZdEIqa0OzuVP7SYYc6VfQ';
+const DEV_USERS = ['skhun@dublincleaners.com','ss.sku@protonmail.com'];
 
 /** Serve the web app */
 function doGet() {
@@ -28,7 +30,7 @@ function login(email, password) {
       if (hashStr === hash) {
         const cache = CacheService.getUserCache();
         cache.put(CACHE_KEY, JSON.stringify({id:id, email:em, name:name, role:role, managerId:managerId, lang:lang}), SESSION_DURATION);
-        return {success:true, user:{id:id,name:name,role:role,lang:lang}};
+        return {success:true, user:{id:id,email:em,name:name,role:role,lang:lang}};
       }
     }
   }
@@ -196,6 +198,24 @@ function addUser(user) {
   const hash = Array.from(sha, b => ('0' + (b & 0xFF).toString(16)).slice(-2)).join('');
   const id = new Date().getTime();
   sheet.appendRow([id, user.email, user.name, user.role, user.managerId||'', user.lang||'en', salt, hash]);
+}
+
+/** Check if session user is in DEV_USERS */
+function isAuthorizedDev() {
+  const s = getSession();
+  return s && DEV_USERS.indexOf(s.email) !== -1;
+}
+
+/** Admin panel API to add simple user entry */
+function addNewUser(user) {
+  if (!isAuthorizedDev()) throw new Error('denied');
+  const ss = SpreadsheetApp.openById(ADMIN_SHEET_ID);
+  const sheet = ss.getSheets()[0];
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(['Email','Role','CreatedAt']);
+  }
+  sheet.appendRow([user.email, user.role, new Date()]);
+  return true;
 }
 
 /** Trigger daily to send reminders */
