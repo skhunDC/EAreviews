@@ -8,6 +8,8 @@ This project contains a simple Google Apps Script web application used to collec
 - Review questions can be loaded from a spreadsheet or fall back to defaults in the page.
 - Managers and HR can adjust compensation and record final expectations.
 - Submission status is displayed next to the review button for quick feedback.
+- Whenever the Reviews section is opened, the application reloads the latest
+  saved review from the server so users always see their most recent answers.
 - The dev button is always visible, but opening the dev panel requires
   authentication through the Chrome browser OAuth session. Only the accounts
   `skhun@dublincleaners.com` and `ss.sku@protonmail.com` are allowed to access
