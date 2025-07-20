@@ -119,7 +119,10 @@ function show(id){
   document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
   if(id==='reviews'){
     startLoading();
-    if(user) loadReviews();
+    if(user){
+      loadReviews();
+      loadSavedReview();
+    }
     loadQuestions();
   }else{
     document.getElementById(id).classList.remove('hidden');
@@ -197,6 +200,7 @@ function navLogin(){
   if(user){
     google.script.run.logout();
     user=null;
+    reviews=[];
     loginDiv.classList.add('hidden');
     document.getElementById('navLoginBtn').textContent=t('login');
     show('home');
@@ -221,6 +225,18 @@ function loadReviews(){
     renderReviews();
     fillSavedAnswers();
   }).listReviews();
+}
+
+function loadSavedReview(){
+  if(!user || !google || !google.script || !google.script.run) return;
+  google.script.run.withSuccessHandler(r=>{
+    if(r){
+      // replace existing saved review for selected year
+      reviews=reviews.filter(rv=>!(rv.type==='SELF' && rv.employeeId==user.id && rv.data && Number(rv.data.year)==Number(selectedYear)));
+      reviews.push(r);
+    }
+    fillSavedAnswers();
+  }).getReviewByYear(selectedYear);
 }
 function renderReviews(){const c=document.getElementById('reviewsList');if(!c)return;c.innerHTML='';reviews.forEach(rv=>{const div=document.createElement('div');div.className='card';div.innerHTML='<b>'+rv.type+'</b> '+rv.status+'<br>'+JSON.stringify(rv.data);c.appendChild(div);});}
 
