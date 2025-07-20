@@ -17,21 +17,17 @@ function doGet() {
   return HtmlService.createHtmlOutputFromFile('index');
 }
 
-/** Authenticate user with email/password */
-function login(email, password) {
+/** Authenticate user by email */
+function login(email) {
   const ss = SpreadsheetApp.getActive();
   const sheet = ss.getSheetByName(USERS_SHEET);
   const rows = sheet.getDataRange().getValues();
   for (let i = 1; i < rows.length; i++) {
-    const [id, em, name, role, managerId, lang, salt, hash] = rows[i];
+    const [id, em, name, role, managerId, lang] = rows[i];
     if (em === email) {
-      const sha = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, salt + password);
-      const hashStr = Array.from(sha, b => ('0' + (b & 0xFF).toString(16)).slice(-2)).join('');
-      if (hashStr === hash) {
-        const cache = CacheService.getUserCache();
-        cache.put(CACHE_KEY, JSON.stringify({id:id, email:em, name:name, role:role, managerId:managerId, lang:lang}), SESSION_DURATION);
-        return {success:true, user:{id:id,email:em,name:name,role:role,lang:lang}};
-      }
+      const cache = CacheService.getUserCache();
+      cache.put(CACHE_KEY, JSON.stringify({id:id, email:em, name:name, role:role, managerId:managerId, lang:lang}), SESSION_DURATION);
+      return {success:true, user:{id:id,email:em,name:name,role:role,lang:lang}};
     }
   }
   return {success:false};
@@ -44,8 +40,23 @@ function logout() {
 
 /** Get current session user */
 function getSession() {
-  const data = CacheService.getUserCache().get(CACHE_KEY);
+  const cache = CacheService.getUserCache();
+  const data = cache.get(CACHE_KEY);
   if (data) return JSON.parse(data);
+  const email = Session.getActiveUser().getEmail();
+  if (email) {
+    const ss = SpreadsheetApp.getActive();
+    const sheet = ss.getSheetByName(USERS_SHEET);
+    const rows = sheet.getDataRange().getValues();
+    for (let i = 1; i < rows.length; i++) {
+      const [id, em, name, role, managerId, lang] = rows[i];
+      if (em === email) {
+        const user = {id:id,email:em,name:name,role:role,managerId:managerId,lang:lang};
+        cache.put(CACHE_KEY, JSON.stringify(user), SESSION_DURATION);
+        return user;
+      }
+    }
+  }
   return null;
 }
 
@@ -193,11 +204,8 @@ function addUser(user) {
   if (!session || session.role !== 'DEV') throw new Error('denied');
   const ss = SpreadsheetApp.getActive();
   const sheet = ss.getSheetByName(USERS_SHEET);
-  const salt = Utilities.getUuid();
-  const sha = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, salt + user.password);
-  const hash = Array.from(sha, b => ('0' + (b & 0xFF).toString(16)).slice(-2)).join('');
   const id = new Date().getTime();
-  sheet.appendRow([id, user.email, user.name, user.role, user.managerId||'', user.lang||'en', salt, hash]);
+  sheet.appendRow([id, user.email, user.name, user.role, user.managerId||'', user.lang||'en']);
 }
 
 /** Check if session user is in DEV_USERS */
