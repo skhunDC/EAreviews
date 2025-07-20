@@ -12,6 +12,13 @@ const DEV_PASSWORD = 'changeme'; // replace in prod
 const ADMIN_SHEET_ID = '17lpaLBAL9XidYqiMhKNWRhZdEIqa0OzuVP7SYYc6VfQ';
 const DEV_USERS = ['skhun@dublincleaners.com','ss.sku@protonmail.com'];
 
+/** Return the spreadsheet used by the app */
+function getSpreadsheet(){
+  const ss = SpreadsheetApp.getActive();
+  if (ss) return ss;
+  return SpreadsheetApp.openById(ADMIN_SHEET_ID);
+}
+
 /** Create salted password hash */
 function createHash(pwd) {
   const salt = Utilities.getUuid();
@@ -43,7 +50,7 @@ function doGet() {
 
 /** Authenticate user by user ID */
 function login(userId, pwd) {
-  const ss = SpreadsheetApp.getActive();
+  const ss = getSpreadsheet();
   const sheet = ss.getSheetByName(USERS_SHEET);
   const rows = sheet.getDataRange().getValues();
   for (let i = 1; i < rows.length; i++) {
@@ -74,7 +81,7 @@ function getSession() {
   if (data) return JSON.parse(data);
   const email = Session.getActiveUser().getEmail();
   if (email) {
-    const ss = SpreadsheetApp.getActive();
+    const ss = getSpreadsheet();
     const sheet = ss.getSheetByName(USERS_SHEET);
     const rows = sheet.getDataRange().getValues();
     for (let i = 1; i < rows.length; i++) {
@@ -93,7 +100,7 @@ function getSession() {
 function saveLang(lang) {
   const user = getSession();
   if (!user) return;
-  const ss = SpreadsheetApp.getActive();
+  const ss = getSpreadsheet();
   const sheet = ss.getSheetByName(USERS_SHEET);
   const rows = sheet.getDataRange().getValues();
   for (let i = 1; i < rows.length; i++) {
@@ -108,7 +115,7 @@ function saveLang(lang) {
 
 /** Load config translations */
 function loadConfig() {
-  const ss = SpreadsheetApp.getActive();
+  const ss = getSpreadsheet();
   const sheet = ss.getSheetByName(CONFIG_SHEET);
   const rows = sheet.getDataRange().getValues();
   const cfg = {};
@@ -120,7 +127,7 @@ function loadConfig() {
 function listReviews() {
   const user = getSession();
   if (!user) throw new Error('not auth');
-  const ss = SpreadsheetApp.getActive();
+  const ss = getSpreadsheet();
   const sheet = ss.getSheetByName(REVIEWS_SHEET);
   const rows = sheet.getDataRange().getValues();
   const res = [];
@@ -136,7 +143,7 @@ function listReviews() {
 
 /** Helper to get direct reports */
 function getDirectReports(managerId) {
-  const ss = SpreadsheetApp.getActive();
+  const ss = getSpreadsheet();
   const sheet = ss.getSheetByName(USERS_SHEET);
   const rows = sheet.getDataRange().getValues();
   const map = {};
@@ -148,7 +155,7 @@ function getDirectReports(managerId) {
 function saveReview(review) {
   const user = getSession();
   if (!user) throw new Error('not auth');
-  const ss = SpreadsheetApp.getActive();
+  const ss = getSpreadsheet();
   const sheet = ss.getSheetByName(REVIEWS_SHEET);
   const rows = sheet.getDataRange().getValues();
   let rowIndex = -1;
@@ -174,7 +181,7 @@ function scheduleMeeting(mtg) {
   const start = new Date(mtg.start);
   const end = new Date(mtg.end);
   if ((end - start) != 30*60*1000) throw new Error('Slot must be 30m');
-  const ss = SpreadsheetApp.getActive();
+  const ss = getSpreadsheet();
   const sheet = ss.getSheetByName(MEETINGS_SHEET);
   const rows = sheet.getDataRange().getValues();
   for (let i=1;i<rows.length;i++) {
@@ -198,7 +205,7 @@ function scheduleMeeting(mtg) {
 function getDashboard() {
   const user = getSession();
   if (!user || (user.role !== 'HR' && user.role !== 'DEV')) throw new Error('denied');
-  const ss = SpreadsheetApp.getActive();
+  const ss = getSpreadsheet();
   const sheet = ss.getSheetByName(REVIEWS_SHEET);
   const rows = sheet.getDataRange().getValues();
   let completed = 0; let total = 0;
@@ -221,7 +228,7 @@ function getDashboard() {
 
 /** Export reviews CSV */
 function exportCSV() {
-  const ss = SpreadsheetApp.getActive();
+  const ss = getSpreadsheet();
   const sheet = ss.getSheetByName(REVIEWS_SHEET);
   const csv = sheet.getDataRange().getDisplayValues().map(r=>r.join(',')).join('\n');
   return csv;
@@ -231,7 +238,7 @@ function exportCSV() {
 function addUser(user) {
   const session = getSession();
   if (!session || session.role !== 'DEV') throw new Error('denied');
-  const ss = SpreadsheetApp.getActive();
+  const ss = getSpreadsheet();
   const sheet = ss.getSheetByName(USERS_SHEET);
   const id = new Date().getTime();
   sheet.appendRow([id, user.userId, user.name, user.role, user.managerId||'', user.lang||'en']);
@@ -263,7 +270,7 @@ function addNewUser(user) {
 
 /** Trigger daily to send reminders */
 function dailyNotifications() {
-  const ss = SpreadsheetApp.getActive();
+  const ss = getSpreadsheet();
   const reviewSheet = ss.getSheetByName(REVIEWS_SHEET);
   const usersSheet = ss.getSheetByName(USERS_SHEET);
   const reviews = reviewSheet.getDataRange().getValues();
@@ -288,7 +295,7 @@ function dailyNotifications() {
 
 /** Retrieve review questions */
 function getQuestions() {
-  const ss = SpreadsheetApp.getActive();
+  const ss = getSpreadsheet();
   let sheet = ss.getSheetByName(QUESTIONS_SHEET);
   if (!sheet) return [];
   const rows = sheet.getDataRange().getValues();
@@ -301,7 +308,7 @@ function getQuestions() {
 function saveQuestions(list) {
   const user = getSession();
   if (!user || user.role !== 'DEV') throw new Error('denied');
-  const ss = SpreadsheetApp.getActive();
+  const ss = getSpreadsheet();
   let sheet = ss.getSheetByName(QUESTIONS_SHEET);
   if (!sheet) {
     sheet = ss.insertSheet(QUESTIONS_SHEET);
@@ -318,7 +325,7 @@ function saveQuestions(list) {
 function saveCompAdjustment(reviewId, adj) {
   const user = getSession();
   if (!user || (['MANAGER','HR','DEV'].indexOf(user.role)===-1)) throw new Error('denied');
-  const ss = SpreadsheetApp.getActive();
+  const ss = getSpreadsheet();
   let sheet = ss.getSheetByName(COMP_SHEET);
   if(!sheet){
     sheet = ss.insertSheet(COMP_SHEET);
@@ -332,7 +339,7 @@ function saveCompAdjustment(reviewId, adj) {
 function saveFinalExpectation(reviewId, exp) {
   const user = getSession();
   if (!user) throw new Error('not auth');
-  const ss = SpreadsheetApp.getActive();
+  const ss = getSpreadsheet();
   const sheet = ss.getSheetByName(REVIEWS_SHEET);
   const rows = sheet.getDataRange().getValues();
   for(let i=1;i<rows.length;i++){
