@@ -261,6 +261,7 @@ function updateReviewMenu(){
 function selectReviewYear(y){
   selectedYear=y;
   fillSavedAnswers();
+  loadReviews();
   const menu=document.getElementById('reviewMenu');
   if(menu) menu.classList.remove('show');
 }
