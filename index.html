@@ -286,12 +286,17 @@ function addNewUser(){
   const em=document.getElementById('newUserEmail').value;
   const role=document.getElementById('newUserRole').value;
   const pwd=document.getElementById('newUserPwd').value;
-  google.script.run.withSuccessHandler(()=>{
-    alert('Added');
-    document.getElementById('newUserEmail').value='';
-    document.getElementById('newUserRole').value='';
-    document.getElementById('newUserPwd').value='';
-  }).addNewUser({email:em,role:role,password:pwd});
+  google.script.run
+    .withSuccessHandler(()=>{
+      alert('Account created');
+      document.getElementById('newUserEmail').value='';
+      document.getElementById('newUserRole').value='';
+      document.getElementById('newUserPwd').value='';
+    })
+    .withFailureHandler(err=>{
+      alert('Failed to create account: '+err.message);
+    })
+    .addNewUser({email:em,role:role,password:pwd});
 }
 document.addEventListener('DOMContentLoaded',init);
 </script>

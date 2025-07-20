@@ -242,12 +242,16 @@ function isAuthorizedDev() {
 /** Admin panel API to add simple user entry */
 function addNewUser(user) {
   if (!isAuthorizedDev()) throw new Error('denied');
-  const ss = SpreadsheetApp.getActive();
+  if (!user.email || !user.password || !user.role) {
+    throw new Error('missing required fields');
+  }
+  const ss = SpreadsheetApp.openById(ADMIN_SHEET_ID);
   const sheet = ss.getSheetByName(USERS_SHEET);
+  if (!sheet) throw new Error('users sheet not found');
   const id = new Date().getTime();
   const h = createHash(user.password);
   sheet.appendRow([id, user.email, user.name || '', user.role, user.managerId || '', user.lang || 'en', h.hashHex, h.saltHex, new Date()]);
-  return true;
+  return {id:id};
 }
 
 /** Trigger daily to send reminders */
