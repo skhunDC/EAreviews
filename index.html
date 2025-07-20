@@ -25,6 +25,11 @@ select{padding:8px;}
  .rating-group label{display:inline-block;margin-right:10px;}
 button.primary{background:#6200ee;color:white;border:none;border-radius:4px;padding:8px 16px;cursor:pointer;}
 #submitMsg{margin-left:8px;font-weight:bold;}
+/* Dropdown styles */
+.dropdown{position:relative;}
+.dropdown-content{display:none;position:absolute;top:100%;left:0;background:#6200ee;color:white;min-width:80px;z-index:10;}
+.dropdown-content button{background:none;border:none;color:white;cursor:pointer;display:block;width:100%;padding:6px 12px;text-align:left;}
+.dropdown:hover .dropdown-content{display:block;}
 /* Loading bar styles */
 .loading-bar{height:4px;background:#eee;position:relative;overflow:hidden;}
 .loading-bar span{display:block;height:100%;background:#6200ee;width:100%;animation:loadAnim 1.2s linear infinite;}
@@ -36,6 +41,7 @@ let loadingReviews=false;
 let pendingSection=null;
 let currentReviewId=null;
 let autoSaveTimeout=null;
+let selectedYear=new Date().getFullYear();
 
 const defaultQuestions=[
   {id:'attendance',en:'Attendance & Punctuality',es:'Asistencia y Puntualidad',extras:[
@@ -149,11 +155,13 @@ function loadSession(){
       localStorage.setItem('lang',lang);
       applyTranslations();
       showDevButton();
+      updateReviewMenu();
       loadReviews();
       show('home');
     }else{
       applyTranslations();
       showDevButton();
+      updateReviewMenu();
     }
   }).getSession();
 }
@@ -170,6 +178,7 @@ function login(){
         document.getElementById('navLoginBtn').textContent=t('logout');
         applyTranslations();
         showDevButton();
+        updateReviewMenu();
         loadReviews();
       const target=pendingSection||'reviews';
       pendingSection=null;
@@ -196,6 +205,7 @@ function navLogin(){
     user=null;
     loginDiv.classList.add('hidden');
     document.getElementById('navLoginBtn').textContent=t('login');
+    updateReviewMenu();
     show('home');
   }else{
     loginDiv.classList.toggle('hidden');
@@ -214,10 +224,33 @@ function loadReviews(){
   google.script.run.withSuccessHandler(r=>{
     reviews=r;
     renderReviews();
+    updateReviewMenu();
     fillSavedAnswers();
   }).listReviews();
 }
 function renderReviews(){const c=document.getElementById('reviewsList');if(!c)return;c.innerHTML='';reviews.forEach(rv=>{const div=document.createElement('div');div.className='card';div.innerHTML='<b>'+rv.type+'</b> '+rv.status+'<br>'+JSON.stringify(rv.data);c.appendChild(div);});}
+
+function updateReviewMenu(){
+  const menu=document.getElementById('reviewMenu');
+  if(!menu) return;
+  menu.innerHTML='';
+  if(!user){menu.style.display='none';return;}
+  const years=[...new Set(reviews.filter(r=>r.type==='SELF'&&r.employeeId==user.id).map(r=>r.data&&r.data.year).filter(y=>y))];
+  if(years.indexOf(selectedYear)===-1) years.push(selectedYear);
+  years.sort();
+  years.forEach(y=>{
+    const b=document.createElement('button');
+    b.textContent=y;
+    b.onclick=()=>{selectReviewYear(y);};
+    menu.appendChild(b);
+  });
+  menu.style.display='block';
+}
+
+function selectReviewYear(y){
+  selectedYear=y;
+  fillSavedAnswers();
+}
 
 function showDevButton(){
   const btn=document.getElementById('devBtn');
@@ -306,8 +339,15 @@ function renderQuestionList(){
 }
 
 function fillSavedAnswers(){
+  document.querySelectorAll('#questionList input.rating').forEach(r=>{r.checked=false;});
+  document.querySelectorAll('#questionList .extra').forEach(e=>{e.value='';});
+  document.querySelectorAll('#finalBlock input[name=finalExp]').forEach(r=>{r.checked=false;});
+  document.getElementById('finalNotes').value='';
+  document.getElementById('empSign').value='';
+  document.getElementById('mgrSign').value='';
+  currentReviewId=null;
   if(!user||!reviews||!reviews.length) return;
-  const rev=reviews.find(r=>r.type==='SELF'&&r.employeeId==user.id);
+  const rev=reviews.find(r=>r.type==='SELF'&&r.employeeId==user.id&&r.data&&r.data.year==selectedYear);
   if(!rev||!rev.data||!rev.data.answers) return;
   currentReviewId=rev.id;
   const ans=rev.data.answers;
@@ -364,7 +404,7 @@ function gatherAnswers(){
 function saveDraftReview(){
   if(!user) return;
   const ans=gatherAnswers();
-  const review={id:currentReviewId,employeeId:user.id,type:'SELF',data:{answers:ans},status:'DRAFT'};
+  const review={id:currentReviewId,employeeId:user.id,type:'SELF',data:{year:selectedYear,answers:ans},status:'DRAFT'};
   google.script.run.withSuccessHandler(r=>{
     currentReviewId=r.id;
     const exp={result:document.querySelector('input[name=finalExp]:checked')?.value||'',notes:document.getElementById('finalNotes').value,empSign:{name:document.getElementById('empSign').value,ts:new Date().toISOString()},mgrSign:{name:document.getElementById('mgrSign').value,ts:new Date().toISOString()}};
@@ -377,7 +417,7 @@ function scheduleAutoSave(){
 }
 function submitReview(){
   const ans=gatherAnswers();
-  const review={id:currentReviewId,employeeId:user.id,type:'SELF',data:{answers:ans}};
+  const review={id:currentReviewId,employeeId:user.id,type:'SELF',data:{year:selectedYear,answers:ans}};
   google.script.run.withSuccessHandler(r=>{
     currentReviewId=r.id;
     const adjBlock=document.getElementById('compAdjust');
@@ -419,7 +459,10 @@ document.addEventListener('DOMContentLoaded',init);
 <nav>
 <img src="https://www.dublincleaners.com/wp-content/uploads/2024/12/Dublin-Logos-stacked.png" alt="Logo" class="logo">
 <button onclick="show('home')" data-i18n-key="home">Home</button>
+<div class="dropdown">
 <button onclick="show('reviews')" data-i18n-key="reviews">Reviews</button>
+<div id="reviewMenu" class="dropdown-content"></div>
+</div>
 <button onclick="show('schedule')" data-i18n-key="schedule">Schedule</button>
 <div class="nav-title" data-i18n-key="navTitle">Employee Annual Reviews</div>
 <div class="lang-switch">

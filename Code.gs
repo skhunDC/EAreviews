@@ -168,7 +168,13 @@ function saveReview(review) {
   const rows = sheet.getDataRange().getValues();
   let rowIndex = -1;
   for (let i=1;i<rows.length;i++) {
-    if (rows[i][0]==review.id) { rowIndex=i; break; }
+    const [id, emp, type, dataStr] = rows[i];
+    const data = JSON.parse(dataStr||'{}');
+    if(id==review.id || (emp==review.employeeId && type==review.type && data.year==review.data.year)) {
+      rowIndex = i;
+      review.id = id;
+      break;
+    }
   }
   const dataStr = JSON.stringify(review.data);
   if (rowIndex>0) {
