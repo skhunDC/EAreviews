@@ -32,7 +32,6 @@ button.primary{background:#6200ee;color:white;border:none;border-radius:4px;padd
 <script>
 let user=null,config={},lang=localStorage.getItem('lang')||'en';
 let loadingReviews=false;
-const devEmails=['skhun@dublincleaners.com','ss.sku@protonmail.com'];
 
 const defaultQuestions=[
   {id:'attendance',en:'Attendance & Punctuality',es:'Asistencia y Puntualidad',extras:[
@@ -95,7 +94,6 @@ function stopLoading(){
   loadingReviews=false;
 }
 function show(id){
-  if(id==='devPanel' && (!user || devEmails.indexOf(user.email)===-1)) return;
   document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
   if(id==='reviews'){
     startLoading();
@@ -170,14 +168,28 @@ function renderReviews(){const c=document.getElementById('reviewsList');if(!c)re
 
 function showDevButton(){
   const btn=document.getElementById('devBtn');
-  if(!btn)return;
-  if(user&&devEmails.indexOf(user.email)!==-1){
-    btn.classList.remove('hidden');
-    btn.disabled=false;
-  }else{
-    btn.classList.add('hidden');
-    btn.disabled=true;
-  }
+  if(!btn||!google||!google.script||!google.script.run)return;
+  google.script.run.withSuccessHandler(isDev=>{
+    if(isDev){
+      btn.classList.remove('hidden');
+      btn.disabled=false;
+    }else{
+      btn.classList.add('hidden');
+      btn.disabled=true;
+    }
+  }).isAuthorizedDev();
+}
+
+function openDevPanel(){
+  if(!google||!google.script||!google.script.run)return;
+  google.script.run.withSuccessHandler(isDev=>{
+    if(isDev){
+      document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
+      document.getElementById('devPanel').classList.remove('hidden');
+    }else{
+      alert('Not authorized');
+    }
+  }).isAuthorizedDev();
 }
 
 let questions=[];
@@ -296,7 +308,7 @@ document.addEventListener('DOMContentLoaded',init);
   <label class="switch"><input type="checkbox" id="langToggle" onchange="toggleLang()"><span class="slider"></span></label>
   <span>ES</span>
 </div>
-<button id="devBtn" class="hidden" onclick="show('devPanel')">Dev</button>
+<button id="devBtn" class="hidden" onclick="openDevPanel()">Dev</button>
 </nav>
 <div id="loadingBar" class="loading-bar hidden"><span></span></div>
 <section id="home" class="hidden">

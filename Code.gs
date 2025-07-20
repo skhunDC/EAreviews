@@ -202,8 +202,8 @@ function addUser(user) {
 
 /** Check if session user is in DEV_USERS */
 function isAuthorizedDev() {
-  const s = getSession();
-  return s && DEV_USERS.indexOf(s.email) !== -1;
+  const email = Session.getActiveUser().getEmail();
+  return DEV_USERS.indexOf(email) !== -1;
 }
 
 /** Admin panel API to add simple user entry */
