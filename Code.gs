@@ -246,8 +246,11 @@ function addNewUser(user) {
     throw new Error('missing required fields');
   }
   const ss = SpreadsheetApp.openById(ADMIN_SHEET_ID);
-  const sheet = ss.getSheetByName(USERS_SHEET);
-  if (!sheet) throw new Error('users sheet not found');
+  let sheet = ss.getSheetByName(USERS_SHEET);
+  if (!sheet) {
+    sheet = ss.insertSheet(USERS_SHEET);
+    sheet.appendRow(['ID','EMAIL','NAME','ROLE','MANAGER_ID','LANG','HASH','SALT','CREATED']);
+  }
   const id = new Date().getTime();
   const h = createHash(user.password);
   sheet.appendRow([id, user.email, user.name || '', user.role, user.managerId || '', user.lang || 'en', h.hashHex, h.saltHex, new Date()]);
