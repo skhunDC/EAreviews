@@ -213,12 +213,12 @@ function stopLoading(){
 function show(id){
   if((id==='reviews' || id==='schedule') && !user){
     pendingSection=id;
-    document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
+    document.querySelectorAll('body>section').forEach(s=>s.classList.add('hidden'));
     document.getElementById('login').classList.remove('hidden');
     return;
   }
   document.getElementById('login').classList.add('hidden');
-  document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
+  document.querySelectorAll('body>section').forEach(s=>s.classList.add('hidden'));
   if(id==='reviews'){
     startLoading();
     if(user){
@@ -364,7 +364,7 @@ function openDevPanel(){
   if(typeof google==='undefined' || !google.script || !google.script.run) return;
   google.script.run.withSuccessHandler(isDev=>{
     if(isDev){
-      document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));
+      document.querySelectorAll('body>section').forEach(s=>s.classList.add('hidden'));
       document.getElementById('devPanel').classList.remove('hidden');
     }else{
       alert('Not authorized');
