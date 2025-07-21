@@ -335,6 +335,7 @@ function renderQuestionList(){
     document.getElementById('reviews').classList.remove('hidden');
     stopLoading();
   }
+  setupAutosave();
 }
 
 function fillSavedAnswers(){
@@ -416,9 +417,33 @@ function gatherReviewData(){
   const finalExp={result:document.querySelector('input[name=finalExp]:checked')?.value||'',notes:document.getElementById('finalNotes').value,empSign:{name:document.getElementById('empSign').value,ts:new Date().toISOString()},mgrSign:{name:document.getElementById('mgrSign').value,ts:new Date().toISOString()}};
   return {answers,comp,finalExp};
 }
+
+let autosaveTimeout;
+function scheduleAutosave(){
+  clearTimeout(autosaveTimeout);
+  autosaveTimeout=setTimeout(autosaveReview,1000);
+}
+function autosaveReview(){
+  if(!user) return;
+  const data=gatherReviewData();
+  const review={id:currentReviewId,employeeId:user.id,type:'SELF',status:'DRAFT',data:{year:selectedYear,answers:data.answers,finalExpectation:data.finalExp}};
+  google.script.run.withFailureHandler(e=>console.error('autosave failed',e)).saveFullReview(review,data.comp);
+}
+function setupAutosave(){
+  const form=document.getElementById('reviewForm');
+  if(!form)return;
+  const fields=form.querySelectorAll('input,textarea,select');
+  fields.forEach(f=>{
+    f.removeEventListener('input',scheduleAutosave);
+    f.removeEventListener('change',scheduleAutosave);
+    f.addEventListener('input',scheduleAutosave);
+    f.addEventListener('change',scheduleAutosave);
+  });
+  window.addEventListener('beforeunload',autosaveReview);
+}
 function submitReview(){
   const data=gatherReviewData();
-  const review={id:currentReviewId,employeeId:user.id,type:'SELF',data:{year:selectedYear,answers:data.answers,finalExpectation:data.finalExp}};
+  const review={id:currentReviewId,employeeId:user.id,type:'SELF',status:'SUBMITTED',data:{year:selectedYear,answers:data.answers,finalExpectation:data.finalExp}};
   document.getElementById('submitMsg').textContent='Saved';
   google.script.run.withSuccessHandler(r=>{
     currentReviewId=r.id;
