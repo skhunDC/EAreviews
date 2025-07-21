@@ -2,56 +2,57 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Dublin Cleaners</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<title>Employee Reviews</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 <style>
-:root{
-  --font-family:'Roboto','Helvetica Neue',Arial,sans-serif;
-  --color-primary:#1B365D;
-  --color-secondary:#8BC34A;
-  --color-bg:#F5F7FA;
-  --color-surface:#FFFFFF;
-  --color-text:#000;
-  --radius:8px;
-  --shadow:0 2px 4px rgba(0,0,0,.08);
-  --text-h1:2.25rem;
-  --text-h2:1.75rem;
-  --text-h3:1.375rem;
-  --text-body:1rem;
-  --text-small:0.875rem;
-  --space-1:4px;
-  --space-2:8px;
-  --space-3:12px;
-  --space-4:16px;
-  --space-5:24px;
-  --space-6:32px;
-  --transition:all .25s ease;
-}
-@media (prefers-color-scheme: dark){
-  :root{--color-bg:#121212;--color-surface:#1F1F1F;--color-text:#E0E0E0;}
-}
-body{font-family:var(--font-family);background:var(--color-bg);color:var(--color-text);margin:0;font-size:var(--text-body);line-height:1.6;}
-h1{font-size:var(--text-h1);margin:0 0 var(--space-4);}
-h2{font-size:var(--text-h2);margin:0 0 var(--space-3);}
-h3{font-size:var(--text-h3);margin:0 0 var(--space-3);}
-.dc-container{padding:var(--space-5);}
-.dc-header{display:flex;align-items:center;justify-content:space-between;background:var(--color-primary);color:#fff;padding:var(--space-2) var(--space-4);}
-.dc-logo{height:120px;}
-.dc-nav button{background:none;border:none;color:#fff;margin-right:var(--space-2);cursor:pointer;font-size:var(--text-body);transition:var(--transition);}
-.dc-nav button:hover{color:var(--color-secondary);}
-.dc-actions{display:flex;align-items:center;gap:var(--space-2);}
-.dc-lang-toggle button{background:none;border:none;color:#fff;cursor:pointer;font-size:var(--text-body);padding:0 var(--space-1);}
-.dc-lang-toggle button.active{text-decoration:underline;font-weight:bold;}
-.dc-btn{background:var(--color-primary);color:#fff;border:none;border-radius:var(--radius);padding:var(--space-2) var(--space-4);cursor:pointer;transition:var(--transition);}
-.dc-btn:hover{background:#162c4a;}
-.dc-card{background:var(--color-surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:var(--space-4);margin-bottom:var(--space-5);}
-.dc-grid{display:grid;gap:var(--space-3);grid-template-columns:repeat(auto-fit,minmax(200px,1fr));}
-.dc-badge{background:var(--color-secondary);color:#fff;padding:var(--space-1) var(--space-2);border-radius:var(--radius);font-size:var(--text-small);}
-.dc-text-small{font-size:var(--text-small);}
+body{font-family:'Inter',Roboto,Arial,sans-serif;margin:0;padding:0;background:#fefdf9;color:#333;font-size:1rem;line-height:1.6;}
+h1,h2{font-family:'Poppins',Arial,sans-serif;}
+h1{font-size:clamp(1.75rem,4vw,2.5rem);margin:0 0 1rem 0;}
+h2{font-size:1.25rem;margin-top:0;color:#0A5C30;}
+#review-intro h1{text-align:center;color:#0A5C30;font-weight:700;margin-bottom:1.5rem;}
+#review-intro{max-width:900px;margin:auto;padding:2rem;background:#fefdf9;color:#333;}
+#review-intro .intro-cards{display:flex;flex-wrap:wrap;gap:1.5rem;}
+#review-intro .info-card{background:#fff;border-radius:1rem;box-shadow:0 4px 12px rgba(0,0,0,0.08);padding:1.5rem;flex:1 1 100%;animation:slideUp 0.5s ease forwards;}
+@media(min-width:640px){#review-intro .info-card{flex-basis:calc(50% - 0.75rem);}}
+.values-list{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));}
+.values-list li{display:inline-block;background:#0A5C30;color:#fff;padding:0.2rem 0.75rem;border-radius:9999px;font-size:0.9rem;margin:0.2rem;text-align:center;}
+.rating-badges{display:flex;gap:0.5rem;margin-bottom:0.5rem;flex-wrap:wrap;}
+.badge{display:inline-block;padding:0.25rem 0.75rem;border-radius:9999px;font-size:0.9rem;color:#fff;}
+.badge-gray{background:#888;}
+.badge-green{background:#0A5C30;}
+.badge-gold{background:#C9A14A;color:#000;}
+.process{display:flex;flex-wrap:wrap;align-items:center;gap:0.3rem;margin-bottom:0.5rem;font-size:0.9rem;}
+.process svg{width:12px;height:12px;fill:none;stroke:#0A5C30;stroke-width:2;}
+.callout{margin-top:1rem;background:#C9A14A1A;border-left:4px solid #C9A14A;padding:0.75rem;font-size:0.9rem;}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+nav{display:flex;gap:10px;background:#0A5C30;color:white;padding:10px;align-items:center;position:relative;}
+nav button{background:none;border:none;color:white;font-size:16px;cursor:pointer;padding:6px 12px;}
+.lang-switch{display:flex;align-items:center;margin-left:auto;gap:4px;}
+.logo{width:125px;height:125px;}
+.nav-title{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:24px;font-weight:bold;}
+.switch{position:relative;display:inline-block;width:34px;height:18px;}
+.switch input{opacity:0;width:0;height:0;}
+.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#ccc;transition:.4s;border-radius:34px;}
+.slider:before{position:absolute;content:"";height:14px;width:14px;left:2px;bottom:2px;background:white;transition:.4s;border-radius:50%;}
+.switch input:checked + .slider{background:#0A5C30;}
+.switch input:checked + .slider:before{transform:translateX(16px);}
+section{padding:20px;}
+.card{background:#fff;padding:1.5rem;margin-bottom:1.5rem;border-radius:1rem;box-shadow:0 4px 12px rgba(0,0,0,0.08);}
 .hidden{display:none;}
-.dc-footer{text-align:center;padding:var(--space-4);font-size:var(--text-small);color:#555;}
+label{display:block;margin-top:10px;}
+input[type=text],textarea{width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:4px;}
+select{padding:8px;}
+ .rating-group label{display:inline-block;margin-right:10px;}
+button.primary{background:#0A5C30;color:white;border:none;border-radius:4px;padding:8px 16px;cursor:pointer;}
+#submitMsg{margin-left:8px;font-weight:bold;}
+/* Dropdown styles */
+.dropdown{position:relative;}
+.dropdown-content{display:none;position:absolute;top:100%;left:0;background:#0A5C30;color:white;min-width:80px;z-index:10;}
+.dropdown-content button{background:none;border:none;color:white;cursor:pointer;display:block;width:100%;padding:6px 12px;text-align:left;}
+.dropdown-content.show{display:block;}
+/* Loading bar styles */
 .loading-bar{height:4px;background:#eee;position:relative;overflow:hidden;}
-.loading-bar span{display:block;height:100%;background:var(--color-primary);width:100%;animation:loadAnim 1.2s linear infinite;}
+.loading-bar span{display:block;height:100%;background:#0A5C30;width:100%;animation:loadAnim 1.2s linear infinite;}
 @keyframes loadAnim{from{transform:translateX(-100%);}to{transform:translateX(100%);}}
 </style>
 <script>
@@ -232,16 +233,15 @@ function show(id){
   }
 }
 function applyTranslations(){
-  document.querySelectorAll('[data-i18n]').forEach(el=>{
-    const key=el.dataset.i18n;
+  document.querySelectorAll('[data-i18n-key]').forEach(el=>{
+    const key=el.dataset.i18nKey;
     if(el.hasAttribute('data-i18n-placeholder'))el.placeholder=t(key);
     else if(el.hasAttribute('data-i18n-html'))el.innerHTML=t(key);
     else if(el.hasAttribute('data-i18n-alt'))el.alt=t(key);
     else el.textContent=t(key);
   });
-  document.querySelectorAll('.dc-lang-toggle button').forEach(btn=>{
-    btn.classList.toggle('active',btn.dataset.lang===lang);
-  });
+  const toggle=document.getElementById('langToggle');
+  if(toggle)toggle.checked=lang==='es';
   const loginBtn=document.getElementById('navLoginBtn');
   if(loginBtn)loginBtn.textContent=user?t('logout'):t('login');
 }
@@ -318,8 +318,8 @@ function navLogin(){
   }
 }
 
-function toggleLang(l){
-  lang=l||'en';
+function toggleLang(){
+  lang=document.getElementById('langToggle').checked?'es':'en';
   if(user) user.lang=lang;
   if(typeof google!=='undefined' && google.script && google.script.run){
     google.script.run.saveLang(lang);
@@ -571,70 +571,64 @@ document.addEventListener('DOMContentLoaded',init);
 </script>
 </head>
 <body>
-<header class="dc-header">
-  <img src="https://www.dublincleaners.com/wp-content/uploads/2024/12/Dublin-Logos-stacked.png" alt="Logo" class="dc-logo">
-  <h1 class="dc-title" data-i18n="navTitle">Employee Annual Reviews</h1>
-  <div class="dc-actions">
-    <div class="dc-lang-toggle">
-      <button data-lang="en" onclick="toggleLang('en')">EN</button>
-      <button data-lang="es" onclick="toggleLang('es')">ES</button>
-    </div>
-    <button id="devBtn" class="dc-btn" onclick="openDevPanel()">Dev</button>
-  </div>
-</header>
-<nav class="dc-nav">
-  <button onclick="show('home')" data-i18n="home">Home</button>
-  <button onclick="show('reviews')" data-i18n="reviews">Reviews</button>
-  <button onclick="show('schedule')" data-i18n="schedule">Schedule</button>
-  <button id="navLoginBtn" class="dc-btn" onclick="navLogin()">Login</button>
+<nav>
+<img src="https://www.dublincleaners.com/wp-content/uploads/2024/12/Dublin-Logos-stacked.png" alt="Logo" class="logo">
+<button onclick="show('home')" data-i18n-key="home">Home</button>
+<button onclick="show('reviews')" data-i18n-key="reviews">Reviews</button>
+<button onclick="show('schedule')" data-i18n-key="schedule">Schedule</button>
+<div class="nav-title" data-i18n-key="navTitle">Employee Annual Reviews</div>
+<div class="lang-switch">
+  <span>EN</span>
+  <label class="switch"><input type="checkbox" id="langToggle" onchange="toggleLang()"><span class="slider"></span></label>
+  <span>ES</span>
+</div>
+<button id="navLoginBtn" onclick="navLogin()">Login</button>
+<button id="devBtn" onclick="openDevPanel()">Dev</button>
 </nav>
-<main class="dc-container">
 <div id="loadingBar" class="loading-bar hidden"><span></span></div>
-<section id="home" class="dc-card hidden">
-<h2 data-i18n="welcomeTitle">Welcome to the Employee Review Portal</h2>
-<p data-i18n="welcomeMsg">Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.</p>
+<section id="home" class="hidden">
+<h2 data-i18n-key="welcomeTitle">Welcome to the Employee Review Portal</h2>
+<p data-i18n-key="welcomeMsg">Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.</p>
 <div id="reviewsList"></div>
 </section>
-<section id="reviews" class="dc-card hidden">
+<section id="reviews" class="hidden">
 <form id="reviewForm" onsubmit="submitReview();return false;">
-<div data-i18n="intro" data-i18n-html></div>
+<div data-i18n-key="intro" data-i18n-html></div>
 <div id="questionList"></div>
-<div id="compAdjust" class="dc-card hidden">
-<label><span data-i18n="curWage">Current Wage</span><input type="number" id="curWage"></label>
-<label><span data-i18n="newWage">New Wage</span><input type="number" id="newWage" oninput="calcPct()"></label>
-<div><span data-i18n="pctIncrease">% Increase:</span> <span id="pctInc">0</span>%</div>
+<div id="compAdjust" class="card hidden">
+<label><span data-i18n-key="curWage">Current Wage</span><input type="number" id="curWage"></label>
+<label><span data-i18n-key="newWage">New Wage</span><input type="number" id="newWage" oninput="calcPct()"></label>
+<div><span data-i18n-key="pctIncrease">% Increase:</span> <span id="pctInc">0</span>%</div>
 </div>
-<div id="finalBlock" class="dc-card">
-<p data-i18n="finalExpTitle">Final Performance Expectation</p>
-<label><input type="radio" name="finalExp" value="below"> <span data-i18n="belowExp">Below Expectations</span></label>
-<label><input type="radio" name="finalExp" value="meets"> <span data-i18n="meetsExp">Meets Expectations</span></label>
-<label><input type="radio" name="finalExp" value="exceeds"> <span data-i18n="exceedsExp">Exceeds Expectations</span></label>
-<textarea id="finalNotes" data-i18n="notesPlaceholder" data-i18n-placeholder placeholder="Notes"></textarea>
-<small data-i18n="contactQuestions">Contact Sea Khun with questions.</small>
+<div id="finalBlock" class="card">
+<p data-i18n-key="finalExpTitle">Final Performance Expectation</p>
+<label><input type="radio" name="finalExp" value="below"> <span data-i18n-key="belowExp">Below Expectations</span></label>
+<label><input type="radio" name="finalExp" value="meets"> <span data-i18n-key="meetsExp">Meets Expectations</span></label>
+<label><input type="radio" name="finalExp" value="exceeds"> <span data-i18n-key="exceedsExp">Exceeds Expectations</span></label>
+<textarea id="finalNotes" data-i18n-key="notesPlaceholder" data-i18n-placeholder placeholder="Notes"></textarea>
+<small data-i18n-key="contactQuestions">Contact Sea Khun with questions.</small>
 </div>
-<div class="dc-card">
-<label><span data-i18n="empSignature">Employee Signature</span><input type="text" id="empSign"></label>
-<label><span data-i18n="mgrSignature">Manager Signature</span><input type="text" id="mgrSign"></label>
+<div class="card">
+<label><span data-i18n-key="empSignature">Employee Signature</span><input type="text" id="empSign"></label>
+<label><span data-i18n-key="mgrSignature">Manager Signature</span><input type="text" id="mgrSign"></label>
 </div>
-<button class="dc-btn" type="submit" data-i18n="submitReview">Submit Review</button><span id="submitMsg"></span>
+<button class="primary" type="submit" data-i18n-key="submitReview">Submit Review</button><span id="submitMsg"></span>
 </form>
 </section>
-<section id="schedule" class="dc-card hidden">
-<p data-i18n="comingSoon">Coming soon...</p>
+<section id="schedule" class="hidden">
+<p data-i18n-key="comingSoon">Coming soon...</p>
 </section>
-<section id="devPanel" class="dc-card hidden">
+<section id="devPanel" class="hidden">
   <h3>Admin Panel</h3>
   <label>UserID<input type="text" id="newUserId"></label>
   <label>Role<input type="text" id="newUserRole"></label>
   <label>Password<input type="password" id="newUserPwd"></label>
-  <button class="dc-btn" onclick="addNewUser()">Add User</button>
+  <button class="primary" onclick="addNewUser()">Add User</button>
 </section>
-<div id="login" class="dc-card hidden">
-<label><span data-i18n="userId">User ID</span><input type="text" id="userId" data-i18n="userId" data-i18n-placeholder></label>
-<label><span data-i18n="password">Password</span><input type="password" id="password" data-i18n="password" data-i18n-placeholder></label>
-<button class="dc-btn" onclick="login()" data-i18n="login">Login</button>
+<div id="login" class="hidden">
+<label><span data-i18n-key="userId">User ID</span><input type="text" id="userId" data-i18n-key="userId" data-i18n-placeholder></label>
+<label><span data-i18n-key="password">Password</span><input type="password" id="password" data-i18n-key="password" data-i18n-placeholder></label>
+<button class="primary" onclick="login()" data-i18n-key="login">Login</button>
 </div>
-</main>
-<footer class="dc-footer">Follow us on  @dublincleaners  (Facebook, Instagram, TikTok, X)</footer>
 </body>
 </html>
