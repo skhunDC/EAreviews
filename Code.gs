@@ -358,7 +358,10 @@ function saveQuestions(list) {
     sheet = ss.insertSheet(QUESTIONS_SHEET);
     sheet.appendRow(['ID','EN','ES','EXTRA']);
   }
-  sheet.getRange(2,1,sheet.getLastRow(),4).clearContent();
+  const last = sheet.getLastRow();
+  if (last > 1) {
+    sheet.getRange(2, 1, last - 1, 4).clearContent();
+  }
   list.forEach((q,i)=>{
     sheet.getRange(i+2,1,1,4).setValues([[q.id||('q'+(i+1)), q.en, q.es, q.extra||'']]);
   });
