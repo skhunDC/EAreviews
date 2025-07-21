@@ -171,6 +171,8 @@ function loadSession(){
 function login(){
   const e=document.getElementById('userId').value;
   const p=document.getElementById('password').value;
+  document.body.style.cursor='wait';
+  setTimeout(()=>{document.body.style.cursor='';},3000);
   google.script.run
     .withSuccessHandler(r=>{
       if(r.success){
@@ -417,22 +419,11 @@ function gatherReviewData(){
 function submitReview(){
   const data=gatherReviewData();
   const review={id:currentReviewId,employeeId:user.id,type:'SELF',data:{year:selectedYear,answers:data.answers,finalExpectation:data.finalExp}};
-  document.body.style.cursor='wait';
-  document.getElementById('submitMsg').textContent=t('saving');
-
-  const fail=err=>{
-    document.getElementById('submitMsg').textContent=err.message||t('saveFailed');
-    document.body.style.cursor='';
-  };
-
-  const finalize=id=>{
-    currentReviewId=id;
+  document.getElementById('submitMsg').textContent='Saved';
+  google.script.run.withSuccessHandler(r=>{
+    currentReviewId=r.id;
     loadReviews();
-    document.getElementById('submitMsg').textContent=t('reviewSaved');
-    document.body.style.cursor='';
-  };
-
-  google.script.run.withSuccessHandler(r=>finalize(r.id)).withFailureHandler(fail).saveFullReview(review,data.comp);
+  }).saveFullReview(review,data.comp);
 }
 
 function addNewUser(){
