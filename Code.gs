@@ -144,7 +144,11 @@ function loadConfig() {
   const sheet = ss.getSheetByName(CONFIG_SHEET);
   const rows = sheet.getDataRange().getValues();
   const cfg = {};
-  rows.forEach(r => { cfg[r[0]] = {en:r[1], es:r[2]}; });
+  rows.forEach((r,i) => {
+    if(i === 0) return; // skip header row
+    if(!r[0]) return;
+    cfg[r[0]] = {en:r[1], es:r[2]};
+  });
   return cfg;
 }
 
