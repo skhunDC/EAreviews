@@ -12,6 +12,19 @@ const DEV_PASSWORD = 'changeme'; // replace in prod
 const ADMIN_SHEET_ID = '17lpaLBAL9XidYqiMhKNWRhZdEIqa0OzuVP7SYYc6VfQ';
 const DEV_USERS = ['skhun@dublincleaners.com','ss.sku@protonmail.com'];
 const REVIEW_FOLDER_NAME = 'EAReviewData';
+// HTMLService helpers
+function include(filename){
+  return HtmlService.createHtmlOutputFromFile(filename).getContent();
+}
+
+function doGet(){
+  return HtmlService.createTemplateFromFile("index").evaluate().setTitle("Dublin Cleaners");
+}
+
+function getLang(){
+  return PropertiesService.getUserProperties().getProperty("lang") || "en";
+}
+
 
 /** Return the spreadsheet used by the app */
 function getSpreadsheet(){
@@ -68,10 +81,7 @@ function createSession(uid) {
   return token;
 }
 
-/** Serve the web app */
-function doGet() {
-  return HtmlService.createHtmlOutputFromFile('index');
-}
+
 
 /** Authenticate user by user ID */
 function login(userId, pwd) {
@@ -123,6 +133,7 @@ function getSession() {
 
 /** Save language preference */
 function saveLang(lang) {
+  PropertiesService.getUserProperties().setProperty('lang', lang);
   const user = getSession();
   if (!user) return;
   const ss = getSpreadsheet();
