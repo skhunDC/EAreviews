@@ -5,9 +5,7 @@ This project contains a simple Google Apps Script web application used to collec
 ## Features
 - Google Apps Script backend (`Code.gs`) manages user authentication, review data, and language preference storage. Review submissions are stored as JSON files in a private Drive folder instead of a spreadsheet, and user passwords are stored as salted SHA-256 hashes.
 - HTML/JavaScript frontend (`index.html`) displays the review form and includes a small EN/ES switch to change languages. All visible text uses `data-i18n-key` attributes so the entire interface switches language.
-- Review questions can be loaded from a spreadsheet or fall back to defaults in the page.
 - Managers and HR can adjust compensation and record final expectations.
-- Submission status is displayed next to the review button for quick feedback.
 - Whenever the Reviews section is opened, the application reloads the latest
   saved review from the server so users always see their most recent answers.
 - The dev button is always visible, but opening the dev panel requires
