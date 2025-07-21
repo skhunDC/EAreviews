@@ -3,8 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <title>Employee Reviews</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 <style>
-body{font-family:Roboto,Arial,sans-serif;margin:0;padding:0;background:#fafafa;color:#333;}
+body{font-family:'Inter',Roboto,Arial,sans-serif;margin:0;padding:0;background:#fafafa;color:#333;font-size:1rem;line-height:1.6;}
+h1,h2{font-family:'Poppins',Arial,sans-serif;}
+h1{font-size:clamp(1.75rem,4vw,2.5rem);margin:0 0 1rem 0;}
+h2{font-size:1.25rem;margin-top:0;color:#0A5C30;}
+#review-intro{max-width:900px;margin:auto;padding:2rem;background:#fefdf9;color:#333;}
+#review-intro .intro-cards{display:flex;flex-wrap:wrap;gap:1.5rem;}
+#review-intro .info-card{background:#fff;border-radius:1rem;box-shadow:0 4px 12px rgba(0,0,0,0.08);padding:1.5rem;flex:1 1 100%;animation:slideUp 0.5s ease forwards;}
+@media(min-width:640px){#review-intro .info-card{flex-basis:calc(50% - 0.75rem);}}
+.values-list{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));}
+.values-list li{display:inline-block;background:#0A5C30;color:#fff;padding:0.2rem 0.75rem;border-radius:9999px;font-size:0.9rem;margin:0.2rem;text-align:center;}
+.rating-badges{display:flex;gap:0.5rem;margin-bottom:0.5rem;flex-wrap:wrap;}
+.badge{display:inline-block;padding:0.25rem 0.75rem;border-radius:9999px;font-size:0.9rem;color:#fff;}
+.badge-gray{background:#888;}
+.badge-green{background:#0A5C30;}
+.badge-gold{background:#C9A14A;color:#000;}
+.process{display:flex;flex-wrap:wrap;align-items:center;gap:0.3rem;margin-bottom:0.5rem;font-size:0.9rem;}
+.process svg{width:12px;height:12px;fill:none;stroke:#0A5C30;stroke-width:2;}
+.callout{margin-top:1rem;background:#C9A14A1A;border-left:4px solid #C9A14A;padding:0.75rem;font-size:0.9rem;}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 nav{display:flex;gap:10px;background:#6200ee;color:white;padding:10px;align-items:center;position:relative;}
 nav button{background:none;border:none;color:white;font-size:16px;cursor:pointer;padding:6px 12px;}
 .lang-switch{display:flex;align-items:center;margin-left:auto;gap:4px;}
@@ -74,7 +93,47 @@ const translations={
     below:'Below',meets:'Meets',exceeds:'Exceeds',
     notesPlaceholder:'Notes',contactQuestions:'Contact Sea Khun with questions.',empSignature:'Employee Signature',mgrSignature:'Manager Signature',submitReview:'Submit Review',
     reviewSaved:'Review saved',saveFailed:'Failed to save review',saving:'Saving...',
-    intro:`<b>Dublin Cleaners 2025 Employee Annual Reviews – Your Opportunity to Shine</b><br><b>Purpose</b> – Highlight achievements, live our core values, and explain why you deserve a pay increase while receiving growth feedback.<br><b>Core Values</b> Accountable · Attention to Details · Team Player · Tactical Risk Taker · Better than Yesterday · Value Reputation<br><b>Rating System</b> 1 = Below Expectations · 2 = Meets Expectations · 3 = Exceeds Expectations (Attendance &amp; punctuality, Q1, is weighted higher)<br><b>Review Process</b> July reviews → submit form → Manager/Assistant adds notes → schedule 20-min meeting (half-hour slots) ≥ 1 week after submission. Schedule outside regular hours; compensated if on day off/outside shift.<br>Please Message HR about how long your meeting was so they can Add your hours into UKG<br><b>Raises take effect on the first pay period in August.</b>`
+    intro:`<section id="review-intro">
+      <h1>Dublin Cleaners 2025 Employee Annual Reviews – Your Opportunity to Shine</h1>
+      <div class="intro-cards">
+        <div class="info-card">
+          <h2>Purpose</h2>
+          <p>Highlight achievements, live our core values, and explain why you deserve a pay increase while receiving growth feedback.</p>
+        </div>
+        <div class="info-card">
+          <h2>Core Values</h2>
+          <ul class="values-list">
+            <li>Accountable</li>
+            <li>Attention to Details</li>
+            <li>Team Player</li>
+            <li>Tactical Risk Taker</li>
+            <li>Better than Yesterday</li>
+            <li>Value Reputation</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <h2>Rating System &amp; Process</h2>
+          <div class="rating-badges">
+            <span class="badge badge-gray">Below Expectations</span>
+            <span class="badge badge-green">Meets Expectations</span>
+            <span class="badge badge-gold">Exceeds Expectations</span>
+          </div>
+          <p>(Attendance &amp; punctuality, Q1, is weighted higher)</p>
+          <div class="process">
+            <span>July reviews</span>
+            <svg viewBox="0 0 16 16"><path d="M5 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            <span>submit form</span>
+            <svg viewBox="0 0 16 16"><path d="M5 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            <span>Manager/Assistant adds notes</span>
+            <svg viewBox="0 0 16 16"><path d="M5 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            <span>schedule 20-min meeting (half-hour slots) ≥ 1 week after submission</span>
+          </div>
+          <p>Schedule outside regular hours; compensated if on day off/outside shift.</p>
+          <p>Please Message HR about how long your meeting was so they can Add your hours into UKG</p>
+        </div>
+      </div>
+      <div class="callout">Raises take effect on the first pay period in August.</div>
+    </section>`
   },
   es:{
     home:'Inicio',reviews:'Reseñas',schedule:'Agenda',navTitle:'Revisiones Anuales de Empleados',
@@ -88,7 +147,47 @@ const translations={
     below:'Debajo',meets:'Cumple',exceeds:'Supera',
     notesPlaceholder:'Notas',contactQuestions:'Contacte a Sea Khun con preguntas.',empSignature:'Firma del empleado',mgrSignature:'Firma del gerente',submitReview:'Enviar revisión',
     reviewSaved:'Revisión guardada',saveFailed:'No se pudo guardar la revisión',saving:'Guardando...',
-    intro:`<b>Dublin Cleaners Evaluaciones Anuales de Empleados 2025 – Tu oportunidad para destacar</b><br><b>Propósito</b> – Destacar logros, vivir nuestros valores fundamentales y explicar por qué mereces un aumento mientras recibes comentarios para crecer.<br><b>Valores fundamentales</b> Responsabilidad · Atención al detalle · Trabajo en equipo · Tomador de riesgos táctico · Mejor que ayer · Valorar la reputación<br><b>Sistema de calificación</b> 1 = Por debajo de las expectativas · 2 = Cumple con las expectativas · 3 = Supera las expectativas (Asistencia y puntualidad, P1, tiene mayor peso)<br><b>Proceso de revisión</b> Revisiones de julio → enviar formulario → el gerente/asistente agrega notas → programar una reunión de 20 minutos (bloques de media hora) ≥ 1 semana después de la entrega. Programar fuera del horario habitual; se compensa si es día libre/fuera del turno.<br>Informe a RRHH cuánto duró la reunión para que puedan agregar sus horas a UKG<br><b>Los aumentos entran en vigor en el primer periodo de pago de agosto.</b>`
+    intro:`<section id="review-intro">
+      <h1>Dublin Cleaners Evaluaciones Anuales de Empleados 2025 – Tu oportunidad para destacar</h1>
+      <div class="intro-cards">
+        <div class="info-card">
+          <h2>Propósito</h2>
+          <p>Destacar logros, vivir nuestros valores fundamentales y explicar por qué mereces un aumento mientras recibes comentarios para crecer.</p>
+        </div>
+        <div class="info-card">
+          <h2>Valores fundamentales</h2>
+          <ul class="values-list">
+            <li>Responsabilidad</li>
+            <li>Atención al detalle</li>
+            <li>Trabajo en equipo</li>
+            <li>Tomador de riesgos táctico</li>
+            <li>Mejor que ayer</li>
+            <li>Valorar la reputación</li>
+          </ul>
+        </div>
+        <div class="info-card">
+          <h2>Sistema de calificación y Proceso</h2>
+          <div class="rating-badges">
+            <span class="badge badge-gray">Por debajo de las expectativas</span>
+            <span class="badge badge-green">Cumple con las expectativas</span>
+            <span class="badge badge-gold">Supera las expectativas</span>
+          </div>
+          <p>(Asistencia y puntualidad, P1, tiene mayor peso)</p>
+          <div class="process">
+            <span>Revisiones de julio</span>
+            <svg viewBox="0 0 16 16"><path d="M5 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            <span>enviar formulario</span>
+            <svg viewBox="0 0 16 16"><path d="M5 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            <span>el gerente/asistente agrega notas</span>
+            <svg viewBox="0 0 16 16"><path d="M5 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            <span>programar una reunión de 20 minutos (bloques de media hora) ≥ 1 semana después de la entrega</span>
+          </div>
+          <p>Programar fuera del horario habitual; se compensa si es día libre/fuera del turno.</p>
+          <p>Informe a RRHH cuánto duró la reunión para que puedan agregar sus horas a UKG</p>
+        </div>
+      </div>
+      <div class="callout">Los aumentos entran en vigor en el primer periodo de pago de agosto.</div>
+    </section>`
   }
 };
 function t(key){
@@ -493,7 +592,7 @@ document.addEventListener('DOMContentLoaded',init);
 </section>
 <section id="reviews" class="hidden">
 <form id="reviewForm" onsubmit="submitReview();return false;">
-<div class="card" style="max-height:160px;overflow:auto;" data-i18n-key="intro" data-i18n-html></div>
+<div data-i18n-key="intro" data-i18n-html></div>
 <div id="questionList"></div>
 <div id="compAdjust" class="card hidden">
 <label><span data-i18n-key="curWage">Current Wage</span><input type="number" id="curWage"></label>
