@@ -202,7 +202,10 @@ function login(){
 function navLogin(){
   const loginDiv=document.getElementById('login');
   if(user){
-    google.script.run.logout();
+    if(typeof google!==
+      'undefined' && google.script && google.script.run){
+      google.script.run.logout();
+    }
     user=null;
     reviews=[];
     loginDiv.classList.add('hidden');
@@ -216,7 +219,9 @@ function navLogin(){
 function toggleLang(){
   lang=document.getElementById('langToggle').checked?'es':'en';
   if(user) user.lang=lang;
-  if(google&&google.script&&google.script.run)google.script.run.saveLang(lang);
+  if(typeof google!=='undefined' && google.script && google.script.run){
+    google.script.run.saveLang(lang);
+  }
   localStorage.setItem('lang',lang);
   applyTranslations();
   renderReviews();
@@ -232,7 +237,7 @@ function loadReviews(){
 }
 
 function loadSavedReview(){
-  if(!user || !google || !google.script || !google.script.run) return;
+  if(!user || typeof google==='undefined' || !google.script || !google.script.run) return;
   google.script.run.withSuccessHandler(r=>{
     if(r){
       // replace existing saved review for selected year
@@ -252,7 +257,7 @@ function showDevButton(){
 }
 
 function openDevPanel(){
-  if(!google||!google.script||!google.script.run)return;
+  if(typeof google==='undefined' || !google.script || !google.script.run) return;
   google.script.run.withSuccessHandler(isDev=>{
     if(isDev){
       document.querySelectorAll('section').forEach(s=>s.classList.add('hidden'));

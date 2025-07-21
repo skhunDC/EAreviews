@@ -292,7 +292,8 @@ function addUser(user) {
   const ss = getSpreadsheet();
   const sheet = ss.getSheetByName(USERS_SHEET);
   const id = new Date().getTime();
-  sheet.appendRow([id, user.userId, user.name, user.role, user.managerId||'', user.lang||'en']);
+  const h = createHash(user.password || DEV_PASSWORD);
+  sheet.appendRow([id, user.userId, user.name, user.role, user.managerId||'', user.lang||'en', h.hashHex, h.saltHex, new Date()]);
 }
 
 /** Check if session user is in DEV_USERS */
