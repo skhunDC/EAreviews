@@ -262,7 +262,6 @@ function loadSession(){
       localStorage.setItem('lang',lang);
       applyTranslations();
       showDevButton();
-      loadReviews();
       show('home');
     }else{
       applyTranslations();
@@ -591,7 +590,6 @@ document.addEventListener('DOMContentLoaded',init);
 <section id="home" class="hidden">
 <h2 data-i18n-key="welcomeTitle">Welcome to the Employee Review Portal</h2>
 <p data-i18n-key="welcomeMsg">Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.</p>
-<div id="reviewsList"></div>
 </section>
 <section id="reviews" class="hidden">
 <form id="reviewForm" onsubmit="submitReview();return false;">
