@@ -407,3 +407,12 @@ function saveFinalExpectation(reviewId, exp) {
   file.setContent(JSON.stringify(data));
   return true;
 }
+
+/** Save review and optional compensation adjustment in one call */
+function saveFullReview(review, compAdj){
+  const saved = saveReview(review);
+  if(compAdj){
+    saveCompAdjustment(saved.id, compAdj);
+  }
+  return saved;
+}

@@ -404,9 +404,19 @@ function gatherAnswers(){
   });
   return ans;
 }
+function gatherReviewData(){
+  const answers=gatherAnswers();
+  let comp=null;
+  const adjBlock=document.getElementById('compAdjust');
+  if(adjBlock&&!adjBlock.classList.contains('hidden')){
+    comp={employeeId:user.id,current:document.getElementById('curWage').value,new:document.getElementById('newWage').value,pct:document.getElementById('pctInc').textContent};
+  }
+  const finalExp={result:document.querySelector('input[name=finalExp]:checked')?.value||'',notes:document.getElementById('finalNotes').value,empSign:{name:document.getElementById('empSign').value,ts:new Date().toISOString()},mgrSign:{name:document.getElementById('mgrSign').value,ts:new Date().toISOString()}};
+  return {answers,comp,finalExp};
+}
 function submitReview(){
-  const ans=gatherAnswers();
-  const review={id:currentReviewId,employeeId:user.id,type:'SELF',data:{year:selectedYear,answers:ans}};
+  const data=gatherReviewData();
+  const review={id:currentReviewId,employeeId:user.id,type:'SELF',data:{year:selectedYear,answers:data.answers,finalExpectation:data.finalExp}};
   document.body.style.cursor='wait';
   document.getElementById('submitMsg').textContent=t('saving');
 
@@ -415,29 +425,14 @@ function submitReview(){
     document.body.style.cursor='';
   };
 
-  const finalize=()=>{
+  const finalize=id=>{
+    currentReviewId=id;
     loadReviews();
     document.getElementById('submitMsg').textContent=t('reviewSaved');
     document.body.style.cursor='';
   };
 
-  const saveFinal=(id)=>{
-    const exp={result:document.querySelector('input[name=finalExp]:checked')?.value||'',notes:document.getElementById('finalNotes').value,empSign:{name:document.getElementById('empSign').value,ts:new Date().toISOString()},mgrSign:{name:document.getElementById('mgrSign').value,ts:new Date().toISOString()}};
-    google.script.run.withSuccessHandler(finalize).withFailureHandler(fail).saveFinalExpectation(id,exp);
-  };
-
-  const afterReview=id=>{
-    currentReviewId=id;
-    const adjBlock=document.getElementById('compAdjust');
-    if(!adjBlock.classList.contains('hidden')){
-      const adj={employeeId:user.id,current:document.getElementById('curWage').value,new:document.getElementById('newWage').value,pct:document.getElementById('pctInc').textContent};
-      google.script.run.withSuccessHandler(()=>saveFinal(id)).withFailureHandler(fail).saveCompAdjustment(id,adj);
-    } else {
-      saveFinal(id);
-    }
-  };
-
-  google.script.run.withSuccessHandler(r=>afterReview(r.id)).withFailureHandler(fail).saveReview(review);
+  google.script.run.withSuccessHandler(r=>finalize(r.id)).withFailureHandler(fail).saveFullReview(review,data.comp);
 }
 
 function addNewUser(){
@@ -481,6 +476,7 @@ document.addEventListener('DOMContentLoaded',init);
 <div id="reviewsList"></div>
 </section>
 <section id="reviews" class="hidden">
+<form id="reviewForm" onsubmit="submitReview();return false;">
 <div class="card" style="max-height:160px;overflow:auto;" data-i18n-key="intro" data-i18n-html></div>
 <div id="questionList"></div>
 <div id="compAdjust" class="card hidden">
@@ -500,7 +496,8 @@ document.addEventListener('DOMContentLoaded',init);
 <label><span data-i18n-key="empSignature">Employee Signature</span><input type="text" id="empSign"></label>
 <label><span data-i18n-key="mgrSignature">Manager Signature</span><input type="text" id="mgrSign"></label>
 </div>
-<button class="primary" onclick="submitReview()" data-i18n-key="submitReview">Submit Review</button><span id="submitMsg"></span>
+<button class="primary" type="submit" data-i18n-key="submitReview">Submit Review</button><span id="submitMsg"></span>
+</form>
 </section>
 <section id="schedule" class="hidden">
 <p data-i18n-key="comingSoon">Coming soon...</p>
