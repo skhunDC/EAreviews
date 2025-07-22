@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>Employee Reviews</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
 h1,h2{font-family:'Inter',Arial,sans-serif;}
@@ -46,6 +47,8 @@ section{padding:20px;}
 .hidden{display:none;}
 label{display:block;margin-top:10px;}
 input[type=text],textarea{width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:4px;}
+.signature{font-family:'Dancing Script',cursive;font-size:1.2rem;}
+.sign-date{width:auto;margin-left:8px;}
 select{padding:8px;}
  .rating-group label{display:inline-block;margin-right:10px;}
 button.primary{background:#0A5C30;color:white;border:none;border-radius:4px;padding:8px 16px;cursor:pointer;}
@@ -97,7 +100,7 @@ const translations={
     curWage:'Current Wage',newWage:'New Wage',pctIncrease:'% Increase:',
     finalExpTitle:'Final Performance Expectation',belowExp:'Below Expectations',meetsExp:'Meets Expectations',exceedsExp:'Exceeds Expectations',
     below:'Below',meets:'Meets',exceeds:'Exceeds',
-    notesPlaceholder:'Notes',contactQuestions:'Contact Sea Khun with questions.',empSignature:'Employee Signature',mgrSignature:'Manager Signature',submitReview:'Submit Review',
+    notesPlaceholder:'Notes',contactQuestions:'Contact Sea Khun with questions.',empSignature:'Employee Signature',mgrSignature:'Manager Signature',signDate:'Date',submitReview:'Submit Review',
     employeeComments:"Employee's Comments",managerComments:"Manager's Comments",
     reviewSaved:'Review saved',saveFailed:'Failed to save review',saving:'Saving...',
     scheduleBtn:'Schedule Review Meeting',
@@ -162,7 +165,7 @@ const translations={
     curWage:'Salario actual',newWage:'Nuevo salario',pctIncrease:'% Aumento:',
     finalExpTitle:'Expectativa de desempeño final',belowExp:'Debajo de las expectativas',meetsExp:'Cumple con las expectativas',exceedsExp:'Supera las expectativas',
     below:'Debajo',meets:'Cumple',exceeds:'Supera',
-    notesPlaceholder:'Notas',contactQuestions:'Contacte a Sea Khun con preguntas.',empSignature:'Firma del empleado',mgrSignature:'Firma del gerente',submitReview:'Enviar revisión',
+    notesPlaceholder:'Notas',contactQuestions:'Contacte a Sea Khun con preguntas.',empSignature:'Firma del empleado',mgrSignature:'Firma del gerente',signDate:'Fecha',submitReview:'Enviar revisión',
     employeeComments:'Comentarios del empleado',managerComments:'Comentarios del gerente',
     reviewSaved:'Revisión guardada',saveFailed:'No se pudo guardar la revisión',saving:'Guardando...',
     scheduleBtn:'Agendar Reunión de Revisión',
@@ -278,6 +281,8 @@ function applyTranslations(){
 function init(){
   show('home');
   applyTranslations();
+  document.getElementById('empSign').addEventListener('input',()=>updateSignDate('empSign','empSignDate'));
+  document.getElementById('mgrSign').addEventListener('input',()=>updateSignDate('mgrSign','mgrSignDate'));
   loadQuestions();
   initCalendar();
   const revSection=document.getElementById('reviews');
@@ -486,7 +491,11 @@ function fillSavedAnswers(){
   document.querySelectorAll('#finalBlock input[name=finalExp]').forEach(r=>{r.checked=false;});
   document.getElementById('finalNotes').value='';
   document.getElementById('empSign').value='';
+  document.getElementById('empSignDate').value='';
+  document.getElementById('empSignDate').dataset.iso='';
   document.getElementById('mgrSign').value='';
+  document.getElementById('mgrSignDate').value='';
+  document.getElementById('mgrSignDate').dataset.iso='';
   currentReviewId=null;
   if(!user||!reviews||!reviews.length) return;
   const matches=reviews.filter(r=>
@@ -526,8 +535,22 @@ function fillSavedAnswers(){
       if(r) r.checked=true;
     }
     if(fe.notes) document.getElementById('finalNotes').value=fe.notes;
-    if(fe.empSign) document.getElementById('empSign').value=fe.empSign.name||'';
-    if(fe.mgrSign) document.getElementById('mgrSign').value=fe.mgrSign.name||'';
+    if(fe.empSign){
+      document.getElementById('empSign').value=fe.empSign.name||'';
+      if(fe.empSign.ts){
+        const d=new Date(fe.empSign.ts);
+        document.getElementById('empSignDate').value=d.toLocaleString();
+        document.getElementById('empSignDate').dataset.iso=fe.empSign.ts;
+      }
+    }
+    if(fe.mgrSign){
+      document.getElementById('mgrSign').value=fe.mgrSign.name||'';
+      if(fe.mgrSign.ts){
+        const d=new Date(fe.mgrSign.ts);
+        document.getElementById('mgrSignDate').value=d.toLocaleString();
+        document.getElementById('mgrSignDate').dataset.iso=fe.mgrSign.ts;
+      }
+    }
   }
 }
 function calcPct(){const c=parseFloat(document.getElementById('curWage').value||0);const n=parseFloat(document.getElementById('newWage').value||0);const pct=document.getElementById('pctInc');pct.textContent=c?(((n-c)/c)*100).toFixed(2):'0';}
@@ -556,8 +579,29 @@ function gatherReviewData(){
   if(adjBlock&&!adjBlock.classList.contains('hidden')){
     comp={employeeId:user.id,current:document.getElementById('curWage').value,new:document.getElementById('newWage').value,pct:document.getElementById('pctInc').textContent};
   }
-  const finalExp={result:document.querySelector('input[name=finalExp]:checked')?.value||'',notes:document.getElementById('finalNotes').value,empSign:{name:document.getElementById('empSign').value,ts:new Date().toISOString()},mgrSign:{name:document.getElementById('mgrSign').value,ts:new Date().toISOString()}};
+  const empDate=document.getElementById('empSignDate').dataset.iso||new Date().toISOString();
+  const mgrDate=document.getElementById('mgrSignDate').dataset.iso||new Date().toISOString();
+  const finalExp={
+    result:document.querySelector('input[name=finalExp]:checked')?.value||'',
+    notes:document.getElementById('finalNotes').value,
+    empSign:{name:document.getElementById('empSign').value,ts:empDate},
+    mgrSign:{name:document.getElementById('mgrSign').value,ts:mgrDate}
+  };
   return {answers,comp,finalExp};
+}
+
+function updateSignDate(signId,dateId){
+  const input=document.getElementById(signId);
+  const dateField=document.getElementById(dateId);
+  if(!input||!dateField) return;
+  if(input.value.trim()){
+    const now=new Date();
+    dateField.value=now.toLocaleString();
+    dateField.dataset.iso=now.toISOString();
+  }else{
+    dateField.value='';
+    dateField.dataset.iso='';
+  }
 }
 
 let autosaveTimeout;
@@ -678,8 +722,14 @@ document.addEventListener('DOMContentLoaded',init);
 <small data-i18n-key="contactQuestions">Contact Sea Khun with questions.</small>
 </div>
 <div class="card">
-<label><span data-i18n-key="empSignature">Employee Signature</span><input type="text" id="empSign"></label>
-<label><span data-i18n-key="mgrSignature">Manager Signature</span><input type="text" id="mgrSign"></label>
+<label><span data-i18n-key="empSignature">Employee Signature</span>
+  <input type="text" id="empSign" class="signature">
+  <input type="text" id="empSignDate" class="sign-date" readonly data-i18n-key="signDate" data-i18n-placeholder placeholder="Date">
+</label>
+<label><span data-i18n-key="mgrSignature">Manager Signature</span>
+  <input type="text" id="mgrSign" class="signature">
+  <input type="text" id="mgrSignDate" class="sign-date" readonly data-i18n-key="signDate" data-i18n-placeholder placeholder="Date">
+</label>
 </div>
 <button class="primary" type="submit" data-i18n-key="submitReview">Submit Review</button><span id="submitMsg"></span>
 <button id="btnSchedule" class="primary mt-4" onclick="show('schedule')" data-i18n-key="scheduleBtn"></button>
