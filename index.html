@@ -628,12 +628,23 @@ document.addEventListener('DOMContentLoaded',init);
 <section id="schedule" class="hidden">
 <p data-i18n-key="comingSoon">Coming soon...</p>
 </section>
-<section id="devPanel" class="hidden">
-  <h3>Admin Panel</h3>
-  <label>UserID<input type="text" id="newUserId"></label>
-  <label>Role<input type="text" id="newUserRole"></label>
-  <label>Password<input type="password" id="newUserPwd"></label>
-  <button class="primary" onclick="addNewUser()">Add User</button>
+<section id="devPanel" class="hidden fixed inset-0 flex items-center justify-center">
+  <div class="max-w-[420px] w-[90%] bg-white/80 backdrop-blur rounded-2xl shadow-xl p-8 flex flex-col gap-6">
+    <h3 class="text-xl font-semibold text-gray-800 text-center">Admin Panel</h3>
+    <label class="w-full">
+      <span class="text-sm text-gray-500">UserID</span>
+      <input type="text" id="newUserId" class="w-full h-11 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+    </label>
+    <label class="w-full">
+      <span class="text-sm text-gray-500">Role</span>
+      <input type="text" id="newUserRole" class="w-full h-11 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+    </label>
+    <label class="w-full">
+      <span class="text-sm text-gray-500">Password</span>
+      <input type="password" id="newUserPwd" class="w-full h-11 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+    </label>
+    <button class="primary w-full h-12 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold tracking-wide transition-transform active:scale-95" onclick="addNewUser()">Add User</button>
+  </div>
 </section>
 <form id="login" class="hidden fixed inset-0 flex items-center justify-center" onsubmit="login();return false;">
   <div class="max-w-[420px] w-[90%] bg-white/80 backdrop-blur rounded-2xl shadow-xl p-8 flex flex-col gap-6">
