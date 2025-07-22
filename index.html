@@ -323,6 +323,9 @@ function navLogin(){
     show('home');
   }else{
     loginDiv.classList.toggle('hidden');
+    // hide dev panel when showing login
+    const dev=document.getElementById('devPanel');
+    if(dev)dev.classList.add('hidden');
   }
 }
 
@@ -371,6 +374,9 @@ function openDevPanel(){
   google.script.run.withSuccessHandler(isDev=>{
     if(isDev){
       document.querySelectorAll('body>section').forEach(s=>s.classList.add('hidden'));
+      // hide login form if visible
+      const loginDiv=document.getElementById('login');
+      if(loginDiv) loginDiv.classList.add('hidden');
       document.getElementById('devPanel').classList.remove('hidden');
     }else{
       alert('Not authorized');
