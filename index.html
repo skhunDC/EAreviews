@@ -102,7 +102,7 @@ const translations={
     curWage:'Current Wage',newWage:'New Wage',pctIncrease:'% Increase:',
     finalExpTitle:'Final Performance Expectation',belowExp:'Below Expectations',meetsExp:'Meets Expectations',exceedsExp:'Exceeds Expectations',
     below:'Below',meets:'Meets',exceeds:'Exceeds',
-    notesPlaceholder:'Notes',contactQuestions:'Contact Sea Khun with questions.',empSignature:'Employee Signature',mgrSignature:'Manager Signature',signDate:'Date',submitReview:'Submit Review',
+    notesPlaceholder:'Notes',contactQuestions:'Please contact Sea Khun HR/IT Manager with any questions or concerns.',empSignature:'Employee Signature',mgrSignature:'Manager Signature',signDate:'Date',submitReview:'Submit Review',
     employeeComments:"Employee's Comments",managerComments:"Manager's Comments",
     reviewSaved:'Review saved',saveFailed:'Failed to save review',saving:'Saving...',
     scheduleBtn:'Schedule Review Meeting',
@@ -172,7 +172,7 @@ const translations={
     curWage:'Salario actual',newWage:'Nuevo salario',pctIncrease:'% Aumento:',
     finalExpTitle:'Expectativa de desempeño final',belowExp:'Debajo de las expectativas',meetsExp:'Cumple con las expectativas',exceedsExp:'Supera las expectativas',
     below:'Debajo',meets:'Cumple',exceeds:'Supera',
-    notesPlaceholder:'Notas',contactQuestions:'Contacte a Sea Khun con preguntas.',empSignature:'Firma del empleado',mgrSignature:'Firma del gerente',signDate:'Fecha',submitReview:'Enviar revisión',
+    notesPlaceholder:'Notas',contactQuestions:'Comuníquese con Sea Khun, gerente de HR/IT, si tiene alguna pregunta o inquietud.',empSignature:'Firma del empleado',mgrSignature:'Firma del gerente',signDate:'Fecha',submitReview:'Enviar revisión',
     employeeComments:'Comentarios del empleado',managerComments:'Comentarios del gerente',
     reviewSaved:'Revisión guardada',saveFailed:'No se pudo guardar la revisión',saving:'Guardando...',
     scheduleBtn:'Agendar Reunión de Revisión',
@@ -739,7 +739,6 @@ document.addEventListener('DOMContentLoaded',init);
 <label><input type="radio" name="finalExp" value="meets"> <span data-i18n-key="meetsExp">Meets Expectations</span></label>
 <label><input type="radio" name="finalExp" value="exceeds"> <span data-i18n-key="exceedsExp">Exceeds Expectations</span></label>
 <textarea id="finalNotes" data-i18n-key="notesPlaceholder" data-i18n-placeholder placeholder="Notes"></textarea>
-<small data-i18n-key="contactQuestions">Contact Sea Khun with questions.</small>
 </div>
 <div class="card">
 <label><span data-i18n-key="empSignature">Employee Signature</span>
@@ -754,6 +753,7 @@ document.addEventListener('DOMContentLoaded',init);
 <button class="primary" type="submit" data-i18n-key="submitReview">Submit Review</button>
 <button id="btnSchedule" class="primary ml-4" onclick="show('schedule')" data-i18n-key="scheduleBtn"></button>
 <span id="submitMsg"></span>
+<div class="text-right mt-2"><small data-i18n-key="contactQuestions">Please contact Sea Khun HR/IT Manager with any questions or concerns.</small></div>
 </form>
 </section>
 <section id="schedule" class="hidden">
