@@ -589,14 +589,16 @@ function gatherReviewData(){
   if(adjBlock&&!adjBlock.classList.contains('hidden')){
     comp={employeeId:user.id,current:document.getElementById('curWage').value,new:document.getElementById('newWage').value,pct:document.getElementById('pctInc').textContent};
   }
-  const empDate=document.getElementById('empSignDate').dataset.iso||new Date().toISOString();
-  const mgrDate=document.getElementById('mgrSignDate').dataset.iso||new Date().toISOString();
+  const empDate=document.getElementById('empSignDate').dataset.iso;
+  const mgrDate=document.getElementById('mgrSignDate').dataset.iso;
   const finalExp={
     result:document.querySelector('input[name=finalExp]:checked')?.value||'',
     notes:document.getElementById('finalNotes').value,
-    empSign:{name:document.getElementById('empSign').value,ts:empDate},
-    mgrSign:{name:document.getElementById('mgrSign').value,ts:mgrDate}
+    empSign:{name:document.getElementById('empSign').value},
+    mgrSign:{name:document.getElementById('mgrSign').value}
   };
+  if(empDate) finalExp.empSign.ts=empDate;
+  if(mgrDate) finalExp.mgrSign.ts=mgrDate;
   return {answers,comp,finalExp};
 }
 
