@@ -5,8 +5,6 @@
 <title>Employee Reviews</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
 <style>
 h1,h2{font-family:'Inter',Arial,sans-serif;}
 body{font-family:'Inter',Roboto,Arial,sans-serif;margin:0;padding:0;background:linear-gradient(135deg,#f6f8fa 0%,#eaf4ff 100%);color:#333;font-size:1rem;line-height:1.6;}
@@ -105,6 +103,12 @@ const translations={
     bookPrompt:'Book this time?',
     cancel:'Cancel',
     conflict:'Slot already booked',
+    selDate:'Select Date',
+    selTime:'Select Time',
+    book:'Book',
+    chooseTime:'Please choose date and time',
+    bookOk:'Meeting booked',
+    error:'Error occurred',
     intro:`<section id="review-intro">
       <h1>Your Opportunity to Shine</h1>
       <div class="intro-cards">
@@ -163,6 +167,12 @@ const translations={
     bookPrompt:'¿Reservar esta hora?',
     cancel:'Cancelar',
     conflict:'Horario no disponible',
+    selDate:'Seleccionar fecha',
+    selTime:'Seleccionar hora',
+    book:'Agendar',
+    chooseTime:'Seleccione fecha y hora',
+    bookOk:'Reunión programada',
+    error:'Ocurrió un error',
     intro:`<section id="review-intro">
       <h1>Tu oportunidad para destacar</h1>
       <div class="intro-cards">
@@ -268,8 +278,6 @@ function init(){
   applyTranslations();
   loadQuestions();
   initCalendar();
-  document.getElementById('confirmBook').addEventListener('click',confirmBooking);
-  document.getElementById('cancelBook').addEventListener('click',()=>document.getElementById('dlgBook').close());
   const revSection=document.getElementById('reviews');
   google.script.run.withSuccessHandler(c=>{config=c;loadSession();}).loadConfig();
 }
@@ -355,7 +363,6 @@ function toggleLang(){
   applyTranslations();
   renderReviews();
   renderQuestionList();
-  if(calendar) calendar.setOption('locale',lang==='es'?'es':'en');
 }
 let reviews=[];
 function loadReviews(){
@@ -603,43 +610,27 @@ function addNewUser(){
     .addNewUser({userId:uid,role:role,password:pwd});
 }
 
-// ---- Scheduling Calendar -----
-let calendar,startSel,endSel;
-async function initCalendar(){
-  const el=document.getElementById('calendar');
-  if(!el) return;
-  if(!calendar){
-    calendar=new FullCalendar.Calendar(el,{
-      initialView:'timeGridWeek',
-      headerToolbar:false,
-      allDaySlot:false,
-      selectable:true,
-      slotDuration:'00:30',
-    slotMinTime:'07:00',
-    slotMaxTime:'19:00',
-    locale:lang==='es'?'es':'en',
-    events:async(info,success)=>{
-      const resp=await fetch('events?timeMin='+info.startStr+'&timeMax='+info.endStr);
-      success(await resp.json());
-    },
-    select:(info)=>openDialog(info.start,info.end),
-    dateClick:(info)=>openDialog(info.date,new Date(info.date.getTime()+30*60*1000))
-    });
-  }
-  calendar.render();
-  calendar.refetchEvents();
+// ---- Simple Scheduling -----
+function initCalendar(){
+  // no-op kept for compatibility
 }
-function openDialog(start,end){
-  startSel=start;endSel=end;
-  document.getElementById('dlgBook').showModal();
-}
-async function confirmBooking(){
-  document.getElementById('dlgBook').close();
-  const resp=await fetch('book',{method:'POST',body:JSON.stringify({start:startSel.toISOString(),end:endSel.toISOString()})});
+async function bookSimple(){
+  const d=document.getElementById('selDate').value;
+  const t=document.getElementById('selTime').value;
+  if(!d||!t){alert(t('chooseTime'));return;}
+  const start=new Date(d+'T'+t);
+  const end=new Date(start.getTime()+30*60*1000);
+  const resp=await fetch('book',{method:'POST',body:JSON.stringify({start:start.toISOString(),end:end.toISOString()})});
+  const msg=document.getElementById('schedMsg');
   if(resp.ok){
-    calendar.refetchEvents();
+    msg.textContent=t('bookOk');
+    msg.className='text-green-700';
+  }else if(resp.status===409){
+    msg.textContent=t('conflict');
+    msg.className='text-red-700';
   }else{
-    alert(t('conflict'));
+    msg.textContent=t('error');
+    msg.className='text-red-700';
   }
 }
 document.addEventListener('DOMContentLoaded',init);
@@ -691,14 +682,16 @@ document.addEventListener('DOMContentLoaded',init);
 </form>
 </section>
 <section id="schedule" class="hidden">
-  <div id="calendar" class="card shadow-lg p-4"></div>
-  <dialog id="dlgBook" class="p-4 rounded-xl">
-    <p data-i18n-key="bookPrompt">Book this time?</p>
-    <div class="mt-4 flex gap-4 justify-end">
-      <button id="confirmBook" class="primary">OK</button>
-      <button id="cancelBook" type="button" data-i18n-key="cancel">Cancel</button>
-    </div>
-  </dialog>
+  <div id="scheduleForm" class="card shadow-lg p-4 flex flex-col gap-4">
+    <label><span data-i18n-key="selDate">Date</span>
+      <input type="date" id="selDate">
+    </label>
+    <label><span data-i18n-key="selTime">Time</span>
+      <input type="time" id="selTime" step="1800">
+    </label>
+    <button class="primary" onclick="bookSimple()" data-i18n-key="book">Book</button>
+    <div id="schedMsg" class="text-sm"></div>
+  </div>
 </section>
 <section id="devPanel" class="hidden fixed inset-0 flex items-center justify-center">
   <div class="max-w-[420px] w-[90%] bg-white/80 backdrop-blur rounded-2xl shadow-xl p-8 flex flex-col gap-6">
