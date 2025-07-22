@@ -47,6 +47,7 @@ section{padding:20px;}
 .hidden{display:none;}
 label{display:block;margin-top:10px;}
 input[type=text],textarea{width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:4px;}
+input[type=number]{width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:4px;}
 .signature{font-family:'Dancing Script',cursive;font-size:1.2rem;}
 .sign-date{width:auto;margin-left:8px;}
 select{padding:8px;}
@@ -472,7 +473,13 @@ function renderQuestionList(){
           html+='<select class="extra" data-sub="'+ex.id+'">';
           ex.options.forEach(o=>{html+='<option value="'+o+'">'+o+'</option>';});
           html+='</select>';
-        }else html+='<input type="'+ex.type+'" class="extra" data-sub="'+ex.id+'">';
+        }else {
+          let attrs='';
+          if(ex.type==='number' && (ex.id==='absences' || ex.id==='late')){
+            attrs=' min="0" step="1"';
+          }
+          html+='<input type="'+ex.type+'" class="extra" data-sub="'+ex.id+'"'+attrs+'>';
+        }
         html+='</label>';
       });
     }else if(q.extra==='textarea'){
