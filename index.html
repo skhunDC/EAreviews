@@ -26,7 +26,7 @@ h2{font-size:1.25rem;margin-top:0;color:#0A5C30;}
 .process svg{width:12px;height:12px;fill:none;stroke:#0A5C30;stroke-width:2;}
 .callout{margin-top:1rem;background:#C9A14A1A;border-left:4px solid #C9A14A;padding:0.75rem;font-size:0.9rem;}
 @keyframes slideUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-nav{display:flex;gap:10px;background:#0A5C30;color:white;padding:10px;align-items:center;position:relative;}
+nav{display:flex;gap:10px;background:#0A5C30;color:white;padding:10px;align-items:center;position:relative;z-index:50;}
 nav button{background:none;border:none;color:white;font-size:16px;cursor:pointer;padding:6px 12px;}
 .lang-switch{display:flex;align-items:center;margin-left:auto;gap:4px;}
 .logo{width:125px;height:125px;}
@@ -37,6 +37,7 @@ nav button{background:none;border:none;color:white;font-size:16px;cursor:pointer
 .slider:before{position:absolute;content:"";height:20px;width:20px;left:2px;bottom:2px;background:white;transition:.4s;border-radius:50%;}
 .switch input:checked + .slider{background:#059669;}
 .switch input:checked + .slider:before{transform:translateX(16px);}
+#devPanel{z-index:40;}
 section{padding:20px;}
 #login{background:linear-gradient(135deg,#f6f8fa 0%,#eaf4ff 100%);}
 #reviewForm{max-width:900px;margin:auto;padding:2rem;background:#fefdf9;color:#333;}
