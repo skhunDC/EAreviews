@@ -5,6 +5,8 @@
 <title>Employee Reviews</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
 <style>
 h1,h2{font-family:'Inter',Arial,sans-serif;}
 body{font-family:'Inter',Roboto,Arial,sans-serif;margin:0;padding:0;background:linear-gradient(135deg,#f6f8fa 0%,#eaf4ff 100%);color:#333;font-size:1rem;line-height:1.6;}
@@ -99,6 +101,10 @@ const translations={
     below:'Below',meets:'Meets',exceeds:'Exceeds',
     notesPlaceholder:'Notes',contactQuestions:'Contact Sea Khun with questions.',empSignature:'Employee Signature',mgrSignature:'Manager Signature',submitReview:'Submit Review',
     reviewSaved:'Review saved',saveFailed:'Failed to save review',saving:'Saving...',
+    scheduleBtn:'Schedule Review Meeting',
+    bookPrompt:'Book this time?',
+    cancel:'Cancel',
+    conflict:'Slot already booked',
     intro:`<section id="review-intro">
       <h1>Your Opportunity to Shine</h1>
       <div class="intro-cards">
@@ -153,6 +159,10 @@ const translations={
     below:'Debajo',meets:'Cumple',exceeds:'Supera',
     notesPlaceholder:'Notas',contactQuestions:'Contacte a Sea Khun con preguntas.',empSignature:'Firma del empleado',mgrSignature:'Firma del gerente',submitReview:'Enviar revisión',
     reviewSaved:'Revisión guardada',saveFailed:'No se pudo guardar la revisión',saving:'Guardando...',
+    scheduleBtn:'Agendar Reunión de Revisión',
+    bookPrompt:'¿Reservar esta hora?',
+    cancel:'Cancelar',
+    conflict:'Horario no disponible',
     intro:`<section id="review-intro">
       <h1>Tu oportunidad para destacar</h1>
       <div class="intro-cards">
@@ -229,6 +239,9 @@ function show(id){
       loadSavedReview();
     }
     loadQuestions();
+  }else if(id==='schedule'){
+    initCalendar();
+    document.getElementById(id).classList.remove('hidden');
   }else{
     if(id==='home'){
       const list=document.getElementById('reviewsList');
@@ -254,6 +267,9 @@ function init(){
   show('home');
   applyTranslations();
   loadQuestions();
+  initCalendar();
+  document.getElementById('confirmBook').addEventListener('click',confirmBooking);
+  document.getElementById('cancelBook').addEventListener('click',()=>document.getElementById('dlgBook').close());
   const revSection=document.getElementById('reviews');
   google.script.run.withSuccessHandler(c=>{config=c;loadSession();}).loadConfig();
 }
@@ -339,6 +355,7 @@ function toggleLang(){
   applyTranslations();
   renderReviews();
   renderQuestionList();
+  if(calendar) calendar.setOption('locale',lang==='es'?'es':'en');
 }
 let reviews=[];
 function loadReviews(){
@@ -585,6 +602,43 @@ function addNewUser(){
     })
     .addNewUser({userId:uid,role:role,password:pwd});
 }
+
+// ---- Scheduling Calendar -----
+let calendar,startSel,endSel;
+async function initCalendar(){
+  const el=document.getElementById('calendar');
+  if(!el||calendar) return;
+  calendar=new FullCalendar.Calendar(el,{
+    initialView:'timeGridWeek',
+    headerToolbar:false,
+    allDaySlot:false,
+    selectable:true,
+    slotDuration:'00:30',
+    slotMinTime:'07:00',
+    slotMaxTime:'19:00',
+    locale:lang==='es'?'es':'en',
+    events:async(info,success)=>{
+      const resp=await fetch('events?timeMin='+info.startStr+'&timeMax='+info.endStr);
+      success(await resp.json());
+    },
+    select:(info)=>openDialog(info.start,info.end),
+    dateClick:(info)=>openDialog(info.date,new Date(info.date.getTime()+30*60*1000))
+  });
+  calendar.render();
+}
+function openDialog(start,end){
+  startSel=start;endSel=end;
+  document.getElementById('dlgBook').showModal();
+}
+async function confirmBooking(){
+  document.getElementById('dlgBook').close();
+  const resp=await fetch('book',{method:'POST',body:JSON.stringify({start:startSel.toISOString(),end:endSel.toISOString()})});
+  if(resp.ok){
+    calendar.refetchEvents();
+  }else{
+    alert(t('conflict'));
+  }
+}
 document.addEventListener('DOMContentLoaded',init);
 </script>
 </head>
@@ -630,10 +684,18 @@ document.addEventListener('DOMContentLoaded',init);
 <label><span data-i18n-key="mgrSignature">Manager Signature</span><input type="text" id="mgrSign"></label>
 </div>
 <button class="primary" type="submit" data-i18n-key="submitReview">Submit Review</button><span id="submitMsg"></span>
+<button id="btnSchedule" class="primary mt-4" onclick="show('schedule')" data-i18n-key="scheduleBtn"></button>
 </form>
 </section>
 <section id="schedule" class="hidden">
-<p data-i18n-key="comingSoon">Coming soon...</p>
+  <div id="calendar" class="card shadow-lg p-4"></div>
+  <dialog id="dlgBook" class="p-4 rounded-xl">
+    <p data-i18n-key="bookPrompt">Book this time?</p>
+    <div class="mt-4 flex gap-4 justify-end">
+      <button id="confirmBook" class="primary">OK</button>
+      <button id="cancelBook" type="button" data-i18n-key="cancel">Cancel</button>
+    </div>
+  </dialog>
 </section>
 <section id="devPanel" class="hidden fixed inset-0 flex items-center justify-center">
   <div class="max-w-[420px] w-[90%] bg-white/80 backdrop-blur rounded-2xl shadow-xl p-8 flex flex-col gap-6">
