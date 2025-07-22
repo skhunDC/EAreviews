@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <title>Employee Reviews</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
 <style>
-body{font-family:'Inter',Roboto,Arial,sans-serif;margin:0;padding:0;background:#fefdf9;color:#333;font-size:1rem;line-height:1.6;}
-h1,h2{font-family:'Poppins',Arial,sans-serif;}
+h1,h2{font-family:'Inter',Arial,sans-serif;}
+body{font-family:'Inter',Roboto,Arial,sans-serif;margin:0;padding:0;background:linear-gradient(135deg,#f6f8fa 0%,#eaf4ff 100%);color:#333;font-size:1rem;line-height:1.6;}
 h1{font-size:clamp(1.75rem,4vw,2.5rem);margin:0 0 1rem 0;}
 h2{font-size:1.25rem;margin-top:0;color:#0A5C30;}
 #review-intro h1{text-align:center;color:#0A5C30;font-weight:700;margin-bottom:1.5rem;}
@@ -30,13 +31,14 @@ nav button{background:none;border:none;color:white;font-size:16px;cursor:pointer
 .lang-switch{display:flex;align-items:center;margin-left:auto;gap:4px;}
 .logo{width:125px;height:125px;}
 .nav-title{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:24px;font-weight:bold;}
-.switch{position:relative;display:inline-block;width:34px;height:18px;}
+.switch{position:relative;display:inline-block;width:40px;height:24px;}
 .switch input{opacity:0;width:0;height:0;}
-.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#ccc;transition:.4s;border-radius:34px;}
-.slider:before{position:absolute;content:"";height:14px;width:14px;left:2px;bottom:2px;background:white;transition:.4s;border-radius:50%;}
-.switch input:checked + .slider{background:#0A5C30;}
+.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#d1d5db;transition:.4s;border-radius:9999px;}
+.slider:before{position:absolute;content:"";height:20px;width:20px;left:2px;bottom:2px;background:white;transition:.4s;border-radius:50%;}
+.switch input:checked + .slider{background:#059669;}
 .switch input:checked + .slider:before{transform:translateX(16px);}
 section{padding:20px;}
+#login{background:linear-gradient(135deg,#f6f8fa 0%,#eaf4ff 100%);}
 #reviewForm{max-width:900px;margin:auto;padding:2rem;background:#fefdf9;color:#333;}
 .question-title{display:block;font-size:1.25rem;color:#0A5C30;margin-bottom:0.5rem;font-weight:600;}
 .card{background:#fff;padding:1.5rem;margin-bottom:1.5rem;border-radius:1rem;box-shadow:0 4px 12px rgba(0,0,0,0.08);animation:slideUp 0.5s ease forwards;}
@@ -633,10 +635,20 @@ document.addEventListener('DOMContentLoaded',init);
   <label>Password<input type="password" id="newUserPwd"></label>
   <button class="primary" onclick="addNewUser()">Add User</button>
 </section>
-<form id="login" class="hidden" onsubmit="login();return false;">
-<label><span data-i18n-key="userId">User ID</span><input type="text" id="userId" data-i18n-key="userId" data-i18n-placeholder></label>
-<label><span data-i18n-key="password">Password</span><input type="password" id="password" data-i18n-key="password" data-i18n-placeholder></label>
-<button class="primary" type="submit" data-i18n-key="login">Login</button>
+<form id="login" class="hidden fixed inset-0 flex items-center justify-center" onsubmit="login();return false;">
+  <div class="max-w-[420px] w-[90%] bg-white/80 backdrop-blur rounded-2xl shadow-xl p-8 flex flex-col gap-6">
+    <img src="https://www.dublincleaners.com/wp-content/uploads/2024/12/Dublin-Logos-stacked.png" alt="Logo" class="mx-auto" style="height:120px">
+    <h1 class="text-2xl font-semibold text-gray-800 text-center" data-i18n-key="navTitle">Employee Annual Reviews</h1>
+    <label class="w-full">
+      <span class="text-sm text-gray-500" data-i18n-key="userId">User ID</span>
+      <input class="w-full h-11 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent" type="text" id="userId" data-i18n-key="userId" data-i18n-placeholder>
+    </label>
+    <label class="w-full">
+      <span class="text-sm text-gray-500" data-i18n-key="password">Password</span>
+      <input class="w-full h-11 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent" type="password" id="password" data-i18n-key="password" data-i18n-placeholder>
+    </label>
+    <button class="primary w-full h-12 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold tracking-wide transition-transform active:scale-95" type="submit" data-i18n-key="login">Login</button>
+  </div>
 </form>
 </body>
 </html>
