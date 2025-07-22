@@ -273,9 +273,11 @@ function login(){
   const e=document.getElementById('userId').value;
   const p=document.getElementById('password').value;
   document.body.style.cursor='wait';
-  setTimeout(()=>{document.body.style.cursor='';},3000);
+  startLoading();
   google.script.run
     .withSuccessHandler(r=>{
+      document.body.style.cursor='';
+      stopLoading();
       if(r.success){
         user=r.user;
         lang=user.lang;
@@ -297,6 +299,8 @@ function login(){
     }
     })
     .withFailureHandler(err=>{
+      document.body.style.cursor='';
+      stopLoading();
       alert(err.message||t('loginFail'));
     })
     .login(e,p);
@@ -629,10 +633,10 @@ document.addEventListener('DOMContentLoaded',init);
   <label>Password<input type="password" id="newUserPwd"></label>
   <button class="primary" onclick="addNewUser()">Add User</button>
 </section>
-<div id="login" class="hidden">
+<form id="login" class="hidden" onsubmit="login();return false;">
 <label><span data-i18n-key="userId">User ID</span><input type="text" id="userId" data-i18n-key="userId" data-i18n-placeholder></label>
 <label><span data-i18n-key="password">Password</span><input type="password" id="password" data-i18n-key="password" data-i18n-placeholder></label>
-<button class="primary" onclick="login()" data-i18n-key="login">Login</button>
-</div>
+<button class="primary" type="submit" data-i18n-key="login">Login</button>
+</form>
 </body>
 </html>
