@@ -520,6 +520,7 @@ function gatherReviewData(){
 }
 
 let autosaveTimeout;
+let submitMsgTimeout;
 function scheduleAutosave(){
   clearTimeout(autosaveTimeout);
   autosaveTimeout=setTimeout(autosaveReview,1000);
@@ -545,7 +546,10 @@ function setupAutosave(){
 function submitReview(){
   const data=gatherReviewData();
   const review={id:currentReviewId,employeeId:user.id,type:'SELF',status:'SUBMITTED',data:{year:selectedYear,answers:data.answers,finalExpectation:data.finalExp}};
-  document.getElementById('submitMsg').textContent='Saved';
+  const msgEl=document.getElementById('submitMsg');
+  msgEl.textContent='Saved';
+  clearTimeout(submitMsgTimeout);
+  submitMsgTimeout=setTimeout(()=>{msgEl.textContent='';},5000);
   google.script.run.withSuccessHandler(r=>{
     currentReviewId=r.id;
     loadReviews();
