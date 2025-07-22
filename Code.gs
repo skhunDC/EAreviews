@@ -12,6 +12,7 @@ const DEV_PASSWORD = 'changeme'; // replace in prod
 const ADMIN_SHEET_ID = '17lpaLBAL9XidYqiMhKNWRhZdEIqa0OzuVP7SYYc6VfQ';
 const DEV_USERS = ['skhun@dublincleaners.com','ss.sku@protonmail.com'];
 const REVIEW_FOLDER_NAME = 'EAReviewData';
+const CALENDAR_ID = PropertiesService.getScriptProperties().getProperty('CALENDAR_ID');
 
 /** Return the spreadsheet used by the app */
 function getSpreadsheet(){
@@ -68,9 +69,24 @@ function createSession(uid) {
   return token;
 }
 
-/** Serve the web app */
-function doGet() {
+/** Serve the web app or JSON endpoints */
+function doGet(e) {
+  const path = (e && e.pathInfo) || '';
+  if (path === 'events') {
+    return jsonResponse_(getEvents_(e));
+  } else if (path === 'me') {
+    return jsonResponse_(getCurrentUser_());
+  }
   return HtmlService.createHtmlOutputFromFile('index');
+}
+
+/** Handle POST requests */
+function doPost(e) {
+  const path = (e && e.pathInfo) || '';
+  if (path === 'book') {
+    return jsonResponse_(bookSlot_(e));
+  }
+  return jsonResponse_({error:'not_found'});
 }
 
 /** Authenticate user by user ID */
@@ -415,4 +431,95 @@ function saveFullReview(review, compAdj){
     saveCompAdjustment(saved.id, compAdj);
   }
   return saved;
+}
+
+/** --- Scheduling Helpers & API Endpoints -------------------------------- */
+
+/** Return a JSON text output */
+function jsonResponse_(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+/** Verify current session and return user object */
+function checkAuth_() {
+  const user = getSession();
+  if (!user) throw new Error('Unauthorized');
+  return user;
+}
+
+/** Get calendar ID from script properties */
+function getCalendar_() {
+  if (!CALENDAR_ID) throw new Error('Missing CALENDAR_ID');
+  return CALENDAR_ID;
+}
+
+/** Convert Date to ISO string */
+function toIso_(d) {
+  return Utilities.formatDate(new Date(d), 'UTC', "yyyy-MM-dd'T'HH:mm:ss'Z'");
+}
+
+/** Parse JSON body */
+function parseBody_(e) {
+  if (e && e.postData && e.postData.contents) {
+    try { return JSON.parse(e.postData.contents); } catch(err) {}
+  }
+  return {};
+}
+
+/** Return current user */
+function getCurrentUser_() {
+  return checkAuth_();
+}
+
+/** List booked events */
+function getEvents_(e) {
+  const user = checkAuth_();
+  const calId = getCalendar_();
+  const timeMin = e.parameter && e.parameter.timeMin ? e.parameter.timeMin : toIso_(new Date());
+  const timeMax = e.parameter && e.parameter.timeMax ? e.parameter.timeMax : toIso_(new Date(new Date().getTime() + 14*24*60*60*1000));
+  const resp = Calendar.Events.list(calId,{timeMin:timeMin,timeMax:timeMax,singleEvents:true});
+  const events = [];
+  if (resp.items) {
+    resp.items.forEach(ev=>{
+      let desc={};
+      try{ if(ev.description) desc=JSON.parse(ev.description);}catch(e){}
+      events.push({
+        id: ev.id,
+        title: ev.summary,
+        start: ev.start.dateTime || ev.start.date,
+        end: ev.end.dateTime || ev.end.date,
+        editable: desc.uid == user.id
+      });
+    });
+  }
+  return events;
+}
+
+/** Book a new slot */
+function bookSlot_(e) {
+  const body = parseBody_(e);
+  if (!body.start || !body.end) throw new Error('invalid');
+  const user = checkAuth_();
+  const calId = getCalendar_();
+  const existing = Calendar.Events.list(calId, {timeMin: body.start, timeMax: body.end, singleEvents:true});
+  if (existing.items && existing.items.length) {
+    return {status:409};
+  }
+  const event = {
+    summary: 'Review – ' + user.name,
+    description: JSON.stringify({uid:user.id,lang:user.lang,createdAt:toIso_(new Date())}),
+    start: {dateTime: body.start},
+    end: {dateTime: body.end},
+    attendees: [{email:user.userId}]
+  };
+  const created = Calendar.Events.insert(event, calId);
+  return {
+    status:201,
+    id: created.id,
+    title: created.summary,
+    start: created.start.dateTime,
+    end: created.end.dateTime,
+    editable: true
+  };
 }
