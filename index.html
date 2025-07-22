@@ -607,13 +607,14 @@ function addNewUser(){
 let calendar,startSel,endSel;
 async function initCalendar(){
   const el=document.getElementById('calendar');
-  if(!el||calendar) return;
-  calendar=new FullCalendar.Calendar(el,{
-    initialView:'timeGridWeek',
-    headerToolbar:false,
-    allDaySlot:false,
-    selectable:true,
-    slotDuration:'00:30',
+  if(!el) return;
+  if(!calendar){
+    calendar=new FullCalendar.Calendar(el,{
+      initialView:'timeGridWeek',
+      headerToolbar:false,
+      allDaySlot:false,
+      selectable:true,
+      slotDuration:'00:30',
     slotMinTime:'07:00',
     slotMaxTime:'19:00',
     locale:lang==='es'?'es':'en',
@@ -623,8 +624,10 @@ async function initCalendar(){
     },
     select:(info)=>openDialog(info.start,info.end),
     dateClick:(info)=>openDialog(info.date,new Date(info.date.getTime()+30*60*1000))
-  });
+    });
+  }
   calendar.render();
+  calendar.refetchEvents();
 }
 function openDialog(start,end){
   startSel=start;endSel=end;
