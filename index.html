@@ -780,9 +780,9 @@ function initCalendar(){
 }
 async function bookSimple(){
   const d=document.getElementById('selDate').value;
-  const t=document.getElementById('selTime').value;
-  if(!d||!t){alert(t('chooseTime'));return;}
-  const start=new Date(d+'T'+t);
+  const timeVal=document.getElementById('selTime').value;
+  if(!d||!timeVal){alert(t('chooseTime'));return;}
+  const start=new Date(d+'T'+timeVal);
   const end=new Date(start.getTime()+30*60*1000);
   const resp=await fetch('book',{method:'POST',body:JSON.stringify({start:start.toISOString(),end:end.toISOString()})});
   const msg=document.getElementById('schedMsg');
