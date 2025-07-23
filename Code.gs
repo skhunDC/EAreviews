@@ -10,7 +10,6 @@ const CACHE_KEY = 'SESSION';
 const SESSION_DURATION = 60 * 60 * 8; // 8 hours
 const DEV_PASSWORD = 'changeme'; // replace in prod
 const ADMIN_SHEET_ID = '17lpaLBAL9XidYqiMhKNWRhZdEIqa0OzuVP7SYYc6VfQ';
-const DEV_USERS = ['skhun@dublincleaners.com','ss.sku@protonmail.com'];
 const REVIEW_FOLDER_NAME = 'EAReviewData';
 const CALENDAR_ID = PropertiesService.getScriptProperties().getProperty('CALENDAR_ID');
 
@@ -318,10 +317,10 @@ function addUser(user) {
   sheet.appendRow([id, user.userId, user.name, user.role, user.managerId||'', user.lang||'en', h.hashHex, h.saltHex, new Date()]);
 }
 
-/** Check if session user is in DEV_USERS */
+/** Check if the current session belongs to a DEV role */
 function isAuthorizedDev() {
-  const email = Session.getActiveUser().getEmail();
-  return DEV_USERS.indexOf(email) !== -1;
+  const session = getSession();
+  return session && session.role === 'DEV';
 }
 
 /** Admin panel API to add simple user entry */
@@ -339,7 +338,8 @@ function addNewUser(user) {
   const id = new Date().getTime();
   const h = createHash(user.password);
   sheet.appendRow([id, user.userId, user.name || '', user.role, user.managerId || '', user.lang || 'en', h.hashHex, h.saltHex, new Date()]);
-  logDevAction(Session.getActiveUser().getEmail(), 'add user', user.userId);
+  const dev = getSession();
+  logDevAction(dev ? dev.userId : 'unknown', 'add user', user.userId);
   return {id:id};
 }
 
@@ -349,7 +349,8 @@ function getAllUsers(){
   const sheet = SpreadsheetApp.openById(ADMIN_SHEET_ID).getSheetByName(USERS_SHEET);
   if(!sheet) return [];
   const rows = sheet.getDataRange().getValues();
-  logDevAction(Session.getActiveUser().getEmail(), 'view users', '');
+  const dev = getSession();
+  logDevAction(dev ? dev.userId : 'unknown', 'view users', '');
   return rows.slice(1).map(r=>({userId:r[1],role:r[3]}));
 }
 
@@ -361,7 +362,8 @@ function updateUserID(oldID, newID){
   for(let i=1;i<data.length;i++){
     if(data[i][1]==oldID){
       sheet.getRange(i+1,2).setValue(newID);
-      logDevAction(Session.getActiveUser().getEmail(),'change id',newID);
+      const dev = getSession();
+      logDevAction(dev ? dev.userId : 'unknown','change id',newID);
       return true;
     }
   }
@@ -376,7 +378,8 @@ function updateUserRole(userID, role){
   for(let i=1;i<data.length;i++){
     if(data[i][1]==userID){
       sheet.getRange(i+1,4).setValue(role);
-      logDevAction(Session.getActiveUser().getEmail(),'change role to '+role,userID);
+      const dev = getSession();
+      logDevAction(dev ? dev.userId : 'unknown','change role to '+role,userID);
       return true;
     }
   }
@@ -393,7 +396,8 @@ function updateUserPassword(userID, newPwd){
       const h=createHash(newPwd);
       sheet.getRange(i+1,7).setValue(h.hashHex);
       sheet.getRange(i+1,8).setValue(h.saltHex);
-      logDevAction(Session.getActiveUser().getEmail(),'reset password',userID);
+      const dev = getSession();
+      logDevAction(dev ? dev.userId : 'unknown','reset password',userID);
       return true;
     }
   }

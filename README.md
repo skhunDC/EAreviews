@@ -8,14 +8,9 @@ This project contains a simple Google Apps Script web application used to collec
 - Managers and HR can adjust compensation and record final expectations.
 - Whenever the Reviews section is opened, the application reloads the latest
   saved review from the server so users always see their most recent answers.
-- The dev button is always visible, but opening the dev panel requires
-  authentication through the Chrome browser OAuth session. Only the accounts
-  `skhun@dublincleaners.com` and `ss.sku@protonmail.com` are allowed to access
-  it. Authorized developers can create new users from the panel with passwords of
-  any complexity. They can also reset an existing user's password from the dev
-  panel. All passwords are hashed before being stored. Developer accounts do not
-  require a password. Instead, clicking the Dev button uses the Chrome browser's
-  OAuth session to authenticate. Only the whitelisted developer accounts can
-  open the dev panel this way.
+- The dev button is always visible. Developers simply log in with a user account
+  whose role is `DEV` to open the dev panel. These accounts can create new users
+  from the panel with passwords of any complexity and can reset existing user
+  passwords. All passwords are hashed before being stored.
 
 The project is intentionally lightweight and open. Feel free to modify or extend it as needed.
