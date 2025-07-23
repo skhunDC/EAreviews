@@ -639,19 +639,36 @@ function bookSlot_(e) {
 /** Manager adds availability slot */
 function addAvailability_(e){
   const body = parseBody_(e);
-  if(!body.date || !body.time) throw new Error('invalid');
   const user = checkAuth_();
   if(user.role !== 'Manager' && user.role !== 'DEV') throw new Error('denied');
-  const d = new Date(body.date);
-  if(d.getDay() === 0 || d.getDay() === 6) throw new Error('weekend');
+  // support old {date,time} payload for single slot
+  if(body.date && body.time){
+    const d = new Date(body.date);
+    if(d.getDay() === 0 || d.getDay() === 6) throw new Error('weekend');
+    const sheet = getScheduleSheet();
+    const data = sheet.getDataRange().getValues();
+    for(let i=1;i<data.length;i++){
+      if(data[i][0]==body.date && data[i][1]==body.time){
+        return {status:'exists'};
+      }
+    }
+    sheet.appendRow([body.date, body.time, user.userId, '', '']);
+    return {status:'ok'};
+  }
+  if(!body.start || !body.end) throw new Error('invalid');
+  let start = new Date(body.start);
+  let end = new Date(body.end);
+  if(isNaN(start) || isNaN(end) || start >= end) throw new Error('invalid');
   const sheet = getScheduleSheet();
   const data = sheet.getDataRange().getValues();
-  for(let i=1;i<data.length;i++){
-    if(data[i][0]==body.date && data[i][1]==body.time){
-      return {status:'exists'};
-    }
+  const existing = new Set(data.slice(1).map(r=>r[0]+"|"+r[1]));
+  for(let t=start; t<end; t=new Date(t.getTime()+30*60000)){
+    if(t.getDay()==0||t.getDay()==6) continue;
+    const dateStr=Utilities.formatDate(t, 'UTC', 'yyyy-MM-dd');
+    const timeStr=Utilities.formatDate(t, 'UTC', 'HH:mm');
+    if(existing.has(dateStr+"|"+timeStr)) continue;
+    sheet.appendRow([dateStr,timeStr,user.userId,'','']);
   }
-  sheet.appendRow([body.date, body.time, user.userId, '', '']);
   return {status:'ok'};
 }
 
