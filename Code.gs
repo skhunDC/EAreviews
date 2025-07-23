@@ -174,6 +174,7 @@ function saveLang(lang) {
 function loadConfig() {
   const ss = getSpreadsheet();
   const sheet = ss.getSheetByName(CONFIG_SHEET);
+  if (!sheet) return {};
   const rows = sheet.getDataRange().getValues();
   const cfg = {};
   rows.forEach((r,i) => {
