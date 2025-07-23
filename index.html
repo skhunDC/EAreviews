@@ -436,6 +436,10 @@ function openDevPanel(){
       document.querySelectorAll('body>section').forEach(s=>s.classList.add('hidden'));
       const loginDiv=document.getElementById('login');
       if(loginDiv)loginDiv.classList.add('hidden');
+      const nu=document.getElementById('newUserModal');
+      if(nu)nu.classList.add('hidden');
+      const rp=document.getElementById('resetPwModal');
+      if(rp)rp.classList.add('hidden');
       loadUsers();
       document.getElementById('devPanel').classList.remove('hidden');
     }else{
