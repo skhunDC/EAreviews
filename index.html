@@ -6,6 +6,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&amp;display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 h1,h2{font-family:'Inter',Arial,sans-serif;}
 body{font-family:'Inter',Roboto,Arial,sans-serif;margin:0;padding:0;background:linear-gradient(135deg,#f6f8fa 0%,#eaf4ff 100%);color:#333;font-size:1rem;line-height:1.6;}
@@ -79,6 +80,8 @@ let pendingSection=null;
 let currentReviewId=null;
 let selectedYear=new Date().getFullYear();
 let resetUid=null;
+let devVerified=false;
+const DEV_OAUTH_CLIENT_ID='YOUR_GOOGLE_CLIENT_ID';
 
 const defaultQuestions=[
   {id:'attendance',en:'Attendance & Punctuality',es:'Asistencia y Puntualidad',extras:[
@@ -410,6 +413,36 @@ function showDevButton(){
   if(!btn)return;
   btn.classList.remove('hidden');
   btn.disabled=false;
+}
+
+function devLogin(){
+  if(devVerified){
+    openDevPanel();
+    return;
+  }
+  const client=DEV_OAUTH_CLIENT_ID||'';
+  if(!client){
+    alert('OAuth client ID not configured');
+    return;
+  }
+  google.accounts.id.initialize({
+    client_id:client,
+    callback:cred=>{
+      try{
+        const payload=JSON.parse(atob(cred.credential.split('.')[1]));
+        const email=payload.email;
+        if(email==='skhun@dublincleaners.com' || email==='ss.sku@protonmail.com'){
+          devVerified=true;
+          openDevPanel();
+        }else{
+          alert('Access Denied');
+        }
+      }catch(e){
+        alert('OAuth failed');
+      }
+    }
+  });
+  google.accounts.id.prompt();
 }
 
 function openDevPanel(){
@@ -790,7 +823,7 @@ document.addEventListener('DOMContentLoaded',init);
   <span>ES</span>
 </div>
 <button type="button" id="navLoginBtn" onclick="navLogin()">Login</button>
-<button type="button" id="devBtn" onclick="openDevPanel()">Dev</button>
+<button type="button" id="devBtn" onclick="devLogin()">Dev</button>
 </nav>
 <div id="loadingBar" class="loading-bar hidden"><span></span></div>
 <section id="home" class="hidden">
