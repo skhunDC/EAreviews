@@ -2,6 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Employee Reviews</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&amp;display=swap" rel="stylesheet">
@@ -28,9 +29,11 @@ h2{font-size:1.25rem;margin-top:0;color:#0A5C30;}
 .process svg{width:12px;height:12px;fill:none;stroke:#0A5C30;stroke-width:2;}
 .callout{margin-top:1rem;background:#C9A14A1A;border-left:4px solid #C9A14A;padding:0.75rem;font-size:0.9rem;}
 @keyframes slideUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.nav-items{display:flex;gap:10px;align-items:center;margin-left:auto;}
+.nav-toggle{display:none;background:none;border:none;color:white;font-size:24px;cursor:pointer;margin-left:auto;}
 nav{display:flex;gap:10px;background:#0A5C30;color:white;padding:10px;align-items:center;position:relative;z-index:50;}
 nav button{background:none;border:none;color:white;font-size:16px;cursor:pointer;padding:6px 12px;}
-.lang-switch{display:flex;align-items:center;margin-left:auto;gap:4px;}
+.lang-switch{display:flex;align-items:center;gap:4px;}
 .logo{width:125px;height:125px;}
 .nav-title{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:24px;font-weight:bold;}
 .switch{position:relative;display:inline-block;width:40px;height:24px;}
@@ -43,7 +46,7 @@ nav button{background:none;border:none;color:white;font-size:16px;cursor:pointer
 #devPanel table{width:100%;border-collapse:collapse;}
 #devPanel th,#devPanel td{padding:8px;border-bottom:1px solid #ddd;}
 #devPanel td .actions button{margin-left:4px;}
-#devPanel .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);z-index:50;}
+#devPanel .modal{position:fixed;top:0;right:0;bottom:0;left:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);z-index:50;}
 #devPanel .modal.hidden{display:none;}
 #accessDenied{z-index:60;}
 #addUserFab{z-index:50;}
@@ -81,6 +84,18 @@ button.primary{background:#0A5C30;color:white;border:none;border-radius:4px;padd
 .calendar .slot.booked{background:#e5e7eb;color:#888;cursor:not-allowed;}
 .calendar .slot.mine{background:#0A5C30;color:#fff;}
 .calendar .slot:hover{box-shadow:0 2px 4px rgba(0,0,0,0.1);}
+@media(max-width:640px){
+  .logo{width:80px;height:80px;}
+  nav{flex-wrap:wrap;}
+  .nav-title{position:static;transform:none;margin:0 auto;}
+  #navItems{display:none;width:100%;flex-direction:column;gap:8px;margin-top:10px;}
+  #navItems.show{display:flex;}
+  .nav-toggle{display:block;}
+  .lang-switch{margin-left:0;}
+}
+@media(min-width:641px){
+  #navItems{display:flex;}
+}
 </style>
 <script>
 let user=null,config={},lang=localStorage.getItem('lang')||'en';
@@ -321,6 +336,10 @@ function applyTranslations(){
   if(toggle)toggle.checked=lang==='es';
   const loginBtn=document.getElementById('navLoginBtn');
   if(loginBtn)loginBtn.textContent=user?t('logout'):t('login');
+}
+function toggleMenu(){
+  const items=document.getElementById('navItems');
+  if(items) items.classList.toggle('show');
 }
 function init(){
   show('home');
@@ -901,18 +920,21 @@ document.addEventListener('DOMContentLoaded',init);
 </head>
 <body>
 <nav>
-<img src="https://www.dublincleaners.com/wp-content/uploads/2024/12/Dublin-Logos-stacked.png" alt="Logo" class="logo">
-<button type="button" onclick="show('home')" data-i18n-key="home">Home</button>
-<button type="button" onclick="show('reviews')" data-i18n-key="reviews">Reviews</button>
-<button type="button" onclick="show('schedule')" data-i18n-key="schedule">Schedule</button>
-<div class="nav-title" data-i18n-key="navTitle">Employee Annual Reviews</div>
-<div class="lang-switch">
-  <span>EN</span>
-  <label class="switch"><input type="checkbox" id="langToggle" onchange="toggleLang()"><span class="slider"></span></label>
-  <span>ES</span>
-</div>
-<button type="button" id="navLoginBtn" onclick="navLogin()">Login</button>
-<button type="button" id="devBtn" onclick="devLink()">Dev</button>
+  <img src="https://www.dublincleaners.com/wp-content/uploads/2024/12/Dublin-Logos-stacked.png" alt="Logo" class="logo">
+  <button class="nav-toggle material-icons" onclick="toggleMenu()">menu</button>
+  <div class="nav-title" data-i18n-key="navTitle">Employee Annual Reviews</div>
+  <div id="navItems" class="nav-items">
+    <button type="button" onclick="show('home')" data-i18n-key="home">Home</button>
+    <button type="button" onclick="show('reviews')" data-i18n-key="reviews">Reviews</button>
+    <button type="button" onclick="show('schedule')" data-i18n-key="schedule">Schedule</button>
+    <div class="lang-switch">
+      <span>EN</span>
+      <label class="switch"><input type="checkbox" id="langToggle" onchange="toggleLang()"><span class="slider"></span></label>
+      <span>ES</span>
+    </div>
+    <button type="button" id="navLoginBtn" onclick="navLogin()">Login</button>
+    <button type="button" id="devBtn" onclick="devLink()">Dev</button>
+  </div>
 </nav>
 <div id="loadingBar" class="loading-bar hidden"><span></span></div>
 <section id="home" class="hidden">
@@ -937,14 +959,16 @@ document.addEventListener('DOMContentLoaded',init);
 <textarea id="finalNotes" data-i18n-key="notesPlaceholder" data-i18n-placeholder placeholder="Notes"></textarea>
 </div>
 <div class="card">
-<label><span data-i18n-key="empSignature">Employee Signature</span>
-  <input type="text" id="empSign" class="signature">
+  <label>
+    <span data-i18n-key="empSignature">Employee Signature</span>
+    <input type="text" id="empSign" class="signature">
+  </label>
   <input type="text" id="empSignDate" class="sign-date" readonly data-i18n-key="signDate" data-i18n-placeholder placeholder="Date">
-</label>
-<label><span data-i18n-key="mgrSignature">Manager Signature</span>
-  <input type="text" id="mgrSign" class="signature">
+  <label class="mt-4">
+    <span data-i18n-key="mgrSignature">Manager Signature</span>
+    <input type="text" id="mgrSign" class="signature">
+  </label>
   <input type="text" id="mgrSignDate" class="sign-date" readonly data-i18n-key="signDate" data-i18n-placeholder placeholder="Date">
-</label>
 </div>
 <button class="primary" type="submit" data-i18n-key="submitReview">Submit Review</button>
 <button id="btnSchedule" class="primary ml-4" onclick="show('schedule')" data-i18n-key="scheduleBtn"></button>

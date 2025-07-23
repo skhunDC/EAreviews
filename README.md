@@ -16,3 +16,9 @@ This project contains a simple Google Apps Script web application used to collec
   review files from Drive via the new `deleteAllReviews` function in `Code.gs`.
 
 The project is intentionally lightweight and open. Feel free to modify or extend it as needed.
+
+## Mobile + Desktop Compatibility
+The entire site now uses a **mobile-first** design. Layouts rely on Tailwind CSS utilities along with Flexbox, CSS Grid and custom media queries so pages scale gracefully from phones to large monitors. Language toggling continues to work across all screen sizes.
+
+### Testing Responsiveness
+Use your browser's DevTools or a mobile emulator to resize the viewport. Keeping the width under **480&nbsp;px** closely simulates a phone.
