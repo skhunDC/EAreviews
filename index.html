@@ -421,6 +421,8 @@ function openDevPanel(){
   if(!navigator.userAgent.includes('Chrome')){alert('Use Chrome browser');return;}
   google.script.run.withSuccessHandler(isDev=>{
     if(isDev){
+      // fetch session after authorization so client knows user role
+      google.script.run.withSuccessHandler(u=>{if(u)user=u;}).getSession();
       document.querySelectorAll('body>section').forEach(s=>s.classList.add('hidden'));
       const loginDiv=document.getElementById('login');
       if(loginDiv)loginDiv.classList.add('hidden');

@@ -329,7 +329,17 @@ function addUser(user) {
 /** Check if session user is in DEV_USERS */
 function isAuthorizedDev() {
   const email = Session.getActiveUser().getEmail();
-  return DEV_USERS.indexOf(email) !== -1;
+  const ok = DEV_USERS.indexOf(email) !== -1;
+  if (ok) {
+    // ensure a cached DEV session so other calls recognize the user
+    const cache = CacheService.getUserCache();
+    if (!cache.get(CACHE_KEY)) {
+      const user = {id: email, userId: email, name: email,
+                    role: 'DEV', managerId: '', lang: 'en'};
+      cache.put(CACHE_KEY, JSON.stringify(user), SESSION_DURATION);
+    }
+  }
+  return ok;
 }
 
 /** Admin panel API to add simple user entry */
