@@ -12,6 +12,7 @@ This project contains a simple Google Apps Script web application used to collec
   authentication through the Chrome browser OAuth session. Only the accounts
   `skhun@dublincleaners.com` and `ss.sku@protonmail.com` are allowed to access
   it. Authorized developers can create new users from the panel with securely
-  hashed passwords.
+  hashed passwords. Developer accounts automatically sign in via the Chrome
+  browser's OAuth session and do not require a password.
 
 The project is intentionally lightweight and open. Feel free to modify or extend it as needed.
