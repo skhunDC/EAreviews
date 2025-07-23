@@ -305,28 +305,11 @@ function init(){
   document.getElementById('mgrSign').addEventListener('input',()=>updateSignDate('mgrSign','mgrSignDate'));
   loadQuestions();
   initCalendar();
-  const revSection=document.getElementById('reviews');
-  google.script.run.withSuccessHandler(c=>{config=c;loadSession();}).loadConfig();
-}
-function loadSession(){
-  google.script.run.withSuccessHandler(u=>{
-    if(u){
-      user=u;
-      lang=u.lang;
-      localStorage.setItem('lang',lang);
-      applyTranslations();
-      showDevButton();
-      document.getElementById('navLoginBtn').textContent=t('logout');
-      if(user.role==='DEV'){
-        openDevPanel();
-      }else{
-        show('home');
-      }
-    }else{
-      applyTranslations();
-      showDevButton();
-    }
-  }).getSession();
+  google.script.run.withSuccessHandler(c=>{
+    config=c;
+    applyTranslations();
+    showDevButton();
+  }).loadConfig();
 }
 function login(){
   const e=document.getElementById('userId').value;
