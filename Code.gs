@@ -367,7 +367,8 @@ function getAllUsers(){
   const sheet = SpreadsheetApp.openById(ADMIN_SHEET_ID).getSheetByName(USERS_SHEET);
   if(!sheet) return [];
   const rows = sheet.getDataRange().getValues();
-  return rows.slice(1).map(r=>({id:r[0],userId:r[1],role:r[3],password:r[6]}));
+  logDevAction(Session.getActiveUser().getEmail(), 'view users', '');
+  return rows.slice(1).map(r=>({userId:r[1],role:r[3]}));
 }
 
 /** Update a user's ID */
