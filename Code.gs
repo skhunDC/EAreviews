@@ -323,6 +323,17 @@ function isAuthorizedDev() {
   return session && session.role === 'DEV';
 }
 
+/** OAuth check specifically for Dev link */
+function authorizeDev(){
+  const email = Session.getActiveUser().getEmail();
+  if(email === 'skhun@dublincleaners.com' || email === 'ss.sku@protonmail.com'){
+    const dev = {id:email, userId:email, name:email, role:'DEV', lang:'en'};
+    CacheService.getUserCache().put(CACHE_KEY, JSON.stringify(dev), SESSION_DURATION);
+    return {authorized:true, email:email};
+  }
+  return {authorized:false};
+}
+
 /** Admin panel API to add simple user entry */
 function addNewUser(user) {
   if (!isAuthorizedDev()) throw new Error('denied');

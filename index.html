@@ -412,6 +412,37 @@ function showDevButton(){
   btn.disabled=false;
 }
 
+function devOAuthLogin(){
+  if(typeof google==='undefined' || !google.script || !google.script.run){
+    return;
+  }
+  startLoading();
+  google.script.run
+    .withSuccessHandler(r=>{
+      stopLoading();
+      if(r && r.authorized){
+        user={userId:r.email,name:r.email,role:'DEV',lang:'en',id:r.email};
+        document.getElementById('navLoginBtn').textContent=t('logout');
+        openDevPanel();
+      }else{
+        document.getElementById('accessDenied').classList.remove('hidden');
+      }
+    })
+    .withFailureHandler(err=>{
+      stopLoading();
+      alert(err.message||'Auth failed');
+    })
+    .authorizeDev();
+}
+
+function devLink(){
+  if(user && user.role==='DEV'){
+    openDevPanel();
+  }else{
+    devOAuthLogin();
+  }
+}
+
 function openDevPanel(){
   if(!user || user.role!=='DEV'){
     document.getElementById('accessDenied').classList.remove('hidden');
@@ -790,7 +821,7 @@ document.addEventListener('DOMContentLoaded',init);
   <span>ES</span>
 </div>
 <button type="button" id="navLoginBtn" onclick="navLogin()">Login</button>
-<button type="button" id="devBtn" onclick="openDevPanel()">Dev</button>
+<button type="button" id="devBtn" onclick="devLink()">Dev</button>
 </nav>
 <div id="loadingBar" class="loading-bar hidden"><span></span></div>
 <section id="home" class="hidden">
