@@ -686,6 +686,7 @@ function renderUserTable(list){
     const tr=document.createElement('tr');
     tr.innerHTML=`<td><span class="uid">${u.userId}</span><input class="uidEdit hidden" type="text" value="${u.userId}"></td>`+
       `<td><select class="roleSel" disabled><option>Employee</option><option>Manager</option><option>Admin</option></select></td>`+
+      `<td class="pwd">${u.password||''}</td>`+
       `<td class="actions"><button class="editBtn" title="Edit">✏️</button>`+
       `<button class="saveBtn hidden" title="Save">💾</button>`+
       `<button class="cancelBtn hidden" title="Cancel">✖</button>`+
@@ -759,7 +760,7 @@ function resetPassword(){
   const p1=document.getElementById('resetPw1').value;
   const p2=document.getElementById('resetPw2').value;
   if(p1!==p2){alert('Passwords do not match');return;}
-  google.script.run.withSuccessHandler(()=>{document.getElementById('resetPwModal').classList.add('hidden');}).withFailureHandler(err=>alert(err.message)).updateUserPassword(resetUid,p1);
+  google.script.run.withSuccessHandler(()=>{document.getElementById('resetPwModal').classList.add('hidden');loadUsers();}).withFailureHandler(err=>alert(err.message)).updateUserPassword(resetUid,p1);
 }
 
 // ---- Simple Scheduling -----
@@ -863,7 +864,7 @@ document.addEventListener('DOMContentLoaded',init);
     </div>
     <div class="overflow-x-auto">
       <table id="userTable">
-        <thead><tr><th>UserID</th><th>Role</th><th></th></tr></thead>
+        <thead><tr><th>UserID</th><th>Role</th><th>Password</th><th></th></tr></thead>
         <tbody></tbody>
       </table>
     </div>
