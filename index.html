@@ -343,9 +343,13 @@ function login(){
         applyTranslations();
         showDevButton();
         loadReviews();
-      const target=pendingSection||'reviews';
-      pendingSection=null;
-      show(target);
+        if(user.role==='DEV'){
+          openDevPanel();
+        }else{
+          const target=pendingSection||'reviews';
+          pendingSection=null;
+          show(target);
+        }
       }else{
         let msg='';
         if(r.error==='invalid_password')msg=t('invalidPwd');
@@ -860,7 +864,7 @@ document.addEventListener('DOMContentLoaded',init);
       <button onclick="document.getElementById('devPanel').classList.add('hidden')">✖</button>
     </div>
     <div class="text-right mb-2">
-      <button class="primary" onclick="showNewUserModal()">+ New User</button>
+      <button class="primary" onclick="showNewUserModal()">+ Add User</button>
     </div>
     <div class="overflow-x-auto">
       <table id="userTable">
