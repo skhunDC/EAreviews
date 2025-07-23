@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>Employee Reviews</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script&amp;display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
 h1,h2{font-family:'Inter',Arial,sans-serif;}
@@ -696,7 +696,7 @@ function renderUserTable(list){
   list.forEach(u=>{
     const tr=document.createElement('tr');
     tr.innerHTML=`<td><span class="uid">${u.userId}</span><input class="uidEdit hidden border px-1" type="text" value="${u.userId}"></td>`+
-      `<td><select class="roleSel" disabled><option>Employee</option><option>Manager</option><option>Admin</option></select></td>`+
+      `<td><select class="roleSel" disabled><option>Employee</option><option>Manager</option><option>HR</option><option>DEV</option></select></td>`+
       `<td class="actions"><button type="button" class="editBtn" title="Edit">✏️</button>`+
       `<button type="button" class="saveBtn hidden" title="Save">💾</button>`+
       `<button type="button" class="cancelBtn hidden" title="Cancel">✖</button>`+
@@ -826,7 +826,7 @@ document.addEventListener('DOMContentLoaded',init);
 <div id="reviewsList" class="mb-4"></div>
 <div id="questionList"></div>
 <div id="compAdjust" class="card hidden">
-<label><span data-i18n-key="curWage">Current Wage</span><input type="number" id="curWage"></label>
+<label><span data-i18n-key="curWage">Current Wage</span><input type="number" id="curWage" oninput="calcPct()"></label>
 <label><span data-i18n-key="newWage">New Wage</span><input type="number" id="newWage" oninput="calcPct()"></label>
 <div><span data-i18n-key="pctIncrease">% Increase:</span> <span id="pctInc">0</span>%</div>
 </div>
@@ -884,7 +884,7 @@ document.addEventListener('DOMContentLoaded',init);
       <h4 class="text-lg font-semibold text-center">Add User</h4>
       <input id="newUid" class="w-full border px-2 py-1" placeholder="UserID">
       <select id="newRole" class="w-full border px-2 py-1">
-        <option>Employee</option><option>Manager</option><option>Admin</option>
+        <option>Employee</option><option>Manager</option><option>HR</option><option>DEV</option>
       </select>
       <input id="newPw1" type="password" class="w-full border px-2 py-1" placeholder="Password">
       <input id="newPw2" type="password" class="w-full border px-2 py-1" placeholder="Confirm Password">
