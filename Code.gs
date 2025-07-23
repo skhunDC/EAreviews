@@ -131,24 +131,12 @@ function getSession() {
   const data = cache.get(CACHE_KEY);
   if (data) return JSON.parse(data);
   const email = Session.getActiveUser().getEmail();
-  if (email) {
-    const ss = getSpreadsheet();
-    const sheet = ss.getSheetByName(USERS_SHEET);
-    const rows = sheet.getDataRange().getValues();
-    for (let i = 1; i < rows.length; i++) {
-      const [id, uid, name, role, managerId, lang] = rows[i];
-      if (uid === email) {
-        const user = {id:id,userId:uid,name:name,role:role,managerId:managerId,lang:lang};
-        cache.put(CACHE_KEY, JSON.stringify(user), SESSION_DURATION);
-        return user;
-      }
-    }
-    // allow devs without sheet entry to auto-login via OAuth
-    if (DEV_USERS.indexOf(email) !== -1) {
-      const user = {id:email, userId:email, name:email, role:'DEV', managerId:'', lang:'en'};
-      cache.put(CACHE_KEY, JSON.stringify(user), SESSION_DURATION);
-      return user;
-    }
+  // Only allow auto sign-in for whitelisted developer accounts
+  if (email && DEV_USERS.indexOf(email) !== -1) {
+    const user = {id: email, userId: email, name: email,
+                  role: 'DEV', managerId: '', lang: 'en'};
+    cache.put(CACHE_KEY, JSON.stringify(user), SESSION_DURATION);
+    return user;
   }
   return null;
 }
