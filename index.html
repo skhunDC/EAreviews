@@ -696,10 +696,10 @@ function renderUserTable(list){
     const tr=document.createElement('tr');
     tr.innerHTML=`<td><span class="uid">${u.userId}</span><input class="uidEdit hidden border px-1" type="text" value="${u.userId}"></td>`+
       `<td><select class="roleSel" disabled><option>Employee</option><option>Manager</option><option>Admin</option></select></td>`+
-      `<td class="actions"><button class="editBtn" title="Edit">✏️</button>`+
-      `<button class="saveBtn hidden" title="Save">💾</button>`+
-      `<button class="cancelBtn hidden" title="Cancel">✖</button>`+
-      `<button class="pwBtn" title="Change Password">🔑</button></td>`;
+      `<td class="actions"><button type="button" class="editBtn" title="Edit">✏️</button>`+
+      `<button type="button" class="saveBtn hidden" title="Save">💾</button>`+
+      `<button type="button" class="cancelBtn hidden" title="Cancel">✖</button>`+
+      `<button type="button" class="pwBtn" title="Change Password">🔑</button></td>`;
     tr.querySelector('.roleSel').value=u.role;
     tr.querySelector('.uid').onclick=()=>enableEdit(tr,u.userId);
     tr.querySelector('.editBtn').onclick=()=>enableEdit(tr,u.userId);
@@ -802,17 +802,17 @@ document.addEventListener('DOMContentLoaded',init);
 <body>
 <nav>
 <img src="https://www.dublincleaners.com/wp-content/uploads/2024/12/Dublin-Logos-stacked.png" alt="Logo" class="logo">
-<button onclick="show('home')" data-i18n-key="home">Home</button>
-<button onclick="show('reviews')" data-i18n-key="reviews">Reviews</button>
-<button onclick="show('schedule')" data-i18n-key="schedule">Schedule</button>
+<button type="button" onclick="show('home')" data-i18n-key="home">Home</button>
+<button type="button" onclick="show('reviews')" data-i18n-key="reviews">Reviews</button>
+<button type="button" onclick="show('schedule')" data-i18n-key="schedule">Schedule</button>
 <div class="nav-title" data-i18n-key="navTitle">Employee Annual Reviews</div>
 <div class="lang-switch">
   <span>EN</span>
   <label class="switch"><input type="checkbox" id="langToggle" onchange="toggleLang()"><span class="slider"></span></label>
   <span>ES</span>
 </div>
-<button id="navLoginBtn" onclick="navLogin()">Login</button>
-<button id="devBtn" onclick="openDevPanel()">Dev</button>
+<button type="button" id="navLoginBtn" onclick="navLogin()">Login</button>
+<button type="button" id="devBtn" onclick="openDevPanel()">Dev</button>
 </nav>
 <div id="loadingBar" class="loading-bar hidden"><span></span></div>
 <section id="home" class="hidden">
@@ -875,7 +875,7 @@ document.addEventListener('DOMContentLoaded',init);
         <tbody></tbody>
       </table>
     </div>
-    <button id="addUserFab" class="fixed bottom-6 right-6 bg-emerald-600 text-white rounded-full w-12 h-12 shadow-lg text-xl" onclick="showNewUserModal()" title="Add New User">+</button>
+    <button type="button" id="addUserFab" class="fixed bottom-6 right-6 bg-emerald-600 text-white rounded-full w-12 h-12 shadow-lg text-xl" onclick="showNewUserModal()" title="Add New User">+</button>
   </div>
   <div id="newUserModal" class="modal hidden">
     <div class="bg-white rounded-xl p-6 w-80 space-y-4">
@@ -887,8 +887,8 @@ document.addEventListener('DOMContentLoaded',init);
       <input id="newPw1" type="password" class="w-full border px-2 py-1" placeholder="Password">
       <input id="newPw2" type="password" class="w-full border px-2 py-1" placeholder="Confirm Password">
       <div class="flex justify-between">
-        <button class="primary" onclick="addNewUser()">Save</button>
-        <button onclick="document.getElementById('newUserModal').classList.add('hidden')">Cancel</button>
+        <button type="button" class="primary" onclick="addNewUser()">Save</button>
+        <button type="button" onclick="document.getElementById('newUserModal').classList.add('hidden')">Cancel</button>
       </div>
     </div>
   </div>
@@ -898,8 +898,8 @@ document.addEventListener('DOMContentLoaded',init);
       <input id="resetPw1" type="password" class="w-full border px-2 py-1" placeholder="New Password">
       <input id="resetPw2" type="password" class="w-full border px-2 py-1" placeholder="Confirm Password">
       <div class="flex justify-between">
-        <button class="primary" onclick="resetPassword()">Save</button>
-        <button onclick="document.getElementById('resetPwModal').classList.add('hidden')">Cancel</button>
+        <button type="button" class="primary" onclick="resetPassword()">Save</button>
+        <button type="button" onclick="document.getElementById('resetPwModal').classList.add('hidden')">Cancel</button>
       </div>
     </div>
   </div>
@@ -908,7 +908,7 @@ document.addEventListener('DOMContentLoaded',init);
   <div class="bg-white rounded-xl shadow-xl p-8 text-center space-y-4">
     <h3 class="text-xl font-semibold">Access Denied</h3>
     <p>You are not authorized to use this console.</p>
-    <button class="primary" onclick="document.getElementById('accessDenied').classList.add('hidden')">Close</button>
+    <button type="button" class="primary" onclick="document.getElementById('accessDenied').classList.add('hidden')">Close</button>
   </div>
 </section>
 <form id="login" class="hidden flex justify-center mt-8" onsubmit="login();return false;">
