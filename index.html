@@ -312,7 +312,12 @@ function loadSession(){
       localStorage.setItem('lang',lang);
       applyTranslations();
       showDevButton();
-      show('home');
+      document.getElementById('navLoginBtn').textContent=t('logout');
+      if(user.role==='DEV'){
+        openDevPanel();
+      }else{
+        show('home');
+      }
     }else{
       applyTranslations();
       showDevButton();

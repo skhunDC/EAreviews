@@ -13,8 +13,8 @@ This project contains a simple Google Apps Script web application used to collec
   `skhun@dublincleaners.com` and `ss.sku@protonmail.com` are allowed to access
   it. Authorized developers can create new users from the panel with securely
   hashed passwords. Developer accounts automatically sign in via the Chrome
-  browser's OAuth session and do not require a password. Opening the dev
-  panel now establishes a dev session automatically when a verified account
-  is detected.
+  browser's OAuth session and do not require a password. When the page loads and
+  the OAuth email matches one of the developer accounts, the dev panel opens
+  automatically with no password prompt.
 
 The project is intentionally lightweight and open. Feel free to modify or extend it as needed.
