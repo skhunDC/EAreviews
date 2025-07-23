@@ -11,10 +11,11 @@ This project contains a simple Google Apps Script web application used to collec
 - The dev button is always visible, but opening the dev panel requires
   authentication through the Chrome browser OAuth session. Only the accounts
   `skhun@dublincleaners.com` and `ss.sku@protonmail.com` are allowed to access
-  it. Authorized developers can create new users from the panel with securely
-  hashed passwords. Developer accounts automatically sign in via the Chrome
-  browser's OAuth session and do not require a password. When the page loads and
-  the OAuth email matches one of the developer accounts, the dev panel opens
-  automatically with no password prompt.
+  it. Authorized developers can create new users from the panel with passwords of
+  any complexity. They can also reset an existing user's password from the dev
+  panel. All passwords are hashed before being stored. Developer accounts
+  automatically sign in via the Chrome browser's OAuth session and do not
+  require a password. When the page loads and the OAuth email matches one of the
+  developer accounts, the dev panel opens automatically with no password prompt.
 
 The project is intentionally lightweight and open. Feel free to modify or extend it as needed.
