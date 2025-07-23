@@ -129,6 +129,10 @@ const translations={
     conflict:'Slot already booked',
     selDate:'Select Date',
     selTime:'Select Time',
+    fromDate:'Start Date',
+    fromTime:'Start Time',
+    toDate:'End Date',
+    toTime:'End Time',
     book:'Book',
     chooseTime:'Please choose date and time',
     bookOk:'Meeting booked',
@@ -202,6 +206,10 @@ const translations={
     conflict:'Horario no disponible',
     selDate:'Seleccionar fecha',
     selTime:'Seleccionar hora',
+    fromDate:'Fecha inicial',
+    fromTime:'Hora inicial',
+    toDate:'Fecha final',
+    toTime:'Hora final',
     book:'Agendar',
     chooseTime:'Seleccione fecha y hora',
     bookOk:'Reunión programada',
@@ -878,10 +886,13 @@ function bookSlot(date,time){
     .then(r=>{if(r.status===200){loadMonth(currentMonth);}else if(r.status===409){alert(t('conflict'));}else{alert(t('error'));}});
 }
 function addAvailability(){
-  const d=document.getElementById('availDate').value;
-  const tval=document.getElementById('availTime').value;
-  if(!d||!tval)return;
-  fetch('avail',{method:'POST',body:JSON.stringify({date:d,time:tval})})
+  const sd=document.getElementById('availFromDate').value;
+  const st=document.getElementById('availFromTime').value;
+  const ed=document.getElementById('availToDate').value;
+  const et=document.getElementById('availToTime').value;
+  if(!sd||!st||!ed||!et)return;
+  const body={start:sd+'T'+st,end:ed+'T'+et};
+  fetch('avail',{method:'POST',body:JSON.stringify(body)})
     .then(r=>{if(r.ok){document.getElementById('availMsg').textContent='';loadMonth(currentMonth);}else{document.getElementById('availMsg').textContent=t('error');}});
 }
 function formatDate(d){return d.toISOString().split('T')[0];}
@@ -953,11 +964,17 @@ document.addEventListener('DOMContentLoaded',init);
   </div>
   <div id="availForm" class="card hidden">
     <div class="font-semibold mb-2" data-i18n-key="addSlotTitle">Set Availability</div>
-    <label><span data-i18n-key="selDate">Date</span>
-      <input type="date" id="availDate">
+    <label><span data-i18n-key="fromDate">Start Date</span>
+      <input type="date" id="availFromDate">
     </label>
-    <label><span data-i18n-key="selTime">Time</span>
-      <input type="time" id="availTime" step="1800">
+    <label><span data-i18n-key="fromTime">Start Time</span>
+      <input type="time" id="availFromTime" step="1800">
+    </label>
+    <label><span data-i18n-key="toDate">End Date</span>
+      <input type="date" id="availToDate">
+    </label>
+    <label><span data-i18n-key="toTime">End Time</span>
+      <input type="time" id="availToTime" step="1800">
     </label>
     <button class="primary" onclick="addAvailability()" data-i18n-key="addSlotBtn">Add Slot</button>
     <div id="availMsg" class="text-sm"></div>
