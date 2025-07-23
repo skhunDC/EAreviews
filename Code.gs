@@ -45,19 +45,27 @@ function loadAllReviews(){
   return list;
 }
 
-/** Create salted password hash */
-function createHash(pwd) {
-  const salt = Utilities.getUuid();
-  const digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, salt + pwd, Utilities.Charset.UTF_8);
-  const hashHex = digest.map(b=>('0'+(b&0xff).toString(16)).slice(-2)).join('');
-  return {saltHex:salt, hashHex:hashHex};
+/** PBKDF2-SHA256 implementation */
+function pbkdf2_(pwd, salt, iter){
+  let u = Utilities.computeHmacSha256Signature(salt + '\u0000\u0000\u0000\u0001', pwd);
+  let out = u.slice();
+  for(let i=1;i<iter;i++){
+    u = Utilities.computeHmacSha256Signature(u, pwd);
+    for(let j=0;j<out.length;j++) out[j] ^= u[j];
+  }
+  return out.map(b=>("0"+ (b & 0xff).toString(16)).slice(-2)).join('');
 }
 
-/** Verify password against stored salt/hash */
-function verifyPwd(pwd, salt, hash) {
-  const digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, salt + pwd, Utilities.Charset.UTF_8);
-  const hex = digest.map(b=>('0'+(b&0xff).toString(16)).slice(-2)).join('');
-  return hex === hash;
+/** Create salted password hash using PBKDF2-SHA256 */
+function createHash(pwd) {
+  const salt = Utilities.getUuid().replace(/-/g,'');
+  const hashHex = pbkdf2_(pwd, salt, 1000);
+  return {saltHex: salt, hashHex: hashHex};
+}
+
+/** Verify password against stored salt/hash using PBKDF2 */
+function verifyPwd(pwd, salt, hash){
+  return pbkdf2_(pwd, salt, 1000) === hash;
 }
 
 /** Create session token and store */
@@ -333,7 +341,74 @@ function addNewUser(user) {
   const id = new Date().getTime();
   const h = createHash(user.password);
   sheet.appendRow([id, user.userId, user.name || '', user.role, user.managerId || '', user.lang || 'en', h.hashHex, h.saltHex, new Date()]);
+  logDevAction(Session.getActiveUser().getEmail(), 'add user', user.userId);
   return {id:id};
+}
+
+/** Return all users for developer console */
+function getAllUsers(){
+  if(!isAuthorizedDev()) throw new Error('denied');
+  const sheet = SpreadsheetApp.openById(ADMIN_SHEET_ID).getSheetByName(USERS_SHEET);
+  if(!sheet) return [];
+  const rows = sheet.getDataRange().getValues();
+  return rows.slice(1).map(r=>({id:r[0],userId:r[1],role:r[3]}));
+}
+
+/** Update a user's ID */
+function updateUserID(oldID, newID){
+  if(!isAuthorizedDev()) throw new Error('denied');
+  const sheet = SpreadsheetApp.openById(ADMIN_SHEET_ID).getSheetByName(USERS_SHEET);
+  const data = sheet.getDataRange().getValues();
+  for(let i=1;i<data.length;i++){
+    if(data[i][1]==oldID){
+      sheet.getRange(i+1,2).setValue(newID);
+      logDevAction(Session.getActiveUser().getEmail(),'change id',newID);
+      return true;
+    }
+  }
+  throw new Error('user_not_found');
+}
+
+/** Update a user's role */
+function updateUserRole(userID, role){
+  if(!isAuthorizedDev()) throw new Error('denied');
+  const sheet = SpreadsheetApp.openById(ADMIN_SHEET_ID).getSheetByName(USERS_SHEET);
+  const data = sheet.getDataRange().getValues();
+  for(let i=1;i<data.length;i++){
+    if(data[i][1]==userID){
+      sheet.getRange(i+1,4).setValue(role);
+      logDevAction(Session.getActiveUser().getEmail(),'change role to '+role,userID);
+      return true;
+    }
+  }
+  throw new Error('user_not_found');
+}
+
+/** Update a user's password */
+function updateUserPassword(userID, pwd){
+  if(!isAuthorizedDev()) throw new Error('denied');
+  const sheet = SpreadsheetApp.openById(ADMIN_SHEET_ID).getSheetByName(USERS_SHEET);
+  const data = sheet.getDataRange().getValues();
+  for(let i=1;i<data.length;i++){
+    if(data[i][1]==userID){
+      const h = createHash(pwd);
+      sheet.getRange(i+1,7,1,2).setValues([[h.hashHex,h.saltHex]]);
+      logDevAction(Session.getActiveUser().getEmail(),'password change',userID);
+      return true;
+    }
+  }
+  throw new Error('user_not_found');
+}
+
+/** Log developer actions */
+function logDevAction(devEmail, action, userId){
+  const ss = SpreadsheetApp.openById(ADMIN_SHEET_ID);
+  let sheet = ss.getSheetByName('LOGS');
+  if(!sheet){
+    sheet = ss.insertSheet('LOGS');
+    sheet.appendRow(['Timestamp','Developer','Action','UserID']);
+  }
+  sheet.appendRow([new Date(), devEmail, action, userId]);
 }
 
 /** Trigger daily to send reminders */

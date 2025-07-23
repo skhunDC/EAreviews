@@ -39,6 +39,10 @@ nav button{background:none;border:none;color:white;font-size:16px;cursor:pointer
 .switch input:checked + .slider{background:#059669;}
 .switch input:checked + .slider:before{transform:translateX(16px);}
 #devPanel{z-index:40;}
+#devPanel table{width:100%;border-collapse:collapse;}
+#devPanel th,#devPanel td{padding:8px;border-bottom:1px solid #ddd;}
+#devPanel td .actions button{margin-left:4px;}
+#devPanel .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);z-index:50;}
 section{padding:20px;}
 #login{background:linear-gradient(135deg,#f6f8fa 0%,#eaf4ff 100%);}
 #reviewForm{max-width:900px;margin:auto;padding:2rem;background:#fefdf9;color:#333;}
@@ -413,13 +417,14 @@ function showDevButton(){
 }
 
 function openDevPanel(){
-  if(typeof google==='undefined' || !google.script || !google.script.run) return;
+  if(typeof google==='undefined'||!google.script||!google.script.run) return;
+  if(!navigator.userAgent.includes('Chrome')){alert('Use Chrome browser');return;}
   google.script.run.withSuccessHandler(isDev=>{
     if(isDev){
       document.querySelectorAll('body>section').forEach(s=>s.classList.add('hidden'));
-      // hide login form if visible
       const loginDiv=document.getElementById('login');
-      if(loginDiv) loginDiv.classList.add('hidden');
+      if(loginDiv)loginDiv.classList.add('hidden');
+      loadUsers();
       document.getElementById('devPanel').classList.remove('hidden');
     }else{
       alert('Not authorized');
@@ -661,21 +666,94 @@ function submitReview(){
   }).saveFullReview(review,data.comp);
 }
 
+function loadUsers(){
+  google.script.run.withSuccessHandler(renderUserTable).getAllUsers();
+}
+
+function renderUserTable(list){
+  const body=document.querySelector('#userTable tbody');
+  if(!body)return;
+  body.innerHTML='';
+  list.forEach(u=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><span class="uid">${u.userId}</span><input class="uidEdit hidden" type="text" value="${u.userId}"></td>`+
+      `<td><select class="roleSel" disabled><option>Employee</option><option>Manager</option><option>Admin</option></select></td>`+
+      `<td><button class="text-sm underline changePw">Change Password</button></td>`+
+      `<td class="actions"><button class="editBtn" title="Edit">✏️</button>`+
+      `<button class="saveBtn hidden" title="Save">💾</button>`+
+      `<button class="cancelBtn hidden" title="Cancel">✖</button></td>`;
+    tr.querySelector('.roleSel').value=u.role;
+    tr.querySelector('.editBtn').onclick=()=>enableEdit(tr,u.userId);
+    tr.querySelector('.cancelBtn').onclick=()=>disableEdit(tr);
+    tr.querySelector('.saveBtn').onclick=()=>saveRow(tr,u.userId);
+    tr.querySelector('.changePw').onclick=()=>openPwdModal(u.userId);
+    body.appendChild(tr);
+  });
+}
+
+function enableEdit(tr,id){
+  tr.querySelector('.uid').classList.add('hidden');
+  tr.querySelector('.uidEdit').classList.remove('hidden');
+  tr.querySelector('.roleSel').disabled=false;
+  tr.querySelector('.editBtn').classList.add('hidden');
+  tr.querySelector('.saveBtn').classList.remove('hidden');
+  tr.querySelector('.cancelBtn').classList.remove('hidden');
+}
+
+function disableEdit(tr){
+  tr.querySelector('.uid').classList.remove('hidden');
+  tr.querySelector('.uidEdit').classList.add('hidden');
+  tr.querySelector('.roleSel').disabled=true;
+  tr.querySelector('.editBtn').classList.remove('hidden');
+  tr.querySelector('.saveBtn').classList.add('hidden');
+  tr.querySelector('.cancelBtn').classList.add('hidden');
+}
+
+function saveRow(tr,oldId){
+  const newId=tr.querySelector('.uidEdit').value.trim();
+  const role=tr.querySelector('.roleSel').value;
+  const after=()=>{disableEdit(tr);loadUsers();};
+  if(newId!==oldId){
+    google.script.run.withSuccessHandler(()=>{
+      google.script.run.withSuccessHandler(after).updateUserRole(newId,role);
+    }).withFailureHandler(err=>alert(err.message)).updateUserID(oldId,newId);
+  }else{
+    google.script.run.withSuccessHandler(after).withFailureHandler(err=>alert(err.message)).updateUserRole(oldId,role);
+  }
+}
+
+function openPwdModal(uid){
+  document.getElementById('pwdUserId').value=uid;
+  document.getElementById('newPw').value='';
+  document.getElementById('confirmPw').value='';
+  document.getElementById('pwdModal').classList.remove('hidden');
+}
+
+function changePassword(){
+  const uid=document.getElementById('pwdUserId').value;
+  const pw=document.getElementById('newPw').value;
+  const c=document.getElementById('confirmPw').value;
+  if(pw!==c){alert('Passwords do not match');return;}
+  if(!/^(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(pw)){alert('Weak password');return;}
+  google.script.run.withSuccessHandler(()=>{document.getElementById('pwdModal').classList.add('hidden');loadUsers();}).withFailureHandler(err=>alert(err.message)).updateUserPassword(uid,pw);
+}
+
+function showNewUserModal(){
+  document.getElementById('newUid').value='';
+  document.getElementById('newRole').value='Employee';
+  document.getElementById('newPw1').value='';
+  document.getElementById('newPw2').value='';
+  document.getElementById('newUserModal').classList.remove('hidden');
+}
+
 function addNewUser(){
-  const uid=document.getElementById('newUserId').value;
-  const role=document.getElementById('newUserRole').value;
-  const pwd=document.getElementById('newUserPwd').value;
-  google.script.run
-    .withSuccessHandler(()=>{
-      alert('Account created');
-      document.getElementById('newUserId').value='';
-      document.getElementById('newUserRole').value='';
-      document.getElementById('newUserPwd').value='';
-    })
-    .withFailureHandler(err=>{
-      alert('Failed to create account: '+err.message);
-    })
-    .addNewUser({userId:uid,role:role,password:pwd});
+  const uid=document.getElementById('newUid').value.trim();
+  const r=document.getElementById('newRole').value;
+  const p1=document.getElementById('newPw1').value;
+  const p2=document.getElementById('newPw2').value;
+  if(p1!==p2){alert('Passwords do not match');return;}
+  if(!/^(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(p1)){alert('Weak password');return;}
+  google.script.run.withSuccessHandler(()=>{document.getElementById('newUserModal').classList.add('hidden');loadUsers();}).withFailureHandler(err=>alert(err.message)).addNewUser({userId:uid,password:p1,role:r});
 }
 
 // ---- Simple Scheduling -----
@@ -768,22 +846,48 @@ document.addEventListener('DOMContentLoaded',init);
     <div id="schedMsg" class="text-sm"></div>
   </div>
 </section>
-<section id="devPanel" class="hidden fixed inset-0 flex items-center justify-center">
-  <div class="max-w-[420px] w-[90%] bg-white/80 backdrop-blur rounded-2xl shadow-xl p-8 flex flex-col gap-6">
-    <h3 class="text-xl font-semibold text-gray-800 text-center">Admin Panel</h3>
-    <label class="w-full">
-      <span class="text-sm text-gray-500">UserID</span>
-      <input type="text" id="newUserId" class="w-full h-11 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
-    </label>
-    <label class="w-full">
-      <span class="text-sm text-gray-500">Role</span>
-      <input type="text" id="newUserRole" class="w-full h-11 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
-    </label>
-    <label class="w-full">
-      <span class="text-sm text-gray-500">Password</span>
-      <input type="password" id="newUserPwd" class="w-full h-11 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
-    </label>
-    <button class="primary w-full h-12 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold tracking-wide transition-transform active:scale-95" onclick="addNewUser()">Add User</button>
+<section id="devPanel" class="hidden fixed inset-0 p-4 overflow-auto bg-black/30 flex items-start justify-center">
+  <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-3xl">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-semibold">Developer Console</h3>
+      <button onclick="document.getElementById('devPanel').classList.add('hidden')">✖</button>
+    </div>
+    <div class="text-right mb-2">
+      <button class="primary" onclick="showNewUserModal()">+ New User</button>
+    </div>
+    <div class="overflow-x-auto">
+      <table id="userTable">
+        <thead><tr><th>UserID</th><th>Role</th><th>Password</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+  <div id="newUserModal" class="modal hidden">
+    <div class="bg-white rounded-xl p-6 w-80 space-y-4">
+      <h4 class="text-lg font-semibold text-center">Add User</h4>
+      <input id="newUid" class="w-full border px-2 py-1" placeholder="UserID">
+      <select id="newRole" class="w-full border px-2 py-1">
+        <option>Employee</option><option>Manager</option><option>Admin</option>
+      </select>
+      <input id="newPw1" type="password" class="w-full border px-2 py-1" placeholder="Password">
+      <input id="newPw2" type="password" class="w-full border px-2 py-1" placeholder="Confirm Password">
+      <div class="flex justify-between">
+        <button class="primary" onclick="addNewUser()">Save</button>
+        <button onclick="document.getElementById('newUserModal').classList.add('hidden')">Cancel</button>
+      </div>
+    </div>
+  </div>
+  <div id="pwdModal" class="modal hidden">
+    <div class="bg-white rounded-xl p-6 w-80 space-y-4">
+      <h4 class="text-lg font-semibold text-center">Change Password</h4>
+      <input id="pwdUserId" type="text" class="w-full border px-2 py-1" readonly>
+      <input id="newPw" type="password" class="w-full border px-2 py-1" placeholder="New Password">
+      <input id="confirmPw" type="password" class="w-full border px-2 py-1" placeholder="Confirm Password">
+      <div class="flex justify-between">
+        <button class="primary" onclick="changePassword()">Save</button>
+        <button onclick="document.getElementById('pwdModal').classList.add('hidden')">Cancel</button>
+      </div>
+    </div>
   </div>
 </section>
 <form id="login" class="hidden flex justify-center mt-8" onsubmit="login();return false;">
