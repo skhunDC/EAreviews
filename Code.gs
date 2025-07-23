@@ -141,6 +141,12 @@ function getSession() {
         return user;
       }
     }
+    // allow devs without sheet entry to auto-login via OAuth
+    if (DEV_USERS.indexOf(email) !== -1) {
+      const user = {id:email, userId:email, name:email, role:'DEV', managerId:'', lang:'en'};
+      cache.put(CACHE_KEY, JSON.stringify(user), SESSION_DURATION);
+      return user;
+    }
   }
   return null;
 }
