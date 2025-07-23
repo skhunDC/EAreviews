@@ -843,7 +843,8 @@ function initCalendar(){
     document.getElementById('nextMonth').onclick=()=>changeMonth(1);
     calendarInit=true;
   }
-  if(user && (user.role==='Manager'||user.role==='DEV')){
+  const role = user ? String(user.role || '').toUpperCase() : '';
+  if(role==='MANAGER' || role==='DEV'){
     document.getElementById('availForm').classList.remove('hidden');
   }else{
     document.getElementById('availForm').classList.add('hidden');

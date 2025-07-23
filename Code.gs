@@ -640,7 +640,8 @@ function bookSlot_(e) {
 function addAvailability_(e){
   const body = parseBody_(e);
   const user = checkAuth_();
-  if(user.role !== 'Manager' && user.role !== 'DEV') throw new Error('denied');
+  const role = String(user.role || '').toUpperCase();
+  if(role !== 'MANAGER' && role !== 'DEV') throw new Error('denied');
   // support old {date,time} payload for single slot
   if(body.date && body.time){
     const d = new Date(body.date);
