@@ -6,6 +6,7 @@ const MEETINGS_SHEET = 'MEETINGS';
 const CONFIG_SHEET = 'CONFIG';
 const QUESTIONS_SHEET = 'QUESTIONS';
 const COMP_SHEET = 'COMP_ADJUST';
+const SCHEDULE_SHEET = 'SCHEDULE';
 const CACHE_KEY = 'SESSION';
 const SESSION_DURATION = 60 * 60 * 8; // 8 hours
 const DEV_PASSWORD = 'changeme'; // replace in prod
@@ -18,6 +19,17 @@ function getSpreadsheet(){
   const ss = SpreadsheetApp.getActive();
   if (ss) return ss;
   return SpreadsheetApp.openById(ADMIN_SHEET_ID);
+}
+
+/** Retrieve the SCHEDULE sheet, create if missing */
+function getScheduleSheet(){
+  const ss = SpreadsheetApp.openById(ADMIN_SHEET_ID);
+  let sheet = ss.getSheetByName(SCHEDULE_SHEET);
+  if(!sheet){
+    sheet = ss.insertSheet(SCHEDULE_SHEET);
+    sheet.appendRow(['Date','Time','ManagerEmail','BookedBy','BookedAt']);
+  }
+  return sheet;
 }
 
 /** Retrieve or create the Drive folder that stores review data */
@@ -85,6 +97,8 @@ function doGet(e) {
     return jsonResponse_(getEvents_(e));
   } else if (path === 'me') {
     return jsonResponse_(getCurrentUser_());
+  } else if (path === 'slots') {
+    return jsonResponse_(listSlots_(e));
   }
   return HtmlService.createHtmlOutputFromFile('index');
 }
@@ -94,6 +108,8 @@ function doPost(e) {
   const path = (e && e.pathInfo) || '';
   if (path === 'book') {
     return jsonResponse_(bookSlot_(e));
+  } else if (path === 'avail') {
+    return jsonResponse_(addAvailability_(e));
   }
   return jsonResponse_({error:'not_found'});
 }
@@ -600,30 +616,58 @@ function getEvents_(e) {
   return events;
 }
 
-/** Book a new slot */
+/** Book a new slot from the schedule sheet */
 function bookSlot_(e) {
   const body = parseBody_(e);
-  if (!body.start || !body.end) throw new Error('invalid');
+  if(!body.date || !body.time) throw new Error('invalid');
   const user = checkAuth_();
-  const calId = getCalendar_();
-  const existing = Calendar.Events.list(calId, {timeMin: body.start, timeMax: body.end, singleEvents:true});
-  if (existing.items && existing.items.length) {
-    return {status:409};
+  const sheet = getScheduleSheet();
+  const data = sheet.getDataRange().getValues();
+  for(let i=1;i<data.length;i++){
+    if(data[i][3] === user.userId) return {status:409};
   }
-  const event = {
-    summary: 'Review – ' + user.name,
-    description: JSON.stringify({uid:user.id,lang:user.lang,createdAt:toIso_(new Date())}),
-    start: {dateTime: body.start},
-    end: {dateTime: body.end},
-    attendees: [{email:user.userId}]
-  };
-  const created = Calendar.Events.insert(event, calId);
-  return {
-    status:201,
-    id: created.id,
-    title: created.summary,
-    start: created.start.dateTime,
-    end: created.end.dateTime,
-    editable: true
-  };
+  for(let i=1;i<data.length;i++){
+    if(data[i][0]==body.date && data[i][1]==body.time){
+      if(data[i][3]) return {status:409};
+      sheet.getRange(i+1,4,1,2).setValues([[user.userId,new Date()]]);
+      return {status:200};
+    }
+  }
+  return {status:404};
+}
+
+/** Manager adds availability slot */
+function addAvailability_(e){
+  const body = parseBody_(e);
+  if(!body.date || !body.time) throw new Error('invalid');
+  const user = checkAuth_();
+  if(user.role !== 'Manager' && user.role !== 'DEV') throw new Error('denied');
+  const d = new Date(body.date);
+  if(d.getDay() === 0 || d.getDay() === 6) throw new Error('weekend');
+  const sheet = getScheduleSheet();
+  const data = sheet.getDataRange().getValues();
+  for(let i=1;i<data.length;i++){
+    if(data[i][0]==body.date && data[i][1]==body.time){
+      return {status:'exists'};
+    }
+  }
+  sheet.appendRow([body.date, body.time, user.userId, '', '']);
+  return {status:'ok'};
+}
+
+/** List schedule slots for the requested range */
+function listSlots_(e){
+  checkAuth_();
+  const start = e.parameter && e.parameter.start ? e.parameter.start : null;
+  const end = e.parameter && e.parameter.end ? e.parameter.end : null;
+  const sheet = getScheduleSheet();
+  const data = sheet.getDataRange().getValues();
+  const out = [];
+  for(let i=1;i<data.length;i++){
+    const row = data[i];
+    if(start && row[0] < start) continue;
+    if(end && row[0] > end) continue;
+    out.push({date:row[0], time:row[1], managerEmail:row[2], bookedBy:row[3]});
+  }
+  return out;
 }

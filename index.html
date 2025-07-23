@@ -5,6 +5,7 @@
 <title>Employee Reviews</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
 h1,h2{font-family:'Inter',Arial,sans-serif;}
@@ -71,6 +72,15 @@ button.primary{background:#0A5C30;color:white;border:none;border-radius:4px;padd
 .loading-bar{height:4px;background:#eee;position:relative;overflow:hidden;}
 .loading-bar span{display:block;height:100%;background:#0A5C30;width:100%;animation:loadAnim 1.2s linear infinite;}
 @keyframes loadAnim{from{transform:translateX(-100%);}to{transform:translateX(100%);}}
+.calendar{width:100%;border-collapse:collapse;}
+.calendar th,.calendar td{border:1px solid #ddd;padding:4px;vertical-align:top;height:90px;}
+.calendar td.disabled{background:#f3f4f6;color:#999;}
+.calendar .date-num{font-weight:600;}
+.calendar .slot{margin-top:2px;padding:2px 4px;border-radius:4px;font-size:0.75rem;cursor:pointer;}
+.calendar .slot.available{background:#d1fae5;}
+.calendar .slot.booked{background:#e5e7eb;color:#888;cursor:not-allowed;}
+.calendar .slot.mine{background:#0A5C30;color:#fff;}
+.calendar .slot:hover{box-shadow:0 2px 4px rgba(0,0,0,0.1);}
 </style>
 <script>
 let user=null,config={},lang=localStorage.getItem('lang')||'en';
@@ -123,6 +133,9 @@ const translations={
     chooseTime:'Please choose date and time',
     bookOk:'Meeting booked',
     error:'Error occurred',
+    scheduleGuide:`<div class="callout"><h3 class="font-bold mb-1">Booking & Availability Guidelines</h3><ul class="list-disc pl-4 space-y-1"><li><strong>Production Team</strong> – Reserve reviews <strong>12:00 PM – 2:00 PM</strong> (post-production). These slots have priority for the conference room.</li><li><strong>Delivery Drivers</strong> – Aim for <strong>Wednesdays</strong> (non-Route day).</li><li><strong>CSRs</strong> – Book any other open time that works for you and your manager.</li><li><strong>One Room. One Slot. One Team.</strong> – Only <strong>one 30-minute</strong> booking at a time; no double-booking allowed.</li></ul></div>`,
+    addSlotTitle:'Set Availability',
+    addSlotBtn:'Add Slot',
     intro:`<section id="review-intro">
       <h1>Your Opportunity to Shine</h1>
       <div class="intro-cards">
@@ -193,6 +206,9 @@ const translations={
     chooseTime:'Seleccione fecha y hora',
     bookOk:'Reunión programada',
     error:'Ocurrió un error',
+    scheduleGuide:`<div class="callout"><h3 class="font-bold mb-1">Pautas de reserva y disponibilidad</h3><ul class="list-disc pl-4 space-y-1"><li><strong>Equipo de Producción</strong> – Reserve revisiones <strong>12:00 PM – 2:00 PM</strong> (después de producción). Estas horas tienen prioridad para la sala de conferencias.</li><li><strong>Conductores de Entrega</strong> – Trate de reservar <strong>los miércoles</strong> (día sin ruta).</li><li><strong>CSRs</strong> – Programe cualquier otro horario disponible que funcione para usted y su gerente.</li><li><strong>Una sala. Un turno. Un equipo.</strong> – Solo una reserva de <strong>30 minutos</strong>; no se permiten dobles reservas.</li></ul></div>`,
+    addSlotTitle:'Establecer disponibilidad',
+    addSlotBtn:'Agregar horario',
     intro:`<section id="review-intro">
       <h1>Tu oportunidad para destacar</h1>
       <div class="intro-cards">
@@ -790,29 +806,85 @@ function confirmClearReviews(){
     .deleteAllReviews();
 }
 
-// ---- Simple Scheduling -----
+// ---- Modern Calendar Scheduling -----
+let currentMonth=new Date();
+let slots=[];
+let calendarInit=false;
 function initCalendar(){
-  // no-op kept for compatibility
-}
-async function bookSimple(){
-  const d=document.getElementById('selDate').value;
-  const timeVal=document.getElementById('selTime').value;
-  if(!d||!timeVal){alert(t('chooseTime'));return;}
-  const start=new Date(d+'T'+timeVal);
-  const end=new Date(start.getTime()+30*60*1000);
-  const resp=await fetch('book',{method:'POST',body:JSON.stringify({start:start.toISOString(),end:end.toISOString()})});
-  const msg=document.getElementById('schedMsg');
-  if(resp.ok){
-    msg.textContent=t('bookOk');
-    msg.className='text-green-700';
-  }else if(resp.status===409){
-    msg.textContent=t('conflict');
-    msg.className='text-red-700';
-  }else{
-    msg.textContent=t('error');
-    msg.className='text-red-700';
+  if(!calendarInit){
+    document.getElementById('prevMonth').onclick=()=>changeMonth(-1);
+    document.getElementById('nextMonth').onclick=()=>changeMonth(1);
+    calendarInit=true;
   }
+  if(user && (user.role==='Manager'||user.role==='DEV')){
+    document.getElementById('availForm').classList.remove('hidden');
+  }else{
+    document.getElementById('availForm').classList.add('hidden');
+  }
+  loadMonth(currentMonth);
 }
+function changeMonth(delta){
+  currentMonth=new Date(currentMonth.getFullYear(),currentMonth.getMonth()+delta,1);
+  loadMonth(currentMonth);
+}
+function loadMonth(d){
+  const start=formatDate(new Date(d.getFullYear(),d.getMonth(),1));
+  const end=formatDate(new Date(d.getFullYear(),d.getMonth()+1,0));
+  document.getElementById('monthLabel').textContent=d.toLocaleDateString(lang==='es'?'es-ES':'en-US',{month:'long',year:'numeric'});
+  fetch('slots?start='+start+'&end='+end)
+    .then(r=>r.json())
+    .then(data=>{slots=data;renderCalendar();});
+}
+function renderCalendar(){
+  const year=currentMonth.getFullYear();
+  const month=currentMonth.getMonth();
+  const first=new Date(year,month,1);
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  let html='<table class="calendar"><thead><tr>';
+  for(let i=0;i<7;i++){
+    html+='<th>'+new Date(2020,5,i).toLocaleDateString(lang==='es'?'es-ES':'en-US',{weekday:'short'})+'</th>';
+  }
+  html+='</tr></thead><tbody>';
+  let day=1;
+  for(let w=0;w<6 && day<=daysInMonth;w++){
+    html+='<tr>';
+    for(let d=0;d<7;d++){
+      if(w===0 && d<first.getDay()||day>daysInMonth){html+='<td class="empty"></td>';continue;}
+      const dateObj=new Date(year,month,day);
+      const dateStr=formatDate(dateObj);
+      const disabled=(d===0||d===6);
+      html+='<td class="'+(disabled?'disabled':'')+'"><div class="date-num">'+day+'</div>';
+      const daySlots=slots.filter(s=>s.date===dateStr);
+      daySlots.forEach(s=>{
+        let cls='slot';
+        if(s.bookedBy){cls+=' booked';if(s.bookedBy===user.userId)cls+=' mine';}
+        else cls+=' available';
+        html+='<div class="'+cls+'" data-date="'+s.date+'" data-time="'+s.time+'">'+s.time+'</div>';
+      });
+      html+='</td>';day++;}
+    html+='</tr>';}
+  html+='</tbody></table>';
+  document.getElementById('calendar').innerHTML=html;
+  document.querySelectorAll('#calendar .slot.available').forEach(el=>{
+    el.addEventListener('click',()=>{
+      if(confirm(t('bookPrompt'))){
+        bookSlot(el.dataset.date,el.dataset.time);
+      }
+    });
+  });
+}
+function bookSlot(date,time){
+  fetch('book',{method:'POST',body:JSON.stringify({date:date,time:time})})
+    .then(r=>{if(r.status===200){loadMonth(currentMonth);}else if(r.status===409){alert(t('conflict'));}else{alert(t('error'));}});
+}
+function addAvailability(){
+  const d=document.getElementById('availDate').value;
+  const tval=document.getElementById('availTime').value;
+  if(!d||!tval)return;
+  fetch('avail',{method:'POST',body:JSON.stringify({date:d,time:tval})})
+    .then(r=>{if(r.ok){document.getElementById('availMsg').textContent='';loadMonth(currentMonth);}else{document.getElementById('availMsg').textContent=t('error');}});
+}
+function formatDate(d){return d.toISOString().split('T')[0];}
 document.addEventListener('DOMContentLoaded',init);
 </script>
 </head>
@@ -870,15 +942,25 @@ document.addEventListener('DOMContentLoaded',init);
 </form>
 </section>
 <section id="schedule" class="hidden">
-  <div id="scheduleForm" class="card shadow-lg p-4 flex flex-col gap-4">
+  <div data-i18n-key="scheduleGuide" data-i18n-html class="mb-4"></div>
+  <div id="calendarWrapper" class="card">
+    <div class="flex justify-between items-center mb-2">
+      <button id="prevMonth" class="material-icons">chevron_left</button>
+      <h3 id="monthLabel" class="font-semibold"></h3>
+      <button id="nextMonth" class="material-icons">chevron_right</button>
+    </div>
+    <div id="calendar"></div>
+  </div>
+  <div id="availForm" class="card hidden">
+    <div class="font-semibold mb-2" data-i18n-key="addSlotTitle">Set Availability</div>
     <label><span data-i18n-key="selDate">Date</span>
-      <input type="date" id="selDate">
+      <input type="date" id="availDate">
     </label>
     <label><span data-i18n-key="selTime">Time</span>
-      <input type="time" id="selTime" step="1800">
+      <input type="time" id="availTime" step="1800">
     </label>
-    <button class="primary" onclick="bookSimple()" data-i18n-key="book">Book</button>
-    <div id="schedMsg" class="text-sm"></div>
+    <button class="primary" onclick="addAvailability()" data-i18n-key="addSlotBtn">Add Slot</button>
+    <div id="availMsg" class="text-sm"></div>
   </div>
 </section>
 <section id="devPanel" class="hidden fixed inset-0 p-4 pt-16 overflow-auto bg-black/30 flex items-start justify-center">
