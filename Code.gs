@@ -365,6 +365,19 @@ function getAllUsers(){
   return rows.slice(1).map(r=>({userId:r[1],role:r[3]}));
 }
 
+/** Delete all review files (DEV only) */
+function deleteAllReviews(){
+  if(!isAuthorizedDev()) throw new Error('denied');
+  const folder = getReviewFolder();
+  const files = folder.getFiles();
+  while(files.hasNext()){
+    files.next().setTrashed(true);
+  }
+  const dev = getSession();
+  logDevAction(dev ? dev.userId : 'unknown','delete all reviews','');
+  return true;
+}
+
 /** Update a user's ID */
 function updateUserID(oldID, newID){
   if(!isAuthorizedDev()) throw new Error('denied');

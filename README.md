@@ -11,6 +11,8 @@ This project contains a simple Google Apps Script web application used to collec
 - The dev button is always visible. Developers simply log in with a user account
   whose role is `DEV` to open the dev panel. These accounts can create new users
   from the panel with passwords of any complexity and can reset existing user
-  passwords. All passwords are hashed before being stored.
+  passwords. All passwords are hashed before being stored. The developer panel
+  now includes a **Clear Reviews** button which permanently deletes all stored
+  review files from Drive via the new `deleteAllReviews` function in `Code.gs`.
 
 The project is intentionally lightweight and open. Feel free to modify or extend it as needed.
