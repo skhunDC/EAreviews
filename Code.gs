@@ -191,8 +191,14 @@ function listReviews() {
   if (!user) throw new Error('not auth');
   const all = loadAllReviews();
   const res = [];
+  const reports = user.role === 'MANAGER' ? getDirectReports(user.id) : {};
   all.forEach(r => {
-    if (user.role === 'HR' || user.role === 'DEV' || r.employeeId == user.id || (user.role === 'MANAGER' && r.employeeId in getDirectReports(user.id))) {
+    if (
+      user.role === 'HR' ||
+      user.role === 'DEV' ||
+      r.employeeId == user.id ||
+      (user.role === 'MANAGER' && Object.prototype.hasOwnProperty.call(reports, r.employeeId))
+    ) {
       res.push(r);
     }
   });
