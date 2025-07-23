@@ -47,10 +47,12 @@ function loadAllReviews(){
 
 /** PBKDF2-SHA256 implementation */
 function pbkdf2_(pwd, salt, iter){
-  let u = Utilities.computeHmacSha256Signature(salt + '\u0000\u0000\u0000\u0001', pwd);
+  const keyBytes = Utilities.newBlob(pwd).getBytes();
+  const saltBytes = Utilities.newBlob(salt + '\u0000\u0000\u0000\u0001').getBytes();
+  let u = Utilities.computeHmacSha256Signature(saltBytes, keyBytes);
   let out = u.slice();
   for(let i=1;i<iter;i++){
-    u = Utilities.computeHmacSha256Signature(u, pwd);
+    u = Utilities.computeHmacSha256Signature(u, keyBytes);
     for(let j=0;j<out.length;j++) out[j] ^= u[j];
   }
   return out.map(b=>("0"+ (b & 0xff).toString(16)).slice(-2)).join('');
