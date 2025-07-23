@@ -125,19 +125,17 @@ function logout() {
   CacheService.getUserCache().remove(CACHE_KEY);
 }
 
-/** Get current session user */
+/**
+ * Get current session user. This simply returns any cached session. Developer
+ * accounts are no longer auto-signed in here; that logic now lives inside
+ * `isAuthorizedDev()` when the Dev panel is opened.
+ */
 function getSession() {
   const cache = CacheService.getUserCache();
   const data = cache.get(CACHE_KEY);
   if (data) return JSON.parse(data);
-  const email = Session.getActiveUser().getEmail();
-  // Only allow auto sign-in for whitelisted developer accounts
-  if (email && DEV_USERS.indexOf(email) !== -1) {
-    const user = {id: email, userId: email, name: email,
-                  role: 'DEV', managerId: '', lang: 'en'};
-    cache.put(CACHE_KEY, JSON.stringify(user), SESSION_DURATION);
-    return user;
-  }
+  // Do not auto-sign in here. Authorization should only occur via explicit
+  // developer actions (e.g. opening the Dev panel).
   return null;
 }
 
