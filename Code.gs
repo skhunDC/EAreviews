@@ -400,6 +400,23 @@ function updateUserRole(userID, role){
   throw new Error('user_not_found');
 }
 
+/** Reset a user's password */
+function updateUserPassword(userID, newPwd){
+  if(!isAuthorizedDev()) throw new Error('denied');
+  const sheet = SpreadsheetApp.openById(ADMIN_SHEET_ID).getSheetByName(USERS_SHEET);
+  const data = sheet.getDataRange().getValues();
+  for(let i=1;i<data.length;i++){
+    if(data[i][1]==userID){
+      const h=createHash(newPwd);
+      sheet.getRange(i+1,7).setValue(h.hashHex);
+      sheet.getRange(i+1,8).setValue(h.saltHex);
+      logDevAction(Session.getActiveUser().getEmail(),'reset password',userID);
+      return true;
+    }
+  }
+  throw new Error('user_not_found');
+}
+
 
 /** Log developer actions */
 function logDevAction(devEmail, action, userId){

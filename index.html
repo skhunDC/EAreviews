@@ -75,6 +75,7 @@ let loadingReviews=false;
 let pendingSection=null;
 let currentReviewId=null;
 let selectedYear=new Date().getFullYear();
+let resetUid=null;
 
 const defaultQuestions=[
   {id:'attendance',en:'Attendance & Punctuality',es:'Asistencia y Puntualidad',extras:[
@@ -687,11 +688,13 @@ function renderUserTable(list){
       `<td><select class="roleSel" disabled><option>Employee</option><option>Manager</option><option>Admin</option></select></td>`+
       `<td class="actions"><button class="editBtn" title="Edit">✏️</button>`+
       `<button class="saveBtn hidden" title="Save">💾</button>`+
-      `<button class="cancelBtn hidden" title="Cancel">✖</button></td>`;
+      `<button class="cancelBtn hidden" title="Cancel">✖</button>`+
+      `<button class="pwBtn" title="Reset Password">🔑</button></td>`;
     tr.querySelector('.roleSel').value=u.role;
     tr.querySelector('.editBtn').onclick=()=>enableEdit(tr,u.userId);
     tr.querySelector('.cancelBtn').onclick=()=>disableEdit(tr);
     tr.querySelector('.saveBtn').onclick=()=>saveRow(tr,u.userId);
+    tr.querySelector('.pwBtn').onclick=()=>showResetPwModal(u.userId);
     body.appendChild(tr);
   });
 }
@@ -742,8 +745,21 @@ function addNewUser(){
   const p1=document.getElementById('newPw1').value;
   const p2=document.getElementById('newPw2').value;
   if(p1!==p2){alert('Passwords do not match');return;}
-  if(!/^(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(p1)){alert('Weak password');return;}
   google.script.run.withSuccessHandler(()=>{document.getElementById('newUserModal').classList.add('hidden');loadUsers();}).withFailureHandler(err=>alert(err.message)).addNewUser({userId:uid,password:p1,role:r});
+}
+
+function showResetPwModal(uid){
+  resetUid=uid;
+  document.getElementById('resetPw1').value='';
+  document.getElementById('resetPw2').value='';
+  document.getElementById('resetPwModal').classList.remove('hidden');
+}
+
+function resetPassword(){
+  const p1=document.getElementById('resetPw1').value;
+  const p2=document.getElementById('resetPw2').value;
+  if(p1!==p2){alert('Passwords do not match');return;}
+  google.script.run.withSuccessHandler(()=>{document.getElementById('resetPwModal').classList.add('hidden');}).withFailureHandler(err=>alert(err.message)).updateUserPassword(resetUid,p1);
 }
 
 // ---- Simple Scheduling -----
@@ -864,6 +880,17 @@ document.addEventListener('DOMContentLoaded',init);
       <div class="flex justify-between">
         <button class="primary" onclick="addNewUser()">Save</button>
         <button onclick="document.getElementById('newUserModal').classList.add('hidden')">Cancel</button>
+      </div>
+    </div>
+  </div>
+  <div id="resetPwModal" class="modal hidden">
+    <div class="bg-white rounded-xl p-6 w-80 space-y-4">
+      <h4 class="text-lg font-semibold text-center">Reset Password</h4>
+      <input id="resetPw1" type="password" class="w-full border px-2 py-1" placeholder="New Password">
+      <input id="resetPw2" type="password" class="w-full border px-2 py-1" placeholder="Confirm Password">
+      <div class="flex justify-between">
+        <button class="primary" onclick="resetPassword()">Save</button>
+        <button onclick="document.getElementById('resetPwModal').classList.add('hidden')">Cancel</button>
       </div>
     </div>
   </div>
