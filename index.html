@@ -685,7 +685,6 @@ function renderUserTable(list){
     const tr=document.createElement('tr');
     tr.innerHTML=`<td><span class="uid">${u.userId}</span><input class="uidEdit hidden" type="text" value="${u.userId}"></td>`+
       `<td><select class="roleSel" disabled><option>Employee</option><option>Manager</option><option>Admin</option></select></td>`+
-      `<td><button class="text-sm underline changePw">Change Password</button></td>`+
       `<td class="actions"><button class="editBtn" title="Edit">✏️</button>`+
       `<button class="saveBtn hidden" title="Save">💾</button>`+
       `<button class="cancelBtn hidden" title="Cancel">✖</button></td>`;
@@ -693,7 +692,6 @@ function renderUserTable(list){
     tr.querySelector('.editBtn').onclick=()=>enableEdit(tr,u.userId);
     tr.querySelector('.cancelBtn').onclick=()=>disableEdit(tr);
     tr.querySelector('.saveBtn').onclick=()=>saveRow(tr,u.userId);
-    tr.querySelector('.changePw').onclick=()=>openPwdModal(u.userId);
     body.appendChild(tr);
   });
 }
@@ -729,21 +727,6 @@ function saveRow(tr,oldId){
   }
 }
 
-function openPwdModal(uid){
-  document.getElementById('pwdUserId').value=uid;
-  document.getElementById('newPw').value='';
-  document.getElementById('confirmPw').value='';
-  document.getElementById('pwdModal').classList.remove('hidden');
-}
-
-function changePassword(){
-  const uid=document.getElementById('pwdUserId').value;
-  const pw=document.getElementById('newPw').value;
-  const c=document.getElementById('confirmPw').value;
-  if(pw!==c){alert('Passwords do not match');return;}
-  if(!/^(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(pw)){alert('Weak password');return;}
-  google.script.run.withSuccessHandler(()=>{document.getElementById('pwdModal').classList.add('hidden');loadUsers();}).withFailureHandler(err=>alert(err.message)).updateUserPassword(uid,pw);
-}
 
 function showNewUserModal(){
   document.getElementById('newUid').value='';
@@ -864,7 +847,7 @@ document.addEventListener('DOMContentLoaded',init);
     </div>
     <div class="overflow-x-auto">
       <table id="userTable">
-        <thead><tr><th>UserID</th><th>Role</th><th>Password</th><th></th></tr></thead>
+        <thead><tr><th>UserID</th><th>Role</th><th></th></tr></thead>
         <tbody></tbody>
       </table>
     </div>
@@ -881,18 +864,6 @@ document.addEventListener('DOMContentLoaded',init);
       <div class="flex justify-between">
         <button class="primary" onclick="addNewUser()">Save</button>
         <button onclick="document.getElementById('newUserModal').classList.add('hidden')">Cancel</button>
-      </div>
-    </div>
-  </div>
-  <div id="pwdModal" class="modal hidden">
-    <div class="bg-white rounded-xl p-6 w-80 space-y-4">
-      <h4 class="text-lg font-semibold text-center">Change Password</h4>
-      <input id="pwdUserId" type="text" class="w-full border px-2 py-1" readonly>
-      <input id="newPw" type="password" class="w-full border px-2 py-1" placeholder="New Password">
-      <input id="confirmPw" type="password" class="w-full border px-2 py-1" placeholder="Confirm Password">
-      <div class="flex justify-between">
-        <button class="primary" onclick="changePassword()">Save</button>
-        <button onclick="document.getElementById('pwdModal').classList.add('hidden')">Cancel</button>
       </div>
     </div>
   </div>
