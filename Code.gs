@@ -7,6 +7,7 @@ const CONFIG_SHEET = 'CONFIG';
 const QUESTIONS_SHEET = 'QUESTIONS';
 const COMP_SHEET = 'COMP_ADJUST';
 const SCHEDULE_SHEET = 'SCHEDULE';
+const AVAILABILITY_SHEET = 'AVAILABILITY';
 const CACHE_KEY = 'SESSION';
 const SESSION_DURATION = 60 * 60 * 8; // 8 hours
 const DEV_PASSWORD = 'changeme'; // replace in prod
@@ -28,6 +29,17 @@ function getScheduleSheet(){
   if(!sheet){
     sheet = ss.insertSheet(SCHEDULE_SHEET);
     sheet.appendRow(['Date','Time','ManagerEmail','BookedBy','BookedAt']);
+  }
+  return sheet;
+}
+
+/** Retrieve the AVAILABILITY sheet, create if missing */
+function getAvailabilitySheet(){
+  const ss = SpreadsheetApp.openById(ADMIN_SHEET_ID);
+  let sheet = ss.getSheetByName(AVAILABILITY_SHEET);
+  if(!sheet){
+    sheet = ss.insertSheet(AVAILABILITY_SHEET);
+    sheet.appendRow(['Date','Time','ManagerEmail','AddedAt']);
   }
   return sheet;
 }
@@ -652,6 +664,7 @@ function addAvailability_(e){
   const user = checkAuth_();
   const role = String(user.role || '').toUpperCase();
   if(role !== 'MANAGER' && role !== 'DEV') throw new Error('denied');
+  const availSheet = getAvailabilitySheet();
   // support old {date,time} payload for single slot
   if(body.date && body.time){
     const d = new Date(body.date);
@@ -667,6 +680,7 @@ function addAvailability_(e){
       }
     }
     sheet.appendRow([body.date, body.time, user.userId, '', '']);
+    availSheet.appendRow([body.date, body.time, user.userId, new Date()]);
     return {status:'ok'};
   }
   if(!body.start || !body.end) throw new Error('invalid');
@@ -683,6 +697,7 @@ function addAvailability_(e){
     const timeStr=Utilities.formatDate(t, 'UTC', 'HH:mm');
     if(existing.has(dateStr+"|"+timeStr)) continue;
     sheet.appendRow([dateStr,timeStr,user.userId,'','']);
+    availSheet.appendRow([dateStr,timeStr,user.userId,new Date()]);
   }
   return {status:'ok'};
 }
