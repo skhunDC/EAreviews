@@ -40,7 +40,7 @@ function getAvailabilitySheet(){
   let sheet = ss.getSheetByName(AVAILABILITY_SHEET);
   if(!sheet){
     sheet = ss.insertSheet(AVAILABILITY_SHEET);
-    sheet.appendRow(['Date','Time','ManagerEmail','AddedAt']);
+    sheet.appendRow(['UserID','StartISO','EndISO','EmployeeID']);
   }
   return sheet;
 }
@@ -769,32 +769,6 @@ function addAvailability(managerEmail, slots){
   return {added:added};
 }
 
-/** Employee books an open slot */
-function bookSlot(employeeEmail, slotId){
-  const user = checkAuth_();
-  const role = String(user.role || '').toUpperCase();
-  if(role !== 'EMPLOYEE' && role !== 'DEV') throw new Error('denied');
-  if(user.userId !== employeeEmail && role !== 'DEV') throw new Error('denied');
-  const lock = LockService.getDocumentLock();
-  lock.waitLock(10000);
-  try{
-    const sheet = getAppointmentsSheet();
-    const data = sheet.getDataRange().getValues();
-    for(let i=1;i<data.length;i++){
-      if(data[i][4] === employeeEmail) return {status:'double'};
-    }
-    for(let i=1;i<data.length;i++){
-      if(String(data[i][0]) === String(slotId)){
-        if(data[i][4]) return {status:'taken'};
-        sheet.getRange(i+1,5,1,2).setValues([[employeeEmail,new Date()]]);
-        return {status:'ok'};
-      }
-    }
-    return {status:'not_found'};
-  } finally {
-    lock.releaseLock();
-  }
-}
 
 /** List bookings for a specific user */
 function listBookingsForUser(email){
@@ -808,4 +782,61 @@ function listBookingsForUser(email){
     }
   }
   return res;
+}
+
+// ----- New Availability API -----
+function getAvailability(){
+  checkAuth_();
+  const sheet=getAvailabilitySheet();
+  const rows=sheet.getDataRange().getValues();
+  const res=[];
+  for(let i=1;i<rows.length;i++){
+    const [uid,start,end,emp]=rows[i];
+    res.push({id:i,userId:uid,start:start,end:end,employeeId:emp});
+  }
+  return res;
+}
+
+function postAvailability(obj){
+  const user=checkAuth_();
+  const role=String(user.role||'').toUpperCase();
+  if(role!=='MANAGER' && role!=='DEV') throw new Error('denied');
+  let start=new Date(obj.start);
+  let end=new Date(obj.end);
+  if(isNaN(start)||isNaN(end)||start>=end) throw new Error('invalid');
+  if(!isHalfHour_(start)||!isHalfHour_(end)) throw new Error('invalid');
+  const sheet=getAvailabilitySheet();
+  const existing=new Set(sheet.getDataRange().getValues().slice(1).map(r=>r[1]+"|"+r[2]));
+  const added=[];
+  for(let t=start;t<end;t=new Date(t.getTime()+30*60000)){
+    const next=new Date(t.getTime()+30*60000);
+    const sIso=t.toISOString();
+    const eIso=next.toISOString();
+    if(existing.has(sIso+"|"+eIso)) continue;
+    sheet.appendRow([user.userId,sIso,eIso,'']);
+    added.push(sheet.getLastRow()-1);
+  }
+  return {added:added};
+}
+
+function bookSlot(args){
+  const user=checkAuth_();
+  const role=String(user.role||'').toUpperCase();
+  const slotId=Number(args.slotId);
+  const emp=args.employeeId;
+  if(role!=='EMPLOYEE' && role!=='DEV' && role!=='MANAGER') throw new Error('denied');
+  const lock=LockService.getDocumentLock();
+  lock.waitLock(10000);
+  try{
+    const sheet=getAvailabilitySheet();
+    const last=sheet.getLastRow();
+    if(slotId<1 || slotId>last-1) return {status:'not_found'};
+    const row=slotId+1;
+    const cur=sheet.getRange(row,4).getValue();
+    if(cur) return {status:'taken'};
+    sheet.getRange(row,4).setValue(emp);
+    return {status:'ok'};
+  }finally{
+    lock.releaseLock();
+  }
 }
