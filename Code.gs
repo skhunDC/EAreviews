@@ -8,6 +8,7 @@ const QUESTIONS_SHEET = 'QUESTIONS';
 const COMP_SHEET = 'COMP_ADJUST';
 const SCHEDULE_SHEET = 'SCHEDULE';
 const AVAILABILITY_SHEET = 'AVAILABILITY';
+const APPOINTMENTS_SHEET = 'APPOINTMENTS';
 const CACHE_KEY = 'SESSION';
 const SESSION_DURATION = 60 * 60 * 8; // 8 hours
 const DEV_PASSWORD = 'changeme'; // replace in prod
@@ -40,6 +41,17 @@ function getAvailabilitySheet(){
   if(!sheet){
     sheet = ss.insertSheet(AVAILABILITY_SHEET);
     sheet.appendRow(['Date','Time','ManagerEmail','AddedAt']);
+  }
+  return sheet;
+}
+
+/** Retrieve the APPOINTMENTS sheet, create if missing */
+function getAppointmentsSheet(){
+  const ss = SpreadsheetApp.openById(ADMIN_SHEET_ID);
+  let sheet = ss.getSheetByName(APPOINTMENTS_SHEET);
+  if(!sheet){
+    sheet = ss.insertSheet(APPOINTMENTS_SHEET);
+    sheet.appendRow(['ID','Date','Time','ManagerEmail','BookedBy','BookedAt']);
   }
   return sheet;
 }
@@ -717,4 +729,83 @@ function listSlots_(e){
     out.push({date:row[0], time:row[1], managerEmail:row[2], bookedBy:row[3]});
   }
   return out;
+}
+
+// -------- New Scheduling API using APPOINTMENTS sheet ---------
+
+/** List available/occupied appointment slots */
+function listAvailability(userRole){
+  checkAuth_();
+  const sheet = getAppointmentsSheet();
+  const data = sheet.getDataRange().getValues();
+  const res = [];
+  for(let i=1;i<data.length;i++){
+    const [id,date,time,manager,bookedBy,bookedAt] = data[i];
+    if(userRole && String(userRole).toUpperCase()==='EMPLOYEE' && bookedBy) continue;
+    res.push({id:id,date:date,time:time,managerEmail:manager,bookedBy:bookedBy,bookedAt:bookedAt});
+  }
+  return res;
+}
+
+/** Managers add availability slots */
+function addAvailability(managerEmail, slots){
+  const user = checkAuth_();
+  const role = String(user.role || '').toUpperCase();
+  if(role !== 'MANAGER' && role !== 'DEV') throw new Error('denied');
+  if(user.userId !== managerEmail && role !== 'DEV') throw new Error('denied');
+  if(!Array.isArray(slots)) throw new Error('invalid');
+  const sheet = getAppointmentsSheet();
+  const existing = new Set(sheet.getDataRange().getValues().slice(1).map(r=>r[1]+"|"+r[2]));
+  const added=[];
+  slots.forEach(s=>{
+    if(!s || !s.date || !s.time) return;
+    const mm = Number(String(s.time).split(':')[1]);
+    if(mm!==0 && mm!==30) return;
+    if(existing.has(s.date+"|"+s.time)) return;
+    const id = Utilities.getUuid();
+    sheet.appendRow([id,s.date,s.time,managerEmail,'','']);
+    added.push(id);
+  });
+  return {added:added};
+}
+
+/** Employee books an open slot */
+function bookSlot(employeeEmail, slotId){
+  const user = checkAuth_();
+  const role = String(user.role || '').toUpperCase();
+  if(role !== 'EMPLOYEE' && role !== 'DEV') throw new Error('denied');
+  if(user.userId !== employeeEmail && role !== 'DEV') throw new Error('denied');
+  const lock = LockService.getDocumentLock();
+  lock.waitLock(10000);
+  try{
+    const sheet = getAppointmentsSheet();
+    const data = sheet.getDataRange().getValues();
+    for(let i=1;i<data.length;i++){
+      if(data[i][4] === employeeEmail) return {status:'double'};
+    }
+    for(let i=1;i<data.length;i++){
+      if(String(data[i][0]) === String(slotId)){
+        if(data[i][4]) return {status:'taken'};
+        sheet.getRange(i+1,5,1,2).setValues([[employeeEmail,new Date()]]);
+        return {status:'ok'};
+      }
+    }
+    return {status:'not_found'};
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** List bookings for a specific user */
+function listBookingsForUser(email){
+  checkAuth_();
+  const sheet = getAppointmentsSheet();
+  const data = sheet.getDataRange().getValues();
+  const res = [];
+  for(let i=1;i<data.length;i++){
+    if(data[i][4] === email){
+      res.push({id:data[i][0],date:data[i][1],time:data[i][2],managerEmail:data[i][3],bookedAt:data[i][5]});
+    }
+  }
+  return res;
 }

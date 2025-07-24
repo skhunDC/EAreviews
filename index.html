@@ -8,6 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
 <style>
 h1,h2{font-family:'Inter',Arial,sans-serif;}
 body{font-family:'Inter',Roboto,Arial,sans-serif;margin:0;padding:0;background:linear-gradient(135deg,#f6f8fa 0%,#eaf4ff 100%);color:#333;font-size:1rem;line-height:1.6;}
@@ -834,88 +836,60 @@ function confirmClearReviews(){
 }
 
 // ---- Modern Calendar Scheduling -----
-let currentMonth=new Date();
-let slots=[];
-let calendarInit=false;
+let calendar;
 function initCalendar(){
-  if(!calendarInit){
-    document.getElementById('prevMonth').onclick=()=>changeMonth(-1);
-    document.getElementById('nextMonth').onclick=()=>changeMonth(1);
-    calendarInit=true;
-  }
-  const role = user ? String(user.role || '').toUpperCase() : '';
-  if(role==='MANAGER' || role==='DEV'){
-    document.getElementById('availForm').classList.remove('hidden');
-  }else{
-    document.getElementById('availForm').classList.add('hidden');
-  }
-  loadMonth(currentMonth);
-}
-function changeMonth(delta){
-  currentMonth=new Date(currentMonth.getFullYear(),currentMonth.getMonth()+delta,1);
-  loadMonth(currentMonth);
-}
-function loadMonth(d){
-  const start=formatDate(new Date(d.getFullYear(),d.getMonth(),1));
-  const end=formatDate(new Date(d.getFullYear(),d.getMonth()+1,0));
-  document.getElementById('monthLabel').textContent=d.toLocaleDateString(lang==='es'?'es-ES':'en-US',{month:'long',year:'numeric'});
-  fetch('slots?start='+start+'&end='+end)
-    .then(r=>r.json())
-    .then(data=>{slots=data;renderCalendar();});
-}
-function renderCalendar(){
-  const year=currentMonth.getFullYear();
-  const month=currentMonth.getMonth();
-  const first=new Date(year,month,1);
-  const daysInMonth=new Date(year,month+1,0).getDate();
-  let html='<table class="calendar"><thead><tr>';
-  for(let i=0;i<7;i++){
-    html+='<th>'+new Date(2020,5,i).toLocaleDateString(lang==='es'?'es-ES':'en-US',{weekday:'short'})+'</th>';
-  }
-  html+='</tr></thead><tbody>';
-  let day=1;
-  for(let w=0;w<6 && day<=daysInMonth;w++){
-    html+='<tr>';
-    for(let d=0;d<7;d++){
-      if(w===0 && d<first.getDay()||day>daysInMonth){html+='<td class="empty"></td>';continue;}
-      const dateObj=new Date(year,month,day);
-      const dateStr=formatDate(dateObj);
-      const disabled=(d===0||d===6);
-      html+='<td class="'+(disabled?'disabled':'')+'"><div class="date-num">'+day+'</div>';
-      const daySlots=slots.filter(s=>s.date===dateStr);
-      daySlots.forEach(s=>{
-        let cls='slot';
-        if(s.bookedBy){cls+=' booked';if(s.bookedBy===user.userId)cls+=' mine';}
-        else cls+=' available';
-        html+='<div class="'+cls+'" data-date="'+s.date+'" data-time="'+s.time+'">'+s.time+'</div>';
-      });
-      html+='</td>';day++;}
-    html+='</tr>';}
-  html+='</tbody></table>';
-  document.getElementById('calendar').innerHTML=html;
-  document.querySelectorAll('#calendar .slot.available').forEach(el=>{
-    el.addEventListener('click',()=>{
-      if(confirm(t('bookPrompt'))){
-        bookSlot(el.dataset.date,el.dataset.time);
-      }
+  if(!document.getElementById('calendar')) return;
+  if(!calendar){
+    calendar=new FullCalendar.Calendar(document.getElementById('calendar'),{
+      initialView:'dayGridMonth',
+      locale:lang==='es'?'es':'en',
+      headerToolbar:{start:'prev,next today',center:'title',end:''},
+      height:'auto',
+      eventClick:slotClick,
+      datesSet:loadSlots
     });
-  });
+    calendar.render();
+  }else{
+    calendar.setOption('locale',lang==='es'?'es':'en');
+    loadSlots();
+  }
+  const role=user?String(user.role||'').toUpperCase():'';
+  document.getElementById('availForm').classList.toggle('hidden',!(role==='MANAGER'||role==='DEV'));
 }
-function bookSlot(date,time){
-  fetch('book',{method:'POST',body:JSON.stringify({date:date,time:time})})
-    .then(r=>{if(r.status===200){loadMonth(currentMonth);}else if(r.status===409){alert(t('conflict'));}else{alert(t('error'));}});
+function loadSlots(){
+  if(!user) return;
+  google.script.run.withSuccessHandler(res=>{
+    calendar.getEvents().forEach(e=>e.remove());
+    res.forEach(s=>{
+      const end=new Date(s.date+'T'+s.time);end.setMinutes(end.getMinutes()+30);
+      let color='#d1fae5',text='#000';
+      if(s.bookedBy){color='#e5e7eb';text='#666';if(s.bookedBy===user.userId){color='#0A5C30';text='#fff';}}
+      calendar.addEvent({id:s.id,title:s.time,start:s.date+'T'+s.time,end:end.toISOString(),backgroundColor:color,borderColor:color,textColor:text,extendedProps:{bookedBy:s.bookedBy}});
+    });
+    const view=calendar.view;
+    for(let d=new Date(view.currentStart);d<view.currentEnd;d.setDate(d.getDate()+1)){
+      const s=d.toISOString().slice(0,10)+'T12:00:00';
+      const e=d.toISOString().slice(0,10)+'T14:00:00';
+      calendar.addEvent({start:s,end:e,display:'background',backgroundColor:'#FFEDBA'});
+    }
+  }).listAvailability(user.role);
+}
+function slotClick(info){
+  const b=info.event.extendedProps.bookedBy;
+  if(b){alert(t('conflict'));return;}
+  if(!confirm(t('bookPrompt'))) return;
+  google.script.run.withSuccessHandler(r=>{if(r.status==='ok'){alert(t('bookOk'));loadSlots();}else{alert(t('conflict'));loadSlots();}}).bookSlot(user.userId,info.event.id);
 }
 function addAvailability(){
   const sd=document.getElementById('availFromDate').value;
   const st=document.getElementById('availFromTime').value;
   const ed=document.getElementById('availToDate').value;
   const et=document.getElementById('availToTime').value;
-  if(!sd||!st||!ed||!et)return;
-  const body={start:sd+'T'+st,end:ed+'T'+et};
-  fetch('avail',{method:'POST',body:JSON.stringify(body)})
-    .then(r=>{if(r.ok){document.getElementById('availMsg').textContent='';loadMonth(currentMonth);}else{document.getElementById('availMsg').textContent=t('error');}});
+  if(!sd||!st||!ed||!et){document.getElementById('availMsg').textContent=t('chooseTime');return;}
+  const slots=[];let start=new Date(sd+'T'+st);const end=new Date(ed+'T'+et);
+  while(start<end){slots.push({date:start.toISOString().slice(0,10),time:start.toISOString().slice(11,16)});start=new Date(start.getTime()+30*60000);}
+  google.script.run.withSuccessHandler(()=>{document.getElementById('availMsg').textContent='';loadSlots();}).withFailureHandler(()=>{document.getElementById('availMsg').textContent=t('error');}).addAvailability(user.userId,slots);
 }
-function formatDate(d){return d.toISOString().split('T')[0];}
 document.addEventListener('DOMContentLoaded',init);
 </script>
 </head>
@@ -980,11 +954,6 @@ document.addEventListener('DOMContentLoaded',init);
 <section id="schedule" class="hidden">
   <div data-i18n-key="scheduleGuide" data-i18n-html class="mb-4"></div>
   <div id="calendarWrapper" class="card">
-    <div class="flex justify-between items-center mb-2">
-      <button id="prevMonth" class="material-icons">chevron_left</button>
-      <h3 id="monthLabel" class="font-semibold"></h3>
-      <button id="nextMonth" class="material-icons">chevron_right</button>
-    </div>
     <div id="calendar"></div>
   </div>
   <div id="availForm" class="card hidden">
