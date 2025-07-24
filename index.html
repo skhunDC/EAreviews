@@ -50,6 +50,10 @@ nav button{background:none;border:none;color:white;font-size:16px;cursor:pointer
 #devPanel td .actions button{margin-left:4px;}
 #devPanel .modal{position:fixed;top:0;right:0;bottom:0;left:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);z-index:50;}
 #devPanel .modal.hidden{display:none;}
+.modal{position:fixed;top:0;right:0;bottom:0;left:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);z-index:50;}
+.modal.hidden{display:none;}
+#snackbar{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#323232;color:#fff;padding:0.75rem 1.25rem;border-radius:4px;opacity:0;transition:opacity 0.3s;z-index:60;}
+#snackbar.show{opacity:1;}
 #accessDenied{z-index:60;}
 #addUserFab{z-index:50;}
 section{padding:20px;}
@@ -157,6 +161,14 @@ const translations={
     scheduleGuide:`<div class="callout"><h3 class="font-bold mb-1">Booking & Availability Guidelines</h3><ul class="list-disc pl-4 space-y-1"><li><strong>Production Team</strong> – Reserve reviews <strong>12:00 PM – 2:00 PM</strong> (post-production). These slots have priority for the conference room.</li><li><strong>Delivery Drivers</strong> – Aim for <strong>Wednesdays</strong> (non-Route day).</li><li><strong>CSRs</strong> – Book any other open time that works for you and your manager.</li><li><strong>One Room. One Slot. One Team.</strong> – Only <strong>one 30-minute</strong> booking at a time; no double-booking allowed.</li></ul></div>`,
     addSlotTitle:'Set Availability',
     addSlotBtn:'Add Slot',
+    slotListTitle:'Slots',
+    slotsSaved:'slot(s) saved',
+    availableShort:'Available',
+    bookedShort:'Booked',
+    errorPast:'Cannot add slots in the past.',
+    errorOverlap:'Slot overlaps with existing.',
+    errorMissing:'Please fill all fields.',
+    errorInvalid:'Invalid time range.',
     intro:`<section id="review-intro">
       <h1>Your Opportunity to Shine</h1>
       <div class="intro-cards">
@@ -234,6 +246,14 @@ const translations={
     scheduleGuide:`<div class="callout"><h3 class="font-bold mb-1">Pautas de reserva y disponibilidad</h3><ul class="list-disc pl-4 space-y-1"><li><strong>Equipo de Producción</strong> – Reserve revisiones <strong>12:00 PM – 2:00 PM</strong> (después de producción). Estas horas tienen prioridad para la sala de conferencias.</li><li><strong>Conductores de Entrega</strong> – Trate de reservar <strong>los miércoles</strong> (día sin ruta).</li><li><strong>CSRs</strong> – Programe cualquier otro horario disponible que funcione para usted y su gerente.</li><li><strong>Una sala. Un turno. Un equipo.</strong> – Solo una reserva de <strong>30 minutos</strong>; no se permiten dobles reservas.</li></ul></div>`,
     addSlotTitle:'Establecer disponibilidad',
     addSlotBtn:'Agregar horario',
+    slotListTitle:'Horarios',
+    slotsSaved:'horario(s) guardado(s)',
+    availableShort:'Disponible',
+    bookedShort:'Reservado',
+    errorPast:'No se pueden agregar horarios en el pasado.',
+    errorOverlap:'El horario se superpone con uno existente.',
+    errorMissing:'Complete todos los campos.',
+    errorInvalid:'Rango de tiempo inválido.',
     intro:`<section id="review-intro">
       <h1>Tu oportunidad para destacar</h1>
       <div class="intro-cards">
@@ -854,7 +874,6 @@ function initCalendar(){
       locale:lang==='es'?'es':'en',
       headerToolbar:{start:'prev,next today',center:'title',end:''},
       height:'auto',
-      eventClick:slotClick,
       datesSet:loadSlots
     });
   }
@@ -868,11 +887,22 @@ function loadSlots(){
   if(!user) return;
   google.script.run.withSuccessHandler(res=>{
     calendar.getEvents().forEach(e=>e.remove());
+    const map={};
     res.forEach(s=>{
-      const start=new Date(s.start);const end=new Date(s.end);
-      let color='#d1fae5',text='#000';
-      if(s.employeeId){color='#e5e7eb';text='#666';if(s.employeeId===user.userId){color='#0A5C30';text='#fff';}}
-      calendar.addEvent({id:s.id,title:start.toISOString().slice(11,16),start:start.toISOString(),end:end.toISOString(),backgroundColor:color,borderColor:color,textColor:text,extendedProps:{bookedBy:s.employeeId}});
+      if(s.userId!==user.userId) return;
+      const d=s.start.slice(0,10);
+      if(!map[d]) map[d]={total:0,booked:0};
+      map[d].total++;
+      if(s.employeeId) map[d].booked++;
+    });
+    Object.keys(map).forEach(d=>{
+      const info=map[d];
+      const remaining=info.total-info.booked;
+      if(remaining>0){
+        calendar.addEvent({start:d,allDay:true,title:remaining+' '+t('availableShort'),backgroundColor:'#34d399',borderColor:'#34d399',textColor:'#fff'});
+      }else{
+        calendar.addEvent({start:d,allDay:true,title:info.booked+' '+t('bookedShort'),backgroundColor:'#ef4444',borderColor:'#ef4444',textColor:'#fff'});
+      }
     });
   }).getAvailability();
 }
@@ -887,18 +917,28 @@ function addAvailability(){
   const st=document.getElementById('availFromTime').value;
   const ed=document.getElementById('availToDate').value;
   const et=document.getElementById('availToTime').value;
-  if(!sd||!st||!ed||!et){document.getElementById('availMsg').textContent=t('chooseTime');return;}
-  google.script.run.withSuccessHandler(()=>{document.getElementById('availMsg').textContent='';loadAvailability();loadSlots();}).withFailureHandler(()=>{document.getElementById('availMsg').textContent=t('error');}).postAvailability({start:sd+'T'+st,end:ed+'T'+et});
+  if(!sd||!st||!ed||!et){showError(t('errorMissing'));return;}
+  google.script.run.withSuccessHandler(res=>{
+    loadAvailability();
+    loadSlots();
+    const n=(res.added||[]).length;
+    if(n) showSnackbar(n+' '+t('slotsSaved'));
+  }).withFailureHandler(err=>{
+    showError(mapError(err));
+  }).postAvailability({start:sd+'T'+st,end:ed+'T'+et});
 }
 function loadAvailability(){
   google.script.run.withSuccessHandler(renderSlotList).getAvailability();
 }
 function renderSlotList(slots){
   const list=document.getElementById('slotList');
-  if(!list) return;
+  const card=document.getElementById('slotCard');
+  if(!list||!card) return;
   list.innerHTML='';
+  let count=0;
   slots.forEach(s=>{
-    if(s.employeeId && s.employeeId!==user.userId) return;
+    if(s.userId!==user.userId) return;
+    count++;
     const row=document.createElement('div');
     row.className='flex items-center gap-2 border rounded p-1';
     const span=document.createElement('span');
@@ -922,6 +962,7 @@ function renderSlotList(slots){
     }
     list.appendChild(row);
   });
+  card.classList.toggle('hidden',count===0);
 }
 function saveSlot(id,val,inputEl){
   if(!val) return;
@@ -932,6 +973,32 @@ function formatRange(start,end){
   const a=new Date(start).toLocaleTimeString(lang==='es'?'es':'en',opts);
   const b=new Date(end).toLocaleTimeString(lang==='es'?'es':'en',opts);
   return a+' \u2013 '+b;
+}
+function showSnackbar(msg){
+  let bar=document.getElementById('snackbar');
+  if(!bar) return;
+  bar.textContent=msg;
+  bar.classList.add('show');
+  setTimeout(()=>bar.classList.remove('show'),3000);
+}
+function showError(msg){
+  console.error(msg);
+  const modal=document.getElementById('errorModal');
+  const txt=document.getElementById('errorText');
+  if(txt)txt.textContent=msg;
+  if(modal)modal.classList.remove('hidden');
+}
+function closeError(){
+  const modal=document.getElementById('errorModal');
+  if(modal)modal.classList.add('hidden');
+}
+function mapError(err){
+  const m=err&&err.message||'';
+  if(m==='past') return t('errorPast');
+  if(m==='overlap') return t('errorOverlap');
+  if(m==='missing') return t('errorMissing');
+  if(m==='invalid') return t('errorInvalid');
+  return t('error');
 }
 document.addEventListener('DOMContentLoaded',init);
 </script>
@@ -955,6 +1022,13 @@ document.addEventListener('DOMContentLoaded',init);
   </div>
 </nav>
 <div id="loadingBar" class="loading-bar hidden"><span></span></div>
+<div id="snackbar"></div>
+<div id="errorModal" class="modal hidden">
+  <div class="bg-white rounded-xl p-6 w-80 space-y-4">
+    <p id="errorText" class="text-center"></p>
+    <button type="button" class="primary w-full" onclick="closeError()">OK</button>
+  </div>
+</div>
 <section id="home" class="hidden">
 <h2 data-i18n-key="welcomeTitle">Welcome to the Employee Review Portal</h2>
 <p data-i18n-key="welcomeMsg">Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.</p>
@@ -997,23 +1071,29 @@ document.addEventListener('DOMContentLoaded',init);
 <section id="schedule" class="hidden">
   <div data-i18n-key="scheduleGuide" data-i18n-html class="mb-4"></div>
   <div id="scheduleFlex" class="flex flex-col md:flex-row gap-4 items-start">
-    <div id="availForm" class="card hidden w-full md:basis-[30%] md:min-w-[280px]">
-      <div class="font-semibold mb-2" data-i18n-key="addSlotTitle">Set Availability</div>
-      <label><span data-i18n-key="fromDate">Start Date</span>
-        <input type="date" id="availFromDate">
-      </label>
-      <label><span data-i18n-key="fromTime">Start Time</span>
-        <input type="time" id="availFromTime" step="1800">
-      </label>
-      <label><span data-i18n-key="toDate">End Date</span>
-        <input type="date" id="availToDate">
-      </label>
-      <label><span data-i18n-key="toTime">End Time</span>
-        <input type="time" id="availToTime" step="1800">
-      </label>
-      <button class="primary" onclick="addAvailability()" data-i18n-key="addSlotBtn">Add Slot</button>
-      <div id="availMsg" class="text-sm"></div>
-      <div id="slotList" class="mt-2 max-h-60 overflow-y-auto space-y-1"></div>
+    <div class="flex flex-col gap-4 w-full md:basis-[30%] md:min-w-[280px]">
+      <div id="availForm" class="card hidden">
+        <div class="font-semibold mb-2" data-i18n-key="addSlotTitle">Set Availability</div>
+        <label><span data-i18n-key="fromDate">Start Date</span>
+          <input type="date" id="availFromDate">
+        </label>
+        <label><span data-i18n-key="fromTime">Start Time</span>
+          <input type="time" id="availFromTime" step="1800">
+        </label>
+        <label><span data-i18n-key="toDate">End Date</span>
+          <input type="date" id="availToDate">
+        </label>
+        <label><span data-i18n-key="toTime">End Time</span>
+          <input type="time" id="availToTime" step="1800">
+        </label>
+        <button class="primary" onclick="addAvailability()" data-i18n-key="addSlotBtn">Add Slot</button>
+        <div id="availMsg" class="text-sm"></div>
+      </div>
+      <div id="slotCard" class="card hidden">
+        <div class="font-semibold mb-2" data-i18n-key="slotListTitle">Slots</div>
+        <hr class="mb-2">
+        <div id="slotList" class="max-h-60 overflow-y-auto space-y-1"></div>
+      </div>
     </div>
     <div id="calendarWrapper" class="card w-full md:basis-[70%] flex-1">
       <div id="calendar"></div>
