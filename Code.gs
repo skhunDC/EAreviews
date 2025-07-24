@@ -798,22 +798,30 @@ function getAvailability(){
 }
 
 function postAvailability(obj){
-  const user=checkAuth_();
-  const role=String(user.role||'').toUpperCase();
-  if(role!=='MANAGER' && role!=='DEV') throw new Error('denied');
-  let start=new Date(obj.start);
-  let end=new Date(obj.end);
-  if(isNaN(start)||isNaN(end)||start>=end) throw new Error('invalid');
-  if(!isHalfHour_(start)||!isHalfHour_(end)) throw new Error('invalid');
-  const sheet=getAvailabilitySheet();
-  const existing=new Set(sheet.getDataRange().getValues().slice(1).map(r=>r[1]+"|"+r[2]));
-  const added=[];
+  const user = checkAuth_();
+  const role = String(user.role || '').toUpperCase();
+  if(role !== 'MANAGER' && role !== 'DEV') throw new Error('denied');
+  if(!obj || !obj.start || !obj.end) throw new Error('missing');
+  let start = new Date(obj.start);
+  let end   = new Date(obj.end);
+  if(isNaN(start) || isNaN(end) || start >= end) throw new Error('invalid');
+  if(start < new Date()) throw new Error('past');
+  if(!isHalfHour_(start) || !isHalfHour_(end)) throw new Error('invalid');
+  const sheet = getAvailabilitySheet();
+  const rows = sheet.getDataRange().getValues().slice(1);
+  const added = [];
   for(let t=start;t<end;t=new Date(t.getTime()+30*60000)){
     const next=new Date(t.getTime()+30*60000);
+    if(t < new Date()) throw new Error('past');
+    for(const r of rows){
+      const rs=new Date(r[1]);
+      const re=new Date(r[2]);
+      if(t < re && next > rs) throw new Error('overlap');
+    }
     const sIso=t.toISOString();
     const eIso=next.toISOString();
-    if(existing.has(sIso+"|"+eIso)) continue;
     sheet.appendRow([user.userId,sIso,eIso,'']);
+    rows.push([user.userId,sIso,eIso,'']);
     added.push(sheet.getLastRow()-1);
   }
   return {added:added};
