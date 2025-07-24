@@ -589,12 +589,10 @@ function serveIndex_(){
     cache.put('idx',html,CACHE_TTL);
   }
   const out=HtmlService.createHtmlOutput(html);
-  const resp=out.getResponse();
-  resp.setHeader('Cache-Control','max-age=3600, public');
-  resp.setHeader('X-Content-Type-Options','nosniff');
-  resp.setHeader('X-Frame-Options','SAMEORIGIN');
-  resp.setHeader('Content-Security-Policy',"default-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com");
-  return resp;
+  // Apps Script's HtmlOutput doesn't expose a raw HTTP response object, so
+  // custom headers such as Cache-Control can't be set directly. Simply return
+  // the HtmlOutput for rendering.
+  return out;
 }
 
 /** --- Scheduling Helpers & API Endpoints -------------------------------- */
