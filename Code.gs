@@ -1,43 +1,32 @@
 // Code.gs - server-side logic for Employee Review Web App
 
-const USERS_SHEET='USERS',REVIEWS_SHEET='REVIEWS',MEETINGS_SHEET='MEETINGS',CONFIG_SHEET='CONFIG',QUESTIONS_SHEET='QUESTIONS',COMP_SHEET='COMP_ADJUST',SCHEDULE_SHEET='SCHEDULE',AVAILABILITY_SHEET='AVAILABILITY',APPOINTMENTS_SHEET='APPOINTMENTS';
-const CACHE_KEY='SESSION',SESSION_DURATION=28800,DEV_PASSWORD='changeme';
-const ADMIN_SHEET_ID='17lpaLBAL9XidYqiMhKNWRhZdEIqa0OzuVP7SYYc6VfQ',REVIEW_FOLDER_NAME='EAReviewData';
-const CALENDAR_ID=PropertiesService.getScriptProperties().getProperty('CALENDAR_ID');
-const CACHE_TTL=600;
-let SS,CFG,USER_MAP;
+const USERS_SHEET = 'USERS';
+const REVIEWS_SHEET = 'REVIEWS';
+const MEETINGS_SHEET = 'MEETINGS';
+const CONFIG_SHEET = 'CONFIG';
+const QUESTIONS_SHEET = 'QUESTIONS';
+const COMP_SHEET = 'COMP_ADJUST';
+const SCHEDULE_SHEET = 'SCHEDULE';
+const AVAILABILITY_SHEET = 'AVAILABILITY';
+const APPOINTMENTS_SHEET = 'APPOINTMENTS';
+const CACHE_KEY = 'SESSION';
+const SESSION_DURATION = 60 * 60 * 8; // 8 hours
+const DEV_PASSWORD = 'changeme'; // replace in prod
+const ADMIN_SHEET_ID = '17lpaLBAL9XidYqiMhKNWRhZdEIqa0OzuVP7SYYc6VfQ';
+const REVIEW_FOLDER_NAME = 'EAReviewData';
+const CALENDAR_ID = PropertiesService.getScriptProperties().getProperty('CALENDAR_ID');
 
-/** Cached spreadsheet accessor */
+/** Return the spreadsheet used by the app */
 function getSpreadsheet(){
-  if(SS)return SS;
-  const cache=CacheService.getScriptCache();
-  const id=cache.get('ssid')||ADMIN_SHEET_ID;
-  SS=SpreadsheetApp.openById(id);
-  cache.put('ssid',id,CACHE_TTL);
-  return SS;
-}
-
-function refreshUserCache(){
-  const sheet=getSpreadsheet().getSheetByName(USERS_SHEET);
-  const rows=sheet.getDataRange().getValues();
-  USER_MAP={};
-  rows.slice(1).forEach(r=>{USER_MAP[r[1]]={id:r[0],name:r[2],role:r[3],managerId:r[4],lang:r[5],hash:r[6],salt:r[7]};});
-  PropertiesService.getScriptProperties().setProperty('users',JSON.stringify(USER_MAP));
-}
-
-function getUserMap(){
-  if(USER_MAP)return USER_MAP;
-  const prop=PropertiesService.getScriptProperties();
-  const data=prop.getProperty('users');
-  if(data){USER_MAP=JSON.parse(data);return USER_MAP;}
-  refreshUserCache();
-  return USER_MAP;
+  const ss = SpreadsheetApp.getActive();
+  if (ss) return ss;
+  return SpreadsheetApp.openById(ADMIN_SHEET_ID);
 }
 
 /** Retrieve the SCHEDULE sheet, create if missing */
 function getScheduleSheet(){
-  const ss=getSpreadsheet();
-  let sheet=ss.getSheetByName(SCHEDULE_SHEET);
+  const ss = SpreadsheetApp.openById(ADMIN_SHEET_ID);
+  let sheet = ss.getSheetByName(SCHEDULE_SHEET);
   if(!sheet){
     sheet = ss.insertSheet(SCHEDULE_SHEET);
     sheet.appendRow(['Date','Time','ManagerEmail','BookedBy','BookedAt']);
@@ -47,8 +36,8 @@ function getScheduleSheet(){
 
 /** Retrieve the AVAILABILITY sheet, create if missing */
 function getAvailabilitySheet(){
-  const ss=getSpreadsheet();
-  let sheet=ss.getSheetByName(AVAILABILITY_SHEET);
+  const ss = SpreadsheetApp.openById(ADMIN_SHEET_ID);
+  let sheet = ss.getSheetByName(AVAILABILITY_SHEET);
   if(!sheet){
     sheet = ss.insertSheet(AVAILABILITY_SHEET);
     sheet.appendRow(['Date','Time','ManagerEmail','AddedAt']);
@@ -58,8 +47,8 @@ function getAvailabilitySheet(){
 
 /** Retrieve the APPOINTMENTS sheet, create if missing */
 function getAppointmentsSheet(){
-  const ss=getSpreadsheet();
-  let sheet=ss.getSheetByName(APPOINTMENTS_SHEET);
+  const ss = SpreadsheetApp.openById(ADMIN_SHEET_ID);
+  let sheet = ss.getSheetByName(APPOINTMENTS_SHEET);
   if(!sheet){
     sheet = ss.insertSheet(APPOINTMENTS_SHEET);
     sheet.appendRow(['ID','Date','Time','ManagerEmail','BookedBy','BookedAt']);
@@ -126,13 +115,16 @@ function createSession(uid) {
 }
 
 /** Serve the web app or JSON endpoints */
-function doGet(e){
-  const path=(e&&e.pathInfo)||'';
-  if(path==='ping')return ContentService.createTextOutput('ok');
-  if(path==='events')return jsonResponse_(getEvents_(e));
-  if(path==='me')return jsonResponse_(getCurrentUser_());
-  if(path==='slots')return jsonResponse_(listSlots_(e));
-  return serveIndex_();
+function doGet(e) {
+  const path = (e && e.pathInfo) || '';
+  if (path === 'events') {
+    return jsonResponse_(getEvents_(e));
+  } else if (path === 'me') {
+    return jsonResponse_(getCurrentUser_());
+  } else if (path === 'slots') {
+    return jsonResponse_(listSlots_(e));
+  }
+  return HtmlService.createHtmlOutputFromFile('index');
 }
 
 /** Handle POST requests */
@@ -147,15 +139,24 @@ function doPost(e) {
 }
 
 /** Authenticate user by user ID */
-function login(userId,pwd){
-  const map=getUserMap();
-  const u=map[userId];
-  if(!u)return{success:false,error:'user_not_found'};
-  if(!verifyPwd(pwd,u.salt,u.hash))return{success:false,error:'invalid_password'};
-  const cache=CacheService.getUserCache();
-  cache.put(CACHE_KEY,JSON.stringify({id:u.id,userId:userId,name:u.name,role:u.role,managerId:u.managerId,lang:u.lang}),SESSION_DURATION);
-  const token=createSession(u.id);
-  return{success:true,token:token,user:{id:u.id,userId:userId,name:u.name,role:u.role,lang:u.lang}};
+function login(userId, pwd) {
+  const ss = getSpreadsheet();
+  const sheet = ss.getSheetByName(USERS_SHEET);
+  const rows = sheet.getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    const [id, uid, name, role, managerId, lang, hash, salt] = rows[i];
+    if (uid === userId) {
+      if (verifyPwd(pwd, salt, hash)) {
+        const cache = CacheService.getUserCache();
+        cache.put(CACHE_KEY, JSON.stringify({id:id, userId:uid, name:name, role:role, managerId:managerId, lang:lang}), SESSION_DURATION);
+        const token = createSession(id);
+        return {success:true, token:token, user:{id:id,userId:uid,name:name,role:role,lang:lang}};
+      } else {
+        return {success:false, error:'invalid_password'};
+      }
+    }
+  }
+  return {success:false, error:'user_not_found'};
 }
 
 /** Logout */
@@ -178,32 +179,32 @@ function getSession() {
 function saveLang(lang) {
   const user = getSession();
   if (!user) return;
-  const sheet=getSpreadsheet().getSheetByName(USERS_SHEET);
-  const data=sheet.getDataRange().getValues();
-  for(let i=1;i<data.length;i++){
-    if(data[i][0]==user.id){
-      sheet.getRange(i+1,6).setValue(lang);
-      user.lang=lang;
-      CacheService.getUserCache().put(CACHE_KEY,JSON.stringify(user),SESSION_DURATION);
-      refreshUserCache();
+  const ss = getSpreadsheet();
+  const sheet = ss.getSheetByName(USERS_SHEET);
+  const rows = sheet.getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if (rows[i][0] == user.id) {
+      sheet.getRange(i+1, 6).setValue(lang);
+      user.lang = lang;
+      CacheService.getUserCache().put(CACHE_KEY, JSON.stringify(user), SESSION_DURATION);
       return;
     }
   }
 }
 
 /** Load config translations */
-function loadConfig(){
-  if(CFG)return CFG;
-  const prop=PropertiesService.getScriptProperties();
-  const c=prop.getProperty('cfg');
-  if(c){CFG=JSON.parse(c);return CFG;}
-  const sheet=getSpreadsheet().getSheetByName(CONFIG_SHEET);
-  if(!sheet)return {};
-  const rows=sheet.getDataRange().getValues();
-  CFG={};
-  rows.slice(1).forEach(r=>{if(r[0])CFG[r[0]]={en:r[1],es:r[2]};});
-  prop.setProperty('cfg',JSON.stringify(CFG));
-  return CFG;
+function loadConfig() {
+  const ss = getSpreadsheet();
+  const sheet = ss.getSheetByName(CONFIG_SHEET);
+  if (!sheet) return {};
+  const rows = sheet.getDataRange().getValues();
+  const cfg = {};
+  rows.forEach((r,i) => {
+    if(i === 0) return; // skip header row
+    if(!r[0]) return;
+    cfg[r[0]] = {en:r[1], es:r[2]};
+  });
+  return cfg;
 }
 
 /** List reviews for session user */
@@ -347,14 +348,14 @@ function exportCSV() {
 }
 
 /** Simple admin to add user (DEV only) */
-function addUser(user){
-  const session=getSession();
-  if(!session||session.role!=='DEV')throw new Error('denied');
-  const sheet=getSpreadsheet().getSheetByName(USERS_SHEET);
-  const id=Date.now();
-  const h=createHash(user.password||DEV_PASSWORD);
-  sheet.appendRow([id,user.userId,user.name,user.role,user.managerId||'',user.lang||'en',h.hashHex,h.saltHex,new Date()]);
-  refreshUserCache();
+function addUser(user) {
+  const session = getSession();
+  if (!session || session.role !== 'DEV') throw new Error('denied');
+  const ss = getSpreadsheet();
+  const sheet = ss.getSheetByName(USERS_SHEET);
+  const id = new Date().getTime();
+  const h = createHash(user.password || DEV_PASSWORD);
+  sheet.appendRow([id, user.userId, user.name, user.role, user.managerId||'', user.lang||'en', h.hashHex, h.saltHex, new Date()]);
 }
 
 /** Check if the current session belongs to a DEV role */
@@ -380,29 +381,28 @@ function addNewUser(user) {
   if (!user.userId || !user.password || !user.role) {
     throw new Error('missing required fields');
   }
-  const ss=getSpreadsheet();
-  let sheet=ss.getSheetByName(USERS_SHEET);
+  const ss = SpreadsheetApp.openById(ADMIN_SHEET_ID);
+  let sheet = ss.getSheetByName(USERS_SHEET);
   if (!sheet) {
     sheet = ss.insertSheet(USERS_SHEET);
     sheet.appendRow(['ID','EMAIL','NAME','ROLE','MANAGER_ID','LANG','HASH','SALT','CREATED']);
   }
-  const id=Date.now();
+  const id = new Date().getTime();
   const h = createHash(user.password);
   sheet.appendRow([id, user.userId, user.name || '', user.role, user.managerId || '', user.lang || 'en', h.hashHex, h.saltHex, new Date()]);
   const dev = getSession();
   logDevAction(dev ? dev.userId : 'unknown', 'add user', user.userId);
-  refreshUserCache();
   return {id:id};
 }
 
 /** Return all users for developer console */
 function getAllUsers(){
-  if(!isAuthorizedDev())throw new Error('denied');
-  const sheet=getSpreadsheet().getSheetByName(USERS_SHEET);
-  if(!sheet)return[];
-  const rows=sheet.getDataRange().getValues();
-  const dev=getSession();
-  logDevAction(dev?dev.userId:'unknown','view users','');
+  if(!isAuthorizedDev()) throw new Error('denied');
+  const sheet = SpreadsheetApp.openById(ADMIN_SHEET_ID).getSheetByName(USERS_SHEET);
+  if(!sheet) return [];
+  const rows = sheet.getDataRange().getValues();
+  const dev = getSession();
+  logDevAction(dev ? dev.userId : 'unknown', 'view users', '');
   return rows.slice(1).map(r=>({userId:r[1],role:r[3]}));
 }
 
@@ -420,16 +420,15 @@ function deleteAllReviews(){
 }
 
 /** Update a user's ID */
-function updateUserID(oldID,newID){
-  if(!isAuthorizedDev())throw new Error('denied');
-  const sheet=getSpreadsheet().getSheetByName(USERS_SHEET);
-  const data=sheet.getDataRange().getValues();
+function updateUserID(oldID, newID){
+  if(!isAuthorizedDev()) throw new Error('denied');
+  const sheet = SpreadsheetApp.openById(ADMIN_SHEET_ID).getSheetByName(USERS_SHEET);
+  const data = sheet.getDataRange().getValues();
   for(let i=1;i<data.length;i++){
     if(data[i][1]==oldID){
       sheet.getRange(i+1,2).setValue(newID);
       const dev = getSession();
       logDevAction(dev ? dev.userId : 'unknown','change id',newID);
-      refreshUserCache();
       return true;
     }
   }
@@ -437,16 +436,15 @@ function updateUserID(oldID,newID){
 }
 
 /** Update a user's role */
-function updateUserRole(userID,role){
-  if(!isAuthorizedDev())throw new Error('denied');
-  const sheet=getSpreadsheet().getSheetByName(USERS_SHEET);
-  const data=sheet.getDataRange().getValues();
+function updateUserRole(userID, role){
+  if(!isAuthorizedDev()) throw new Error('denied');
+  const sheet = SpreadsheetApp.openById(ADMIN_SHEET_ID).getSheetByName(USERS_SHEET);
+  const data = sheet.getDataRange().getValues();
   for(let i=1;i<data.length;i++){
     if(data[i][1]==userID){
       sheet.getRange(i+1,4).setValue(role);
       const dev = getSession();
       logDevAction(dev ? dev.userId : 'unknown','change role to '+role,userID);
-      refreshUserCache();
       return true;
     }
   }
@@ -454,10 +452,10 @@ function updateUserRole(userID,role){
 }
 
 /** Reset a user's password */
-function updateUserPassword(userID,newPwd){
-  if(!isAuthorizedDev())throw new Error('denied');
-  const sheet=getSpreadsheet().getSheetByName(USERS_SHEET);
-  const data=sheet.getDataRange().getValues();
+function updateUserPassword(userID, newPwd){
+  if(!isAuthorizedDev()) throw new Error('denied');
+  const sheet = SpreadsheetApp.openById(ADMIN_SHEET_ID).getSheetByName(USERS_SHEET);
+  const data = sheet.getDataRange().getValues();
   for(let i=1;i<data.length;i++){
     if(data[i][1]==userID){
       const h=createHash(newPwd);
@@ -465,7 +463,6 @@ function updateUserPassword(userID,newPwd){
       sheet.getRange(i+1,8).setValue(h.saltHex);
       const dev = getSession();
       logDevAction(dev ? dev.userId : 'unknown','reset password',userID);
-      refreshUserCache();
       return true;
     }
   }
@@ -474,9 +471,9 @@ function updateUserPassword(userID,newPwd){
 
 
 /** Log developer actions */
-function logDevAction(devEmail,action,userId){
-  const ss=getSpreadsheet();
-  let sheet=ss.getSheetByName('LOGS');
+function logDevAction(devEmail, action, userId){
+  const ss = SpreadsheetApp.openById(ADMIN_SHEET_ID);
+  let sheet = ss.getSheetByName('LOGS');
   if(!sheet){
     sheet = ss.insertSheet('LOGS');
     sheet.appendRow(['Timestamp','Developer','Action','UserID']);
@@ -579,20 +576,6 @@ function saveFullReview(review, compAdj){
     saveCompAdjustment(saved.id, compAdj);
   }
   return saved;
-}
-
-function serveIndex_(){
-  const cache=CacheService.getScriptCache();
-  let html=cache.get('idx');
-  if(!html){
-    html=HtmlService.createTemplateFromFile('index').getRawContent().replace(/[\n\r]+/g,'').replace(/>\s+</g,'><');
-    cache.put('idx',html,CACHE_TTL);
-  }
-  const out=HtmlService.createHtmlOutput(html);
-  // Apps Script's HtmlOutput doesn't expose a raw HTTP response object, so
-  // custom headers such as Cache-Control can't be set directly. Simply return
-  // the HtmlOutput for rendering.
-  return out;
 }
 
 /** --- Scheduling Helpers & API Endpoints -------------------------------- */
@@ -772,18 +755,17 @@ function addAvailability(managerEmail, slots){
   if(user.userId !== managerEmail && role !== 'DEV') throw new Error('denied');
   if(!Array.isArray(slots)) throw new Error('invalid');
   const sheet = getAppointmentsSheet();
-  const existing=new Set(sheet.getDataRange().getValues().slice(1).map(r=>r[1]+"|"+r[2]));
-  const rows=[],added=[];
+  const existing = new Set(sheet.getDataRange().getValues().slice(1).map(r=>r[1]+"|"+r[2]));
+  const added=[];
   slots.forEach(s=>{
-    if(!s||!s.date||!s.time)return;
-    const mm=Number(String(s.time).split(':')[1]);
-    if(mm!==0&&mm!==30)return;
-    if(existing.has(s.date+"|"+s.time))return;
-    const id=Utilities.getUuid();
-    rows.push([id,s.date,s.time,managerEmail,'','']);
+    if(!s || !s.date || !s.time) return;
+    const mm = Number(String(s.time).split(':')[1]);
+    if(mm!==0 && mm!==30) return;
+    if(existing.has(s.date+"|"+s.time)) return;
+    const id = Utilities.getUuid();
+    sheet.appendRow([id,s.date,s.time,managerEmail,'','']);
     added.push(id);
   });
-  if(rows.length)sheet.getRange(sheet.getLastRow()+1,1,rows.length,6).setValues(rows);
   return {added:added};
 }
 
