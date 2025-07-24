@@ -270,6 +270,7 @@ function scheduleMeeting(mtg) {
   const start = new Date(mtg.start);
   const end = new Date(mtg.end);
   if ((end - start) != 30*60*1000) throw new Error('Slot must be 30m');
+  if(!isHalfHour_(start) || !isHalfHour_(end)) throw new Error('invalid');
   const ss = getSpreadsheet();
   const sheet = ss.getSheetByName(MEETINGS_SHEET);
   const rows = sheet.getDataRange().getValues();
@@ -587,6 +588,12 @@ function parseBody_(e) {
   return {};
 }
 
+/** Check if a Date is on a 30-minute boundary */
+function isHalfHour_(d){
+  const m = d.getMinutes();
+  return m === 0 || m === 30;
+}
+
 /** Return current user */
 function getCurrentUser_() {
   return checkAuth_();
@@ -620,6 +627,9 @@ function getEvents_(e) {
 function bookSlot_(e) {
   const body = parseBody_(e);
   if(!body.date || !body.time) throw new Error('invalid');
+  if(!/^\d{2}:\d{2}$/.test(body.time)) throw new Error('invalid');
+  const mm = Number(body.time.split(':')[1]);
+  if(mm !== 0 && mm !== 30) throw new Error('invalid');
   const user = checkAuth_();
   const sheet = getScheduleSheet();
   const data = sheet.getDataRange().getValues();
@@ -646,6 +656,9 @@ function addAvailability_(e){
   if(body.date && body.time){
     const d = new Date(body.date);
     if(d.getDay() === 0 || d.getDay() === 6) throw new Error('weekend');
+    if(!/^\d{2}:\d{2}$/.test(body.time)) throw new Error('invalid');
+    const mm = Number(body.time.split(':')[1]);
+    if(mm !== 0 && mm !== 30) throw new Error('invalid');
     const sheet = getScheduleSheet();
     const data = sheet.getDataRange().getValues();
     for(let i=1;i<data.length;i++){
@@ -660,6 +673,7 @@ function addAvailability_(e){
   let start = new Date(body.start);
   let end = new Date(body.end);
   if(isNaN(start) || isNaN(end) || start >= end) throw new Error('invalid');
+  if(!isHalfHour_(start) || !isHalfHour_(end)) throw new Error('invalid');
   const sheet = getScheduleSheet();
   const data = sheet.getDataRange().getValues();
   const existing = new Set(data.slice(1).map(r=>r[0]+"|"+r[1]));
