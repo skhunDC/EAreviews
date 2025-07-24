@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css">
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+<script type="module">import {Calendar} from "https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/+esm";window.FullCalendar={Calendar};</script>
 <style>
 h1,h2{font-family:'Inter',Arial,sans-serif;}
 body{font-family:'Inter',Roboto,Arial,sans-serif;margin:0;padding:0;background:linear-gradient(135deg,#f6f8fa 0%,#eaf4ff 100%);color:#333;font-size:1rem;line-height:1.6;}
@@ -328,9 +328,11 @@ function show(id){
 }
 
 function openSchedule(){
-  const menu=document.getElementById('navItems');
-  if(menu) menu.classList.remove('show');
-  show('schedule');
+  const menu=document.getElementById("navItems");
+  if(menu) menu.classList.remove("show");
+  show("schedule");
+  initCalendar();
+  loadAvailability();
 }
 function applyTranslations(){
   document.querySelectorAll('[data-i18n-key]').forEach(el=>{
@@ -844,9 +846,10 @@ function confirmClearReviews(){
 // ---- Modern Calendar Scheduling -----
 let calendar;
 function initCalendar(){
-  if(!document.getElementById('calendar')) return;
+  const el=document.getElementById('calendar');
+  if(!el) return;
   if(!calendar){
-    calendar=new FullCalendar.Calendar(document.getElementById('calendar'),{
+    calendar=new FullCalendar.Calendar(el,{
       initialView:'dayGridMonth',
       locale:lang==='es'?'es':'en',
       headerToolbar:{start:'prev,next today',center:'title',end:''},
@@ -854,11 +857,10 @@ function initCalendar(){
       eventClick:slotClick,
       datesSet:loadSlots
     });
-    calendar.render();
-  }else{
-    calendar.setOption('locale',lang==='es'?'es':'en');
-    loadSlots();
   }
+  calendar.setOption('locale',lang==='es'?'es':'en');
+  calendar.render();
+  loadSlots();
   const role=user?String(user.role||'').toUpperCase():'';
   document.getElementById('availForm').classList.toggle('hidden',!(role==='MANAGER'||role==='DEV'));
 }
@@ -867,24 +869,18 @@ function loadSlots(){
   google.script.run.withSuccessHandler(res=>{
     calendar.getEvents().forEach(e=>e.remove());
     res.forEach(s=>{
-      const end=new Date(s.date+'T'+s.time);end.setMinutes(end.getMinutes()+30);
+      const start=new Date(s.start);const end=new Date(s.end);
       let color='#d1fae5',text='#000';
-      if(s.bookedBy){color='#e5e7eb';text='#666';if(s.bookedBy===user.userId){color='#0A5C30';text='#fff';}}
-      calendar.addEvent({id:s.id,title:s.time,start:s.date+'T'+s.time,end:end.toISOString(),backgroundColor:color,borderColor:color,textColor:text,extendedProps:{bookedBy:s.bookedBy}});
+      if(s.employeeId){color='#e5e7eb';text='#666';if(s.employeeId===user.userId){color='#0A5C30';text='#fff';}}
+      calendar.addEvent({id:s.id,title:start.toISOString().slice(11,16),start:start.toISOString(),end:end.toISOString(),backgroundColor:color,borderColor:color,textColor:text,extendedProps:{bookedBy:s.employeeId}});
     });
-    const view=calendar.view;
-    for(let d=new Date(view.currentStart);d<view.currentEnd;d.setDate(d.getDate()+1)){
-      const s=d.toISOString().slice(0,10)+'T12:00:00';
-      const e=d.toISOString().slice(0,10)+'T14:00:00';
-      calendar.addEvent({start:s,end:e,display:'background',backgroundColor:'#FFEDBA'});
-    }
-  }).listAvailability(user.role);
+  }).getAvailability();
 }
 function slotClick(info){
   const b=info.event.extendedProps.bookedBy;
   if(b){alert(t('conflict'));return;}
   if(!confirm(t('bookPrompt'))) return;
-  google.script.run.withSuccessHandler(r=>{if(r.status==='ok'){alert(t('bookOk'));loadSlots();}else{alert(t('conflict'));loadSlots();}}).bookSlot(user.userId,info.event.id);
+  google.script.run.withSuccessHandler(r=>{if(r.status==='ok'){alert(t('bookOk'));loadSlots();loadAvailability();}else{alert(t('conflict'));loadSlots();}}).bookSlot({slotId:info.event.id,employeeId:user.userId});
 }
 function addAvailability(){
   const sd=document.getElementById('availFromDate').value;
@@ -892,9 +888,50 @@ function addAvailability(){
   const ed=document.getElementById('availToDate').value;
   const et=document.getElementById('availToTime').value;
   if(!sd||!st||!ed||!et){document.getElementById('availMsg').textContent=t('chooseTime');return;}
-  const slots=[];let start=new Date(sd+'T'+st);const end=new Date(ed+'T'+et);
-  while(start<end){slots.push({date:start.toISOString().slice(0,10),time:start.toISOString().slice(11,16)});start=new Date(start.getTime()+30*60000);}
-  google.script.run.withSuccessHandler(()=>{document.getElementById('availMsg').textContent='';loadSlots();}).withFailureHandler(()=>{document.getElementById('availMsg').textContent=t('error');}).addAvailability(user.userId,slots);
+  google.script.run.withSuccessHandler(()=>{document.getElementById('availMsg').textContent='';loadAvailability();loadSlots();}).withFailureHandler(()=>{document.getElementById('availMsg').textContent=t('error');}).postAvailability({start:sd+'T'+st,end:ed+'T'+et});
+}
+function loadAvailability(){
+  google.script.run.withSuccessHandler(renderSlotList).getAvailability();
+}
+function renderSlotList(slots){
+  const list=document.getElementById('slotList');
+  if(!list) return;
+  list.innerHTML='';
+  slots.forEach(s=>{
+    if(s.employeeId && s.employeeId!==user.userId) return;
+    const row=document.createElement('div');
+    row.className='flex items-center gap-2 border rounded p-1';
+    const span=document.createElement('span');
+    span.textContent=formatRange(s.start,s.end);
+    row.appendChild(span);
+    const inp=document.createElement('input');
+    inp.type='text';
+    inp.className='border px-1 py-0 flex-1';
+    inp.value=s.employeeId||'';
+    if(s.employeeId){
+      inp.disabled=true;
+      row.classList.add('bg-emerald-50');
+    }
+    row.appendChild(inp);
+    if(!s.employeeId){
+      const btn=document.createElement('button');
+      btn.textContent='Save';
+      btn.className='primary text-xs';
+      btn.onclick=()=>saveSlot(s.id,inp.value,inp);
+      row.appendChild(btn);
+    }
+    list.appendChild(row);
+  });
+}
+function saveSlot(id,val,inputEl){
+  if(!val) return;
+  google.script.run.withSuccessHandler(()=>{loadAvailability();loadSlots();}).withFailureHandler(err=>alert(err.message)).bookSlot({slotId:id,employeeId:val});
+}
+function formatRange(start,end){
+  const opts={hour:'numeric',minute:'2-digit'};
+  const a=new Date(start).toLocaleTimeString(lang==='es'?'es':'en',opts);
+  const b=new Date(end).toLocaleTimeString(lang==='es'?'es':'en',opts);
+  return a+' \u2013 '+b;
 }
 document.addEventListener('DOMContentLoaded',init);
 </script>
@@ -959,25 +996,28 @@ document.addEventListener('DOMContentLoaded',init);
 </section>
 <section id="schedule" class="hidden">
   <div data-i18n-key="scheduleGuide" data-i18n-html class="mb-4"></div>
-  <div id="calendarWrapper" class="card">
-    <div id="calendar"></div>
-  </div>
-  <div id="availForm" class="card hidden">
-    <div class="font-semibold mb-2" data-i18n-key="addSlotTitle">Set Availability</div>
-    <label><span data-i18n-key="fromDate">Start Date</span>
-      <input type="date" id="availFromDate">
-    </label>
-    <label><span data-i18n-key="fromTime">Start Time</span>
-      <input type="time" id="availFromTime" step="1800">
-    </label>
-    <label><span data-i18n-key="toDate">End Date</span>
-      <input type="date" id="availToDate">
-    </label>
-    <label><span data-i18n-key="toTime">End Time</span>
-      <input type="time" id="availToTime" step="1800">
-    </label>
-    <button class="primary" onclick="addAvailability()" data-i18n-key="addSlotBtn">Add Slot</button>
-    <div id="availMsg" class="text-sm"></div>
+  <div id="scheduleFlex" class="flex flex-col md:flex-row gap-4 items-start">
+    <div id="availForm" class="card hidden w-full md:basis-[30%] md:min-w-[280px]">
+      <div class="font-semibold mb-2" data-i18n-key="addSlotTitle">Set Availability</div>
+      <label><span data-i18n-key="fromDate">Start Date</span>
+        <input type="date" id="availFromDate">
+      </label>
+      <label><span data-i18n-key="fromTime">Start Time</span>
+        <input type="time" id="availFromTime" step="1800">
+      </label>
+      <label><span data-i18n-key="toDate">End Date</span>
+        <input type="date" id="availToDate">
+      </label>
+      <label><span data-i18n-key="toTime">End Time</span>
+        <input type="time" id="availToTime" step="1800">
+      </label>
+      <button class="primary" onclick="addAvailability()" data-i18n-key="addSlotBtn">Add Slot</button>
+      <div id="availMsg" class="text-sm"></div>
+      <div id="slotList" class="mt-2 max-h-60 overflow-y-auto space-y-1"></div>
+    </div>
+    <div id="calendarWrapper" class="card w-full md:basis-[70%] flex-1">
+      <div id="calendar"></div>
+    </div>
   </div>
 </section>
 <section id="devPanel" class="hidden fixed inset-0 p-4 pt-16 overflow-auto bg-black/30 flex items-start justify-center">
