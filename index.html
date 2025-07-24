@@ -326,6 +326,12 @@ function show(id){
     document.getElementById(id).classList.remove('hidden');
   }
 }
+
+function openSchedule(){
+  const menu=document.getElementById('navItems');
+  if(menu) menu.classList.remove('show');
+  show('schedule');
+}
 function applyTranslations(){
   document.querySelectorAll('[data-i18n-key]').forEach(el=>{
     const key=el.dataset.i18nKey;
@@ -901,7 +907,7 @@ document.addEventListener('DOMContentLoaded',init);
   <div id="navItems" class="nav-items">
     <button type="button" onclick="show('home')" data-i18n-key="home">Home</button>
     <button type="button" onclick="show('reviews')" data-i18n-key="reviews">Reviews</button>
-    <button type="button" onclick="show('schedule')" data-i18n-key="schedule">Schedule</button>
+    <button type="button" onclick="openSchedule()" data-i18n-key="schedule">Schedule</button>
     <div class="lang-switch">
       <span>EN</span>
       <label class="switch"><input type="checkbox" id="langToggle" onchange="toggleLang()"><span class="slider"></span></label>
