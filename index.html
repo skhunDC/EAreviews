@@ -1,4 +1,163 @@
-<!DOCTYPE html><html><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Employee Reviews</title><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel=stylesheet><link href="https://fonts.googleapis.com/css2?family=Dancing+Script&amp;display=swap" rel=stylesheet><link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel=stylesheet><script defer src=https://cdn.tailwindcss.com></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css><script defer src=https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js></script><style>h1,h2{font-family:Inter,Arial,sans-serif}body{font-family:Inter,Roboto,Arial,sans-serif;margin:0;padding:0;background:linear-gradient(135deg,#f6f8fa 0,#eaf4ff 100%);color:#333;font-size:1rem;line-height:1.6}h1{font-size:clamp(1.75rem,4vw,2.5rem);margin:0 0 1rem 0}h2{font-size:1.25rem;margin-top:0;color:#0a5c30}#review-intro h1{text-align:center;color:#0a5c30;font-weight:700;margin-bottom:1.5rem}#review-intro{max-width:900px;margin:auto;padding:2rem;background:#fefdf9;color:#333}#review-intro .intro-cards{display:flex;flex-wrap:wrap;gap:1.5rem}#review-intro .info-card{background:#fff;border-radius:1rem;box-shadow:0 4px 12px rgba(0,0,0,.08);padding:1.5rem;flex:1 1 100%;animation:slideUp .5s ease forwards}@media(min-width:640px){#review-intro .info-card{flex-basis:calc(50% - .75rem)}}.values-list{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}.values-list li{display:inline-block;background:#0a5c30;color:#fff;padding:.2rem .75rem;border-radius:9999px;font-size:.9rem;margin:.2rem;text-align:center}.rating-badges{display:flex;gap:.5rem;margin-bottom:.5rem;flex-wrap:wrap}.badge{display:inline-block;padding:.25rem .75rem;border-radius:9999px;font-size:.9rem;color:#fff}.badge-gray{background:#888}.badge-green{background:#0a5c30}.badge-gold{background:#c9a14a;color:#000}.process{display:flex;flex-wrap:wrap;align-items:center;gap:.3rem;margin-bottom:.5rem;font-size:.9rem}.process svg{width:12px;height:12px;fill:none;stroke:#0a5c30;stroke-width:2}.callout{margin-top:1rem;background:#c9a14A1A;border-left:4px solid #c9a14a;padding:.75rem;font-size:.9rem}@keyframes slideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.nav-items{display:flex;gap:10px;align-items:center;margin-left:auto}.nav-toggle{display:none;background:0 0;border:none;color:#fff;font-size:24px;cursor:pointer;margin-left:auto}nav{display:flex;gap:10px;background:#0a5c30;color:#fff;padding:10px;align-items:center;position:relative;z-index:50}nav button{background:0 0;border:none;color:#fff;font-size:16px;cursor:pointer;padding:6px 12px}.lang-switch{display:flex;align-items:center;gap:4px}.logo{width:125px;height:125px}.nav-title{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:24px;font-weight:700}.switch{position:relative;display:inline-block;width:40px;height:24px}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#d1d5db;transition:.4s;border-radius:9999px}.slider:before{position:absolute;content:"";height:20px;width:20px;left:2px;bottom:2px;background:#fff;transition:.4s;border-radius:50%}.switch input:checked+.slider{background:#059669}.switch input:checked+.slider:before{transform:translateX(16px)}#devPanel{z-index:70}#devPanel table{width:100%;border-collapse:collapse}#devPanel td,#devPanel th{padding:8px;border-bottom:1px solid #ddd}#devPanel td .actions button{margin-left:4px}#devPanel .modal{position:fixed;top:0;right:0;bottom:0;left:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.4);z-index:50}#devPanel .modal.hidden{display:none}#accessDenied{z-index:60}#addUserFab{z-index:50}section{padding:20px}#login{background:linear-gradient(135deg,#f6f8fa 0,#eaf4ff 100%)}#reviewForm{max-width:900px;margin:auto;padding:2rem;background:#fefdf9;color:#333}.question-title{display:block;font-size:1.25rem;color:#0a5c30;margin-bottom:.5rem;font-weight:600}.card{background:#fff;padding:1.5rem;margin-bottom:1.5rem;border-radius:1rem;box-shadow:0 4px 12px rgba(0,0,0,.08);animation:slideUp .5s ease forwards}.hidden{display:none}label{display:block;margin-top:10px}input[type=text],textarea{width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:4px}input[type=number]{width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:4px}.signature{font-family:'Dancing Script',cursive;font-size:1.2rem}.sign-date{width:auto;margin-left:8px}select{padding:8px}.rating-group label{display:inline-block;margin-right:10px}button.primary{background:#0a5c30;color:#fff;border:none;border-radius:4px;padding:8px 16px;cursor:pointer}#submitMsg{display:block;margin-top:.5rem;font-weight:700}.dropdown{position:relative}.dropdown-content{display:none;position:absolute;top:100%;left:0;background:#0a5c30;color:#fff;min-width:80px;z-index:10}.dropdown-content button{background:0 0;border:none;color:#fff;cursor:pointer;display:block;width:100%;padding:6px 12px;text-align:left}.dropdown-content.show{display:block}.loading-bar{height:4px;background:#eee;position:relative;overflow:hidden}.loading-bar span{display:block;height:100%;background:#0a5c30;width:100%;animation:loadAnim 1.2s linear infinite}@keyframes loadAnim{from{transform:translateX(-100%)}to{transform:translateX(100%)}}.calendar{width:100%;border-collapse:collapse}.calendar td,.calendar th{border:1px solid #ddd;padding:4px;vertical-align:top;height:90px}.calendar td.disabled{background:#f3f4f6;color:#999}.calendar .date-num{font-weight:600}.calendar .slot{margin-top:2px;padding:2px 4px;border-radius:4px;font-size:.75rem;cursor:pointer}.calendar .slot.available{background:#d1fae5}.calendar .slot.booked{background:#e5e7eb;color:#888;cursor:not-allowed}.calendar .slot.mine{background:#0a5c30;color:#fff}.calendar .slot:hover{box-shadow:0 2px 4px rgba(0,0,0,.1)}@media(max-width:640px){.logo{width:80px;height:80px}nav{flex-wrap:wrap}.nav-title{position:static;transform:none;margin:0 auto}#navItems{display:none;width:100%;flex-direction:column;gap:8px;margin-top:10px}#navItems.show{display:flex}.nav-toggle{display:block}.lang-switch{margin-left:0}}@media(min-width:641px){#navItems{display:flex}}</style><script>let user=null,config={},lang=localStorage.getItem("lang")||"en",loadingReviews=!1,pendingSection=null,currentReviewId=null,selectedYear=(new Date).getFullYear(),resetUid=null,defaultQuestions=[{id:"attendance",en:"Attendance & Punctuality",es:"Asistencia y Puntualidad",extras:[{id:"absences",label:"Absences without notice (days)",label_es:"Ausencias sin aviso (días)",type:"number"},{id:"late",label:"Late arrivals (days)",label_es:"Llegadas tarde (días)",type:"number"},{id:"employeeComments",label:"Employee's Comments",label_es:"Comentarios del empleado",type:"textarea"}]},{id:"performance",en:"Performance Improvements: What did you do more, better, or more efficiently last year, up till now?",es:"Mejoras de rendimiento",extras:[{id:"employeeComments",type:"textarea"}]},{id:"values",en:"Living Our Core Values: How have you embodied our core values? Provide specific examples.",es:"Vivir nuestros valores",extras:[{id:"employeeComments",type:"textarea"}]},{id:"growth",en:"Personal Growth: How did you improve your knowledge or skills last year, up till now?",es:"Crecimiento personal",extras:[{id:"employeeComments",type:"textarea"}]},{id:"learning",en:"Learning New Skills: Did you take or create opportunities to learn a new skill or enhance an existing one?",es:"Aprendizaje de nuevas habilidades",extras:[{id:"employeeComments",type:"textarea"}]},{id:"team",en:"Team Support: How did you support your teammates in developing their skills?",es:"Apoyo al equipo",extras:[{id:"employeeComments",type:"textarea"}]},{id:"flexibility",en:"Flexibility: When asked to cover for others, did you agree? Share an example.",es:"Flexibilidad",extras:[{id:"employeeComments",type:"textarea"}]},{id:"initiative",en:"Initiative: Describe a time you proactively improved a process or solved a problem without being asked.",es:"Iniciativa",extras:[{id:"employeeComments",type:"textarea"}]},{id:"proactive",en:"Proactive Contributions: How did you proactively use downtime to tackle additional tasks?",es:"Contribuciones proactivas",extras:[{id:"employeeComments",type:"textarea"}]},{id:"innovation",en:"Innovation & Process Improvement: Have you suggested or implemented improvements to our processes, services, or workplace? Describe your idea and its impact.",es:"Innovación y mejora de procesos",extras:[{id:"employeeComments",type:"textarea"}]},{id:"crossshadow",en:"Cross Shadowing Program Participation",es:"Programa Cross Shadowing",rating:!1,extras:[{id:"participation",label:"Did you participate? (Yes/No/Partial)",label_es:"¿Participaste? (Sí/No/Parcial)",type:"select",options:["Yes","No","Partial"]},{id:"employeeComments",label:"Employee's Comments",label_es:"Comentarios del empleado",type:"textarea"}]},{id:"future",en:"Future Interests: Is there another role or skill you’d like to explore in the future?",es:"Intereses futuros",rating:!1,extras:[{id:"employeeComments",type:"textarea"}]}],translations={en:{home:"Home",reviews:"Reviews",schedule:"Schedule",navTitle:"Employee Annual Reviews",welcomeTitle:"Welcome to the Employee Review Portal",welcomeMsg:"Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.",comingSoon:"Coming soon...",userId:"User ID",password:"Password",login:"Login",logout:"Logout",loginFail:"Login failed",invalidPwd:"Invalid password.",noAccount:"Account not found. Please reach out to Sea Khun to be added.",curWage:"Current Wage",newWage:"New Wage",pctIncrease:"% Increase:",finalExpTitle:"Final Performance Expectation",belowExp:"Below Expectations",meetsExp:"Meets Expectations",exceedsExp:"Exceeds Expectations",below:"Below",meets:"Meets",exceeds:"Exceeds",notesPlaceholder:"Notes",contactQuestions:"Please contact Sea Khun HR/IT Manager with any questions or concerns.",empSignature:"Employee Signature",mgrSignature:"Manager Signature",signDate:"Date",submitReview:"Submit Review",employeeComments:"Employee's Comments",managerComments:"Manager's Comments",reviewSaved:"Review saved",saveFailed:"Failed to save review",saving:"Saving...",scheduleBtn:"Schedule Review Meeting",bookPrompt:"Book this time?",cancel:"Cancel",conflict:"Slot already booked",selDate:"Select Date",selTime:"Select Time",fromDate:"Start Date",fromTime:"Start Time",toDate:"End Date",toTime:"End Time",book:"Book",chooseTime:"Please choose date and time",bookOk:"Meeting booked",error:"Error occurred",scheduleGuide:'<div class="callout"><h3 class="font-bold mb-1">Booking & Availability Guidelines</h3><ul class="list-disc pl-4 space-y-1"><li><strong>Production Team</strong> – Reserve reviews <strong>12:00 PM – 2:00 PM</strong> (post-production). These slots have priority for the conference room.</li><li><strong>Delivery Drivers</strong> – Aim for <strong>Wednesdays</strong> (non-Route day).</li><li><strong>CSRs</strong> – Book any other open time that works for you and your manager.</li><li><strong>One Room. One Slot. One Team.</strong> – Only <strong>one 30-minute</strong> booking at a time; no double-booking allowed.</li></ul></div>',addSlotTitle:"Set Availability",addSlotBtn:"Add Slot",intro:`<section id="review-intro">
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Employee Reviews</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+<style>
+h1,h2{font-family:'Inter',Arial,sans-serif;}
+body{font-family:'Inter',Roboto,Arial,sans-serif;margin:0;padding:0;background:linear-gradient(135deg,#f6f8fa 0%,#eaf4ff 100%);color:#333;font-size:1rem;line-height:1.6;}
+h1{font-size:clamp(1.75rem,4vw,2.5rem);margin:0 0 1rem 0;}
+h2{font-size:1.25rem;margin-top:0;color:#0A5C30;}
+#review-intro h1{text-align:center;color:#0A5C30;font-weight:700;margin-bottom:1.5rem;}
+#review-intro{max-width:900px;margin:auto;padding:2rem;background:#fefdf9;color:#333;}
+#review-intro .intro-cards{display:flex;flex-wrap:wrap;gap:1.5rem;}
+#review-intro .info-card{background:#fff;border-radius:1rem;box-shadow:0 4px 12px rgba(0,0,0,0.08);padding:1.5rem;flex:1 1 100%;animation:slideUp 0.5s ease forwards;}
+@media(min-width:640px){#review-intro .info-card{flex-basis:calc(50% - 0.75rem);}}
+.values-list{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));}
+.values-list li{display:inline-block;background:#0A5C30;color:#fff;padding:0.2rem 0.75rem;border-radius:9999px;font-size:0.9rem;margin:0.2rem;text-align:center;}
+.rating-badges{display:flex;gap:0.5rem;margin-bottom:0.5rem;flex-wrap:wrap;}
+.badge{display:inline-block;padding:0.25rem 0.75rem;border-radius:9999px;font-size:0.9rem;color:#fff;}
+.badge-gray{background:#888;}
+.badge-green{background:#0A5C30;}
+.badge-gold{background:#C9A14A;color:#000;}
+.process{display:flex;flex-wrap:wrap;align-items:center;gap:0.3rem;margin-bottom:0.5rem;font-size:0.9rem;}
+.process svg{width:12px;height:12px;fill:none;stroke:#0A5C30;stroke-width:2;}
+.callout{margin-top:1rem;background:#C9A14A1A;border-left:4px solid #C9A14A;padding:0.75rem;font-size:0.9rem;}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.nav-items{display:flex;gap:10px;align-items:center;margin-left:auto;}
+.nav-toggle{display:none;background:none;border:none;color:white;font-size:24px;cursor:pointer;margin-left:auto;}
+nav{display:flex;gap:10px;background:#0A5C30;color:white;padding:10px;align-items:center;position:relative;z-index:50;}
+nav button{background:none;border:none;color:white;font-size:16px;cursor:pointer;padding:6px 12px;}
+.lang-switch{display:flex;align-items:center;gap:4px;}
+.logo{width:125px;height:125px;}
+.nav-title{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:24px;font-weight:bold;}
+.switch{position:relative;display:inline-block;width:40px;height:24px;}
+.switch input{opacity:0;width:0;height:0;}
+.slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#d1d5db;transition:.4s;border-radius:9999px;}
+.slider:before{position:absolute;content:"";height:20px;width:20px;left:2px;bottom:2px;background:white;transition:.4s;border-radius:50%;}
+.switch input:checked + .slider{background:#059669;}
+.switch input:checked + .slider:before{transform:translateX(16px);}
+#devPanel{z-index:70;}
+#devPanel table{width:100%;border-collapse:collapse;}
+#devPanel th,#devPanel td{padding:8px;border-bottom:1px solid #ddd;}
+#devPanel td .actions button{margin-left:4px;}
+#devPanel .modal{position:fixed;top:0;right:0;bottom:0;left:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);z-index:50;}
+#devPanel .modal.hidden{display:none;}
+#accessDenied{z-index:60;}
+#addUserFab{z-index:50;}
+section{padding:20px;}
+#login{background:linear-gradient(135deg,#f6f8fa 0%,#eaf4ff 100%);}
+#reviewForm{max-width:900px;margin:auto;padding:2rem;background:#fefdf9;color:#333;}
+.question-title{display:block;font-size:1.25rem;color:#0A5C30;margin-bottom:0.5rem;font-weight:600;}
+.card{background:#fff;padding:1.5rem;margin-bottom:1.5rem;border-radius:1rem;box-shadow:0 4px 12px rgba(0,0,0,0.08);animation:slideUp 0.5s ease forwards;}
+.hidden{display:none;}
+label{display:block;margin-top:10px;}
+input[type=text],textarea{width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:4px;}
+input[type=number]{width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:4px;}
+.signature{font-family:'Dancing Script',cursive;font-size:1.2rem;}
+.sign-date{width:auto;margin-left:8px;}
+select{padding:8px;}
+ .rating-group label{display:inline-block;margin-right:10px;}
+button.primary{background:#0A5C30;color:white;border:none;border-radius:4px;padding:8px 16px;cursor:pointer;}
+
+#submitMsg{display:block;margin-top:0.5rem;font-weight:bold;}
+/* Dropdown styles */
+.dropdown{position:relative;}
+.dropdown-content{display:none;position:absolute;top:100%;left:0;background:#0A5C30;color:white;min-width:80px;z-index:10;}
+.dropdown-content button{background:none;border:none;color:white;cursor:pointer;display:block;width:100%;padding:6px 12px;text-align:left;}
+.dropdown-content.show{display:block;}
+/* Loading bar styles */
+.loading-bar{height:4px;background:#eee;position:relative;overflow:hidden;}
+.loading-bar span{display:block;height:100%;background:#0A5C30;width:100%;animation:loadAnim 1.2s linear infinite;}
+@keyframes loadAnim{from{transform:translateX(-100%);}to{transform:translateX(100%);}}
+.calendar{width:100%;border-collapse:collapse;}
+.calendar th,.calendar td{border:1px solid #ddd;padding:4px;vertical-align:top;height:90px;}
+.calendar td.disabled{background:#f3f4f6;color:#999;}
+.calendar .date-num{font-weight:600;}
+.calendar .slot{margin-top:2px;padding:2px 4px;border-radius:4px;font-size:0.75rem;cursor:pointer;}
+.calendar .slot.available{background:#d1fae5;}
+.calendar .slot.booked{background:#e5e7eb;color:#888;cursor:not-allowed;}
+.calendar .slot.mine{background:#0A5C30;color:#fff;}
+.calendar .slot:hover{box-shadow:0 2px 4px rgba(0,0,0,0.1);}
+@media(max-width:640px){
+  .logo{width:80px;height:80px;}
+  nav{flex-wrap:wrap;}
+  .nav-title{position:static;transform:none;margin:0 auto;}
+  #navItems{display:none;width:100%;flex-direction:column;gap:8px;margin-top:10px;}
+  #navItems.show{display:flex;}
+  .nav-toggle{display:block;}
+  .lang-switch{margin-left:0;}
+}
+@media(min-width:641px){
+  #navItems{display:flex;}
+}
+</style>
+<script>
+let user=null,config={},lang=localStorage.getItem('lang')||'en';
+let loadingReviews=false;
+let pendingSection=null;
+let currentReviewId=null;
+let selectedYear=new Date().getFullYear();
+let resetUid=null;
+
+const defaultQuestions=[
+  {id:'attendance',en:'Attendance & Punctuality',es:'Asistencia y Puntualidad',extras:[
+    {id:'absences',label:'Absences without notice (days)',label_es:'Ausencias sin aviso (días)',type:'number'},
+    {id:'late',label:'Late arrivals (days)',label_es:'Llegadas tarde (días)',type:'number'},
+    {id:'employeeComments',label:"Employee's Comments",label_es:'Comentarios del empleado',type:'textarea'}]},
+  {id:'performance',en:'Performance Improvements: What did you do more, better, or more efficiently last year, up till now?',es:'Mejoras de rendimiento',extras:[{id:'employeeComments',type:'textarea'}]},
+  {id:'values',en:'Living Our Core Values: How have you embodied our core values? Provide specific examples.',es:'Vivir nuestros valores',extras:[{id:'employeeComments',type:'textarea'}]},
+  {id:'growth',en:'Personal Growth: How did you improve your knowledge or skills last year, up till now?',es:'Crecimiento personal',extras:[{id:'employeeComments',type:'textarea'}]},
+  {id:'learning',en:'Learning New Skills: Did you take or create opportunities to learn a new skill or enhance an existing one?',es:'Aprendizaje de nuevas habilidades',extras:[{id:'employeeComments',type:'textarea'}]},
+  {id:'team',en:'Team Support: How did you support your teammates in developing their skills?',es:'Apoyo al equipo',extras:[{id:'employeeComments',type:'textarea'}]},
+  {id:'flexibility',en:'Flexibility: When asked to cover for others, did you agree? Share an example.',es:'Flexibilidad',extras:[{id:'employeeComments',type:'textarea'}]},
+  {id:'initiative',en:'Initiative: Describe a time you proactively improved a process or solved a problem without being asked.',es:'Iniciativa',extras:[{id:'employeeComments',type:'textarea'}]},
+  {id:'proactive',en:'Proactive Contributions: How did you proactively use downtime to tackle additional tasks?',es:'Contribuciones proactivas',extras:[{id:'employeeComments',type:'textarea'}]},
+  {id:'innovation',en:'Innovation & Process Improvement: Have you suggested or implemented improvements to our processes, services, or workplace? Describe your idea and its impact.',es:'Innovaci\u00f3n y mejora de procesos',extras:[{id:'employeeComments',type:'textarea'}]},
+  {id:'crossshadow',en:'Cross Shadowing Program Participation',es:'Programa Cross Shadowing',rating:false,extras:[
+    {id:'participation',label:'Did you participate? (Yes/No/Partial)',label_es:'¿Participaste? (Sí/No/Parcial)',type:'select',options:['Yes','No','Partial']},
+    {id:'employeeComments',label:"Employee's Comments",label_es:'Comentarios del empleado',type:'textarea'}]},
+  {id:'future',en:'Future Interests: Is there another role or skill you\u2019d like to explore in the future?',es:'Intereses futuros',rating:false,extras:[{id:'employeeComments',type:'textarea'}]}
+];
+const translations={
+  en:{
+    home:'Home',reviews:'Reviews',schedule:'Schedule',navTitle:'Employee Annual Reviews',
+    welcomeTitle:'Welcome to the Employee Review Portal',
+    welcomeMsg:'Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.',
+    comingSoon:'Coming soon...',userId:'User ID',password:'Password',login:'Login',logout:'Logout',
+    loginFail:'Login failed',invalidPwd:'Invalid password.',
+    noAccount:'Account not found. Please reach out to Sea Khun to be added.',
+    curWage:'Current Wage',newWage:'New Wage',pctIncrease:'% Increase:',
+    finalExpTitle:'Final Performance Expectation',belowExp:'Below Expectations',meetsExp:'Meets Expectations',exceedsExp:'Exceeds Expectations',
+    below:'Below',meets:'Meets',exceeds:'Exceeds',
+    notesPlaceholder:'Notes',contactQuestions:'Please contact Sea Khun HR/IT Manager with any questions or concerns.',empSignature:'Employee Signature',mgrSignature:'Manager Signature',signDate:'Date',submitReview:'Submit Review',
+    employeeComments:"Employee's Comments",managerComments:"Manager's Comments",
+    reviewSaved:'Review saved',saveFailed:'Failed to save review',saving:'Saving...',
+    scheduleBtn:'Schedule Review Meeting',
+    bookPrompt:'Book this time?',
+    cancel:'Cancel',
+    conflict:'Slot already booked',
+    selDate:'Select Date',
+    selTime:'Select Time',
+    fromDate:'Start Date',
+    fromTime:'Start Time',
+    toDate:'End Date',
+    toTime:'End Time',
+    book:'Book',
+    chooseTime:'Please choose date and time',
+    bookOk:'Meeting booked',
+    error:'Error occurred',
+    scheduleGuide:`<div class="callout"><h3 class="font-bold mb-1">Booking & Availability Guidelines</h3><ul class="list-disc pl-4 space-y-1"><li><strong>Production Team</strong> – Reserve reviews <strong>12:00 PM – 2:00 PM</strong> (post-production). These slots have priority for the conference room.</li><li><strong>Delivery Drivers</strong> – Aim for <strong>Wednesdays</strong> (non-Route day).</li><li><strong>CSRs</strong> – Book any other open time that works for you and your manager.</li><li><strong>One Room. One Slot. One Team.</strong> – Only <strong>one 30-minute</strong> booking at a time; no double-booking allowed.</li></ul></div>`,
+    addSlotTitle:'Set Availability',
+    addSlotBtn:'Add Slot',
+    intro:`<section id="review-intro">
       <h1>Your Opportunity to Shine</h1>
       <div class="intro-cards">
         <div class="info-card">
@@ -43,7 +202,39 @@
         </div>
       </div>
       <div class="callout">Raises take effect on the first pay period in August.</div>
-    </section>`},es:{home:"Inicio",reviews:"Reseñas",schedule:"Agenda",navTitle:"Revisiones Anuales de Empleados",welcomeTitle:"Bienvenido al Portal de Evaluaciones",welcomeMsg:"Seleccione una opción en la barra de navegación para ver sus evaluaciones o programar una reunión. Use el botón de idioma para cambiar entre inglés y español.",comingSoon:"Próximamente...",userId:"ID de usuario",password:"Contraseña",login:"Iniciar sesión",logout:"Cerrar sesión",loginFail:"Error al iniciar sesión",invalidPwd:"Contraseña inválida.",noAccount:"Cuenta no encontrada. Por favor contacte a Sea Khun para ser agregado.",curWage:"Salario actual",newWage:"Nuevo salario",pctIncrease:"% Aumento:",finalExpTitle:"Expectativa de desempeño final",belowExp:"Debajo de las expectativas",meetsExp:"Cumple con las expectativas",exceedsExp:"Supera las expectativas",below:"Debajo",meets:"Cumple",exceeds:"Supera",notesPlaceholder:"Notas",contactQuestions:"Comuníquese con Sea Khun, gerente de HR/IT, si tiene alguna pregunta o inquietud.",empSignature:"Firma del empleado",mgrSignature:"Firma del gerente",signDate:"Fecha",submitReview:"Enviar revisión",employeeComments:"Comentarios del empleado",managerComments:"Comentarios del gerente",reviewSaved:"Revisión guardada",saveFailed:"No se pudo guardar la revisión",saving:"Guardando...",scheduleBtn:"Agendar Reunión de Revisión",bookPrompt:"¿Reservar esta hora?",cancel:"Cancelar",conflict:"Horario no disponible",selDate:"Seleccionar fecha",selTime:"Seleccionar hora",fromDate:"Fecha inicial",fromTime:"Hora inicial",toDate:"Fecha final",toTime:"Hora final",book:"Agendar",chooseTime:"Seleccione fecha y hora",bookOk:"Reunión programada",error:"Ocurrió un error",scheduleGuide:'<div class="callout"><h3 class="font-bold mb-1">Pautas de reserva y disponibilidad</h3><ul class="list-disc pl-4 space-y-1"><li><strong>Equipo de Producción</strong> – Reserve revisiones <strong>12:00 PM – 2:00 PM</strong> (después de producción). Estas horas tienen prioridad para la sala de conferencias.</li><li><strong>Conductores de Entrega</strong> – Trate de reservar <strong>los miércoles</strong> (día sin ruta).</li><li><strong>CSRs</strong> – Programe cualquier otro horario disponible que funcione para usted y su gerente.</li><li><strong>Una sala. Un turno. Un equipo.</strong> – Solo una reserva de <strong>30 minutos</strong>; no se permiten dobles reservas.</li></ul></div>',addSlotTitle:"Establecer disponibilidad",addSlotBtn:"Agregar horario",intro:`<section id="review-intro">
+    </section>`
+  },
+  es:{
+    home:'Inicio',reviews:'Reseñas',schedule:'Agenda',navTitle:'Revisiones Anuales de Empleados',
+    welcomeTitle:'Bienvenido al Portal de Evaluaciones',
+    welcomeMsg:'Seleccione una opción en la barra de navegación para ver sus evaluaciones o programar una reunión. Use el botón de idioma para cambiar entre inglés y español.',
+    comingSoon:'Próximamente...',userId:'ID de usuario',password:'Contraseña',login:'Iniciar sesión',logout:'Cerrar sesión',
+    loginFail:'Error al iniciar sesión',invalidPwd:'Contraseña inválida.',
+    noAccount:'Cuenta no encontrada. Por favor contacte a Sea Khun para ser agregado.',
+    curWage:'Salario actual',newWage:'Nuevo salario',pctIncrease:'% Aumento:',
+    finalExpTitle:'Expectativa de desempeño final',belowExp:'Debajo de las expectativas',meetsExp:'Cumple con las expectativas',exceedsExp:'Supera las expectativas',
+    below:'Debajo',meets:'Cumple',exceeds:'Supera',
+    notesPlaceholder:'Notas',contactQuestions:'Comuníquese con Sea Khun, gerente de HR/IT, si tiene alguna pregunta o inquietud.',empSignature:'Firma del empleado',mgrSignature:'Firma del gerente',signDate:'Fecha',submitReview:'Enviar revisión',
+    employeeComments:'Comentarios del empleado',managerComments:'Comentarios del gerente',
+    reviewSaved:'Revisión guardada',saveFailed:'No se pudo guardar la revisión',saving:'Guardando...',
+    scheduleBtn:'Agendar Reunión de Revisión',
+    bookPrompt:'¿Reservar esta hora?',
+    cancel:'Cancelar',
+    conflict:'Horario no disponible',
+    selDate:'Seleccionar fecha',
+    selTime:'Seleccionar hora',
+    fromDate:'Fecha inicial',
+    fromTime:'Hora inicial',
+    toDate:'Fecha final',
+    toTime:'Hora final',
+    book:'Agendar',
+    chooseTime:'Seleccione fecha y hora',
+    bookOk:'Reunión programada',
+    error:'Ocurrió un error',
+    scheduleGuide:`<div class="callout"><h3 class="font-bold mb-1">Pautas de reserva y disponibilidad</h3><ul class="list-disc pl-4 space-y-1"><li><strong>Equipo de Producción</strong> – Reserve revisiones <strong>12:00 PM – 2:00 PM</strong> (después de producción). Estas horas tienen prioridad para la sala de conferencias.</li><li><strong>Conductores de Entrega</strong> – Trate de reservar <strong>los miércoles</strong> (día sin ruta).</li><li><strong>CSRs</strong> – Programe cualquier otro horario disponible que funcione para usted y su gerente.</li><li><strong>Una sala. Un turno. Un equipo.</strong> – Solo una reserva de <strong>30 minutos</strong>; no se permiten dobles reservas.</li></ul></div>`,
+    addSlotTitle:'Establecer disponibilidad',
+    addSlotBtn:'Agregar horario',
+    intro:`<section id="review-intro">
       <h1>Tu oportunidad para destacar</h1>
       <div class="intro-cards">
         <div class="info-card">
@@ -88,4 +279,772 @@
         </div>
       </div>
       <div class="callout">Los aumentos entran en vigor en el primer periodo de pago de agosto.</div>
-    </section>`}};function t(e){return config[e]&&config[e][lang]?config[e][lang]:translations[lang]&&translations[lang][e]?translations[lang][e]:e}function startLoading(){document.body.style.background="#fff";var e=document.getElementById("loadingBar");e&&e.classList.remove("hidden"),loadingReviews=!0}function stopLoading(){document.body.style.background="";var e=document.getElementById("loadingBar");e&&e.classList.add("hidden"),loadingReviews=!1}function show(e){var t;"reviews"!==e&&"schedule"!==e||user?(document.getElementById("login").classList.add("hidden"),document.querySelectorAll("body>section").forEach(e=>e.classList.add("hidden")),"reviews"===e?(startLoading(),user&&(loadReviews(),loadSavedReview()),loadQuestions()):("schedule"===e?initCalendar():"home"===e&&(t=document.getElementById("reviewsList"))&&(t.innerHTML=""),document.getElementById(e).classList.remove("hidden"))):(pendingSection=e,document.querySelectorAll("body>section").forEach(e=>e.classList.add("hidden")),document.getElementById("login").classList.remove("hidden"))}function openSchedule(){var e=document.getElementById("navItems");e&&e.classList.remove("show"),show("schedule")}function applyTranslations(){document.querySelectorAll("[data-i18n-key]").forEach(e=>{var a=e.dataset.i18nKey;e.hasAttribute("data-i18n-placeholder")?e.placeholder=t(a):e.hasAttribute("data-i18n-html")?e.innerHTML=t(a):e.hasAttribute("data-i18n-alt")?e.alt=t(a):e.textContent=t(a)});var e=document.getElementById("langToggle");e&&(e.checked="es"===lang),(e=document.getElementById("navLoginBtn"))&&(e.textContent=user?t("logout"):t("login"))}function toggleMenu(){var e=document.getElementById("navItems");e&&e.classList.toggle("show")}function init(){show("home"),applyTranslations(),document.getElementById("empSign").addEventListener("input",()=>updateSignDate("empSign","empSignDate")),document.getElementById("mgrSign").addEventListener("input",()=>updateSignDate("mgrSign","mgrSignDate")),loadQuestions(),initCalendar(),google.script.run.withSuccessHandler(e=>{config=e,applyTranslations(),showDevButton()}).loadConfig()}function login(){var e=document.getElementById("userId").value,a=document.getElementById("password").value;document.body.style.cursor="wait",startLoading(),google.script.run.withSuccessHandler(e=>{var a;document.body.style.cursor="",stopLoading(),e.success?(user=e.user,lang=user.lang,localStorage.setItem("lang",lang),document.getElementById("login").classList.add("hidden"),document.getElementById("navLoginBtn").textContent=t("logout"),applyTranslations(),showDevButton(),loadReviews(),"DEV"===user.role?openDevPanel():(a=pendingSection||"reviews",pendingSection=null,show(a))):(a="",a="invalid_password"===e.error?t("invalidPwd"):"user_not_found"===e.error?t("noAccount"):t("loginFail"),alert(a))}).withFailureHandler(e=>{document.body.style.cursor="",stopLoading(),alert(e.message||t("loginFail"))}).login(e,a)}function navLogin(){var e=document.getElementById("login");user?("undefined"!=typeof google&&google.script&&google.script.run&&google.script.run.logout(),user=null,reviews=[],e.classList.add("hidden"),document.getElementById("navLoginBtn").textContent=t("login"),show("home")):(e.classList.toggle("hidden"),(e=document.getElementById("devPanel"))&&e.classList.add("hidden"))}function toggleLang(){lang=document.getElementById("langToggle").checked?"es":"en",user&&(user.lang=lang),"undefined"!=typeof google&&google.script&&google.script.run&&google.script.run.saveLang(lang),localStorage.setItem("lang",lang),applyTranslations(),renderReviews(),renderQuestionList()}let reviews=[];function loadReviews(){google.script.run.withSuccessHandler(e=>{reviews=e,renderReviews(),fillSavedAnswers()}).listReviews()}function loadSavedReview(){user&&"undefined"!=typeof google&&google.script&&google.script.run&&google.script.run.withSuccessHandler(e=>{e&&(reviews=reviews.filter(e=>!("SELF"===e.type&&e.employeeId==user.id&&e.data&&Number(e.data.year)==Number(selectedYear)))).push(e),fillSavedAnswers()}).getReviewByYear(selectedYear)}function renderReviews(){let a=document.getElementById("reviewsList");a&&(a.innerHTML="",reviews.forEach(e=>{var t=document.createElement("div");t.className="card",t.innerHTML="<b>"+e.type+"</b> "+e.status+"<br>"+JSON.stringify(e.data),a.appendChild(t)}))}function showDevButton(){var e=document.getElementById("devBtn");e&&(e.classList.remove("hidden"),e.disabled=!1)}function devOAuthLogin(){"undefined"!=typeof google&&google.script&&google.script.run&&(startLoading(),google.script.run.withSuccessHandler(e=>{stopLoading(),e&&e.authorized?(user={userId:e.email,name:e.email,role:"DEV",lang:"en",id:e.email},document.getElementById("navLoginBtn").textContent=t("logout"),openDevPanel()):document.getElementById("accessDenied").classList.remove("hidden")}).withFailureHandler(e=>{stopLoading(),alert(e.message||"Auth failed")}).authorizeDev())}function devLink(){(user&&"DEV"===user.role?openDevPanel:devOAuthLogin)()}function openDevPanel(){var e;(user&&"DEV"===user.role?(document.querySelectorAll("body>section").forEach(e=>e.classList.add("hidden")),(e=document.getElementById("login"))&&e.classList.add("hidden"),(e=document.getElementById("newUserModal"))&&e.classList.add("hidden"),(e=document.getElementById("resetPwModal"))&&e.classList.add("hidden"),loadUsers(),document.getElementById("devPanel")):document.getElementById("accessDenied")).classList.remove("hidden")}let questions=[];function loadQuestions(){"undefined"!=typeof google&&google.script&&google.script.run?google.script.run.withSuccessHandler(e=>{questions=e&&e.length?e:defaultQuestions,renderQuestionList()}).withFailureHandler(e=>{console.error("loadQuestions failed",e),questions=defaultQuestions,renderQuestionList()}).getQuestions():(questions=defaultQuestions,renderQuestionList())}function renderQuestionList(){let o=document.getElementById("questionList");o&&(o.innerHTML="",questions.forEach(e=>{var a=document.createElement("div");a.className="card q",a.dataset.id=e.id;let n='<label class="question-title">'+e[lang]+"</label>";n+=!1!==e.rating?'<div class="rating-group"><label><input type="radio" class="rating" name="rating-'+e.id+'" value="1"> 1 - '+t("below")+'</label><label><input type="radio" class="rating" name="rating-'+e.id+'" value="2"> 2 - '+t("meets")+'</label><label><input type="radio" class="rating" name="rating-'+e.id+'" value="3"> 3 - '+t("exceeds")+"</label></div>":'<input type="hidden" class="rating" value="">',Array.isArray(e.extras)?e.extras.forEach(a=>{let e=a["label_"+lang]||a.label;if("textarea"===a.type&&"managerComments"!==a.id&&(e=t("employeeComments")),n+="<label>"+e,"textarea"===a.type)n+='<textarea class="extra" data-sub="'+a.id+'"></textarea>';else if("select"===a.type)n+='<select class="extra" data-sub="'+a.id+'">',a.options.forEach(e=>{n+='<option value="'+e+'">'+e+"</option>"}),n+="</select>";else{let e="";"number"!==a.type||"absences"!==a.id&&"late"!==a.id||(e=' min="0" step="1"'),n+='<input type="'+a.type+'" class="extra" data-sub="'+a.id+'"'+e+">"}n+="</label>"}):"textarea"===e.extra?n+="<label>"+t("employeeComments")+'<textarea class="extra" data-sub="employeeComments"></textarea></label>':"number"===e.extra&&(n+='<input type="number" class="extra">'),n+="<label>"+t("managerComments")+'<textarea class="extra" data-sub="managerComments"></textarea></label>',a.innerHTML=n,o.appendChild(a)}),fillSavedAnswers(),user&&user.role&&-1!==["MANAGER","HR","DEV"].indexOf(user.role)&&document.getElementById("compAdjust").classList.remove("hidden"),loadingReviews&&(document.getElementById("reviews").classList.remove("hidden"),stopLoading()),setupAutosave())}function fillSavedAnswers(){if(document.querySelectorAll("#questionList input.rating").forEach(e=>{e.checked=!1}),document.querySelectorAll("#questionList .extra").forEach(e=>{e.value=""}),document.querySelectorAll("#finalBlock input[name=finalExp]").forEach(e=>{e.checked=!1}),document.getElementById("finalNotes").value="",document.getElementById("empSign").value="",document.getElementById("empSignDate").value="",document.getElementById("empSignDate").dataset.iso="",document.getElementById("mgrSign").value="",document.getElementById("mgrSignDate").value="",document.getElementById("mgrSignDate").dataset.iso="",currentReviewId=null,user&&reviews&&reviews.length){var e,a=reviews.filter(e=>"SELF"===e.type&&e.employeeId==user.id&&e.data&&Number(e.data.year)==Number(selectedYear));if(a.length)if((a=a.sort((e,t)=>new Date(t.ts)-new Date(e.ts))[0]).data&&a.data.answers){currentReviewId=a.id;let t=a.data.answers;Object.keys(t).forEach(e=>{let n=document.querySelector('#questionList .q[data-id="'+e+'"]');if(n){let a=t[e];a.score&&(e=n.querySelector('input.rating[value="'+a.score+'"]'))&&(e.checked=!0),void 0!==a.extra&&("object"==typeof a.extra?Object.keys(a.extra).forEach(e=>{var t=n.querySelector('.extra[data-sub="'+e+'"]');t&&(t.value=a.extra[e])}):(e=n.querySelector(".extra"))&&(e.value=a.extra))}}),a.data.finalExpectation&&((a=a.data.finalExpectation).result&&(e=document.querySelector('#finalBlock input[name=finalExp][value="'+a.result+'"]'))&&(e.checked=!0),a.notes&&(document.getElementById("finalNotes").value=a.notes),a.empSign&&(document.getElementById("empSign").value=a.empSign.name||"",a.empSign.ts)&&(e=new Date(a.empSign.ts),document.getElementById("empSignDate").value=e.toLocaleString(),document.getElementById("empSignDate").dataset.iso=a.empSign.ts),a.mgrSign)&&(document.getElementById("mgrSign").value=a.mgrSign.name||"",a.mgrSign.ts)&&(e=new Date(a.mgrSign.ts),document.getElementById("mgrSignDate").value=e.toLocaleString(),document.getElementById("mgrSignDate").dataset.iso=a.mgrSign.ts)}}}function calcPct(){var e=parseFloat(document.getElementById("curWage").value||0),t=parseFloat(document.getElementById("newWage").value||0);document.getElementById("pctInc").textContent=e?((t-e)/e*100).toFixed(2):"0"}function gatherAnswers(){let o={};return document.querySelectorAll("#questionList .q").forEach(e=>{var t=e.dataset.id,a=(a=e.querySelector("input.rating:checked, select.rating"))?a.value:"",e=e.querySelectorAll(".extra");let n="";1!==e.length||e[0].dataset.sub?0<e.length&&(n={},e.forEach(e=>{n[e.dataset.sub||"value"]=e.value})):n=e[0].value||"",o[t]={score:a,extra:n}}),o}function gatherReviewData(){let e=gatherAnswers(),t=null;(a=document.getElementById("compAdjust"))&&!a.classList.contains("hidden")&&(t={employeeId:user.id,current:document.getElementById("curWage").value,new:document.getElementById("newWage").value,pct:document.getElementById("pctInc").textContent});var a=document.getElementById("empSignDate").dataset.iso,n=document.getElementById("mgrSignDate").dataset.iso,o={result:document.querySelector("input[name=finalExp]:checked")?.value||"",notes:document.getElementById("finalNotes").value,empSign:{name:document.getElementById("empSign").value},mgrSign:{name:document.getElementById("mgrSign").value}};return a&&(o.empSign.ts=a),n&&(o.mgrSign.ts=n),{answers:e,comp:t,finalExp:o}}function updateSignDate(e,t){e=document.getElementById(e),t=document.getElementById(t);e&&t&&(e.value.trim()?(e=new Date,t.value=e.toLocaleString(),t.dataset.iso=e.toISOString()):(t.value="",t.dataset.iso=""))}let autosaveTimeout,submitMsgTimeout;function scheduleAutosave(){clearTimeout(autosaveTimeout),autosaveTimeout=setTimeout(autosaveReview,1e3)}function autosaveReview(){var e,t;user&&(e=gatherReviewData(),t={id:currentReviewId,employeeId:user.id,type:"SELF",status:"DRAFT",data:{year:selectedYear,answers:e.answers,finalExpectation:e.finalExp}},google.script.run.withFailureHandler(e=>console.error("autosave failed",e)).saveFullReview(t,e.comp))}function setupAutosave(){var e=document.getElementById("reviewForm");e&&(e.querySelectorAll("input,textarea,select").forEach(e=>{e.removeEventListener("input",scheduleAutosave),e.removeEventListener("change",scheduleAutosave),e.addEventListener("input",scheduleAutosave),e.addEventListener("change",scheduleAutosave)}),window.addEventListener("beforeunload",autosaveReview))}function submitReview(){let e=gatherReviewData(),t={id:currentReviewId,employeeId:user.id,type:"SELF",status:"SUBMITTED",data:{year:selectedYear,answers:e.answers,finalExpectation:e.finalExp}},a=document.getElementById("submitMsg");a.textContent="Saved",clearTimeout(submitMsgTimeout),submitMsgTimeout=setTimeout(()=>{a.textContent=""},5e3),google.script.run.withSuccessHandler(e=>{currentReviewId=e.id,loadReviews()}).saveFullReview(t,e.comp)}function loadUsers(){google.script.run.withSuccessHandler(renderUserTable).getAllUsers()}function renderUserTable(e){let a=document.querySelector("#userTable tbody");a&&(a.innerHTML="",e.forEach(e=>{let t=document.createElement("tr");t.innerHTML=`<td><span class="uid">${e.userId}</span><input class="uidEdit hidden border px-1" type="text" value="${e.userId}"></td>`+'<td><select class="roleSel" disabled><option>Employee</option><option>Manager</option><option>HR</option><option>DEV</option></select></td><td class="actions"><button type="button" class="editBtn" title="Edit">✏️</button><button type="button" class="saveBtn hidden" title="Save">💾</button><button type="button" class="cancelBtn hidden" title="Cancel">✖</button><button type="button" class="pwBtn" title="Change Password">🔑</button></td>',t.querySelector(".roleSel").value=e.role,t.querySelector(".uid").onclick=()=>enableEdit(t,e.userId),t.querySelector(".editBtn").onclick=()=>enableEdit(t,e.userId),t.querySelector(".cancelBtn").onclick=()=>disableEdit(t),t.querySelector(".saveBtn").onclick=()=>saveRow(t,e.userId),t.querySelector(".pwBtn").onclick=()=>showResetPwModal(e.userId),a.appendChild(t)}))}function enableEdit(e,t){e.querySelector(".uid").classList.add("hidden"),e.querySelector(".uidEdit").classList.remove("hidden"),e.querySelector(".roleSel").disabled=!1,e.querySelector(".editBtn").classList.add("hidden"),e.querySelector(".saveBtn").classList.remove("hidden"),e.querySelector(".cancelBtn").classList.remove("hidden")}function disableEdit(e){e.querySelector(".uid").classList.remove("hidden"),e.querySelector(".uidEdit").classList.add("hidden"),e.querySelector(".roleSel").disabled=!0,e.querySelector(".editBtn").classList.remove("hidden"),e.querySelector(".saveBtn").classList.add("hidden"),e.querySelector(".cancelBtn").classList.add("hidden")}function saveRow(e,t){let a=e.querySelector(".uidEdit").value.trim(),n=e.querySelector(".roleSel").value,o=()=>{disableEdit(e),loadUsers()};a!==t?google.script.run.withSuccessHandler(()=>{google.script.run.withSuccessHandler(o).updateUserRole(a,n)}).withFailureHandler(e=>alert(e.message)).updateUserID(t,a):google.script.run.withSuccessHandler(o).withFailureHandler(e=>alert(e.message)).updateUserRole(t,n)}function showNewUserModal(){document.getElementById("newUid").value="",document.getElementById("newRole").value="Employee",document.getElementById("newPw1").value="",document.getElementById("newPw2").value="",document.getElementById("newUserModal").classList.remove("hidden")}function addNewUser(){var e=document.getElementById("newUid").value.trim(),t=document.getElementById("newRole").value,a=document.getElementById("newPw1").value;a!==document.getElementById("newPw2").value?alert("Passwords do not match"):google.script.run.withSuccessHandler(()=>{document.getElementById("newUserModal").classList.add("hidden"),loadUsers()}).withFailureHandler(e=>alert(e.message)).addNewUser({userId:e,password:a,role:t})}function showResetPwModal(e){resetUid=e,document.getElementById("resetPw1").value="",document.getElementById("resetPw2").value="",document.getElementById("resetPwModal").classList.remove("hidden")}function resetPassword(){var e=document.getElementById("resetPw1").value;e!==document.getElementById("resetPw2").value?alert("Passwords do not match"):google.script.run.withSuccessHandler(()=>{document.getElementById("resetPwModal").classList.add("hidden"),loadUsers()}).withFailureHandler(e=>alert(e.message)).updateUserPassword(resetUid,e)}function confirmClearReviews(){confirm("Delete all review data?")&&google.script.run.withSuccessHandler(()=>alert("All reviews deleted")).withFailureHandler(e=>alert(e.message)).deleteAllReviews()}let calendar;function initCalendar(){var e;document.getElementById("calendar")&&(calendar?(calendar.setOption("locale","es"===lang?"es":"en"),loadSlots()):(calendar=new FullCalendar.Calendar(document.getElementById("calendar"),{initialView:"dayGridMonth",locale:"es"===lang?"es":"en",headerToolbar:{start:"prev,next today",center:"title",end:""},height:"auto",eventClick:slotClick,datesSet:loadSlots})).render(),e=user?String(user.role||"").toUpperCase():"",document.getElementById("availForm").classList.toggle("hidden",!("MANAGER"===e||"DEV"===e)))}function loadSlots(){user&&google.script.run.withSuccessHandler(e=>{calendar.getEvents().forEach(e=>e.remove()),e.forEach(e=>{var t=new Date(e.date+"T"+e.time);t.setMinutes(t.getMinutes()+30);let a="#d1fae5",n="#000";e.bookedBy&&(a="#e5e7eb",n="#666",e.bookedBy===user.userId)&&(a="#0A5C30",n="#fff"),calendar.addEvent({id:e.id,title:e.time,start:e.date+"T"+e.time,end:t.toISOString(),backgroundColor:a,borderColor:a,textColor:n,extendedProps:{bookedBy:e.bookedBy}})});for(var t=calendar.view,a=new Date(t.currentStart);a<t.currentEnd;a.setDate(a.getDate()+1)){var n=a.toISOString().slice(0,10)+"T12:00:00",o=a.toISOString().slice(0,10)+"T14:00:00";calendar.addEvent({start:n,end:o,display:"background",backgroundColor:"#FFEDBA"})}}).listAvailability(user.role)}function slotClick(e){e.event.extendedProps.bookedBy?alert(t("conflict")):confirm(t("bookPrompt"))&&google.script.run.withSuccessHandler(e=>{"ok"===e.status?alert(t("bookOk")):alert(t("conflict")),loadSlots()}).bookSlot(user.userId,e.event.id)}function addAvailability(){var n=document.getElementById("availFromDate").value,o=document.getElementById("availFromTime").value,s=document.getElementById("availToDate").value,i=document.getElementById("availToTime").value;if(n&&o&&s&&i){let e=[],a=new Date(n+"T"+o);for(var r=new Date(s+"T"+i);a<r;)e.push({date:a.toISOString().slice(0,10),time:a.toISOString().slice(11,16)}),a=new Date(a.getTime()+18e5);google.script.run.withSuccessHandler(()=>{document.getElementById("availMsg").textContent="",loadSlots()}).withFailureHandler(()=>{document.getElementById("availMsg").textContent=t("error")}).addAvailability(user.userId,e)}else document.getElementById("availMsg").textContent=t("chooseTime")}document.addEventListener("DOMContentLoaded",init)</script></head><body><nav><img loading="lazy" src=https://www.dublincleaners.com/wp-content/uploads/2024/12/Dublin-Logos-stacked.png alt=Logo class=logo><button class="nav-toggle material-icons" onclick=toggleMenu()>menu</button><div class=nav-title data-i18n-key=navTitle>Employee Annual Reviews</div><div id=navItems class=nav-items><button type=button onclick='show("home")' data-i18n-key=home>Home</button><button type=button onclick='show("reviews")' data-i18n-key=reviews>Reviews</button><button type=button onclick=openSchedule() data-i18n-key=schedule>Schedule</button><div class=lang-switch><span>EN</span><label class=switch><input type=checkbox id=langToggle onchange=toggleLang()><span class=slider></span></label><span>ES</span></div><button type=button id=navLoginBtn onclick=navLogin()>Login</button><button type=button id=devBtn onclick=devLink()>Dev</button></div></nav><div id=loadingBar class="loading-bar hidden"><span></span></div><section id=home class=hidden><h2 data-i18n-key=welcomeTitle>Welcome to the Employee Review Portal</h2><p data-i18n-key=welcomeMsg>Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.</p></section><section id=reviews class=hidden><form id=reviewForm onsubmit="return submitReview(),!1"><div data-i18n-key=intro data-i18n-html></div><div id=reviewsList class=mb-4></div><div id=questionList></div><div id=compAdjust class="card hidden"><label><span data-i18n-key=curWage>Current Wage</span><input type=number id=curWage oninput=calcPct()></label><label><span data-i18n-key=newWage>New Wage</span><input type=number id=newWage oninput=calcPct()></label><div><span data-i18n-key=pctIncrease>% Increase:</span><span id=pctInc>0</span>%</div></div><div id=finalBlock class=card><p data-i18n-key=finalExpTitle>Final Performance Expectation</p><label><input type=radio name=finalExp value=below><span data-i18n-key=belowExp>Below Expectations</span></label><label><input type=radio name=finalExp value=meets><span data-i18n-key=meetsExp>Meets Expectations</span></label><label><input type=radio name=finalExp value=exceeds><span data-i18n-key=exceedsExp>Exceeds Expectations</span></label><textarea id=finalNotes data-i18n-key=notesPlaceholder data-i18n-placeholder placeholder=Notes></textarea></div><div class=card><label><span data-i18n-key=empSignature>Employee Signature</span><input type=text id=empSign class=signature></label><input type=text id=empSignDate class=sign-date readonly=readonly data-i18n-key=signDate data-i18n-placeholder placeholder=Date><label class=mt-4><span data-i18n-key=mgrSignature>Manager Signature</span><input type=text id=mgrSign class=signature></label><input type=text id=mgrSignDate class=sign-date readonly=readonly data-i18n-key=signDate data-i18n-placeholder placeholder=Date></div><button class=primary type=submit data-i18n-key=submitReview>Submit Review</button><button id=btnSchedule class="primary ml-4" onclick='show("schedule")' data-i18n-key=scheduleBtn></button><span id=submitMsg></span><div class="text-right mt-2"><small data-i18n-key=contactQuestions>Please contact Sea Khun HR/IT Manager with any questions or concerns.</small></div></form></section><section id=schedule class=hidden><div data-i18n-key=scheduleGuide data-i18n-html class=mb-4></div><div id=calendarWrapper class=card><div id=calendar></div></div><div id=availForm class="card hidden"><div class="font-semibold mb-2" data-i18n-key=addSlotTitle>Set Availability</div><label><span data-i18n-key=fromDate>Start Date</span><input type=date id=availFromDate></label><label><span data-i18n-key=fromTime>Start Time</span><input type=time id=availFromTime step=1800></label><label><span data-i18n-key=toDate>End Date</span><input type=date id=availToDate></label><label><span data-i18n-key=toTime>End Time</span><input type=time id=availToTime step=1800></label><button class=primary onclick=addAvailability() data-i18n-key=addSlotBtn>Add Slot</button><div id=availMsg class=text-sm></div></div></section><section id=devPanel class="hidden fixed inset-0 p-4 pt-16 overflow-auto bg-black/30 flex items-start justify-center"><div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-3xl"><div class="flex justify-between items-center mb-4"><h3 class="text-xl font-semibold">Developer Console</h3><div class="flex items-center gap-4"><button type=button class=text-red-600 onclick=confirmClearReviews()>Clear Reviews</button><button onclick='document.getElementById("devPanel").classList.add("hidden")'>✖</button></div></div><div class=overflow-x-auto><table id=userTable><thead><tr><th>UserID</th><th>Role</th><th></th></tr></thead><tbody></tbody></table></div><button type=button id=addUserFab class="fixed bottom-6 right-6 bg-emerald-600 text-white rounded-full w-12 h-12 shadow-lg text-xl" onclick=showNewUserModal() title="Add New User">+</button></div><div id=newUserModal class="modal hidden"><div class="bg-white rounded-xl p-6 w-80 space-y-4"><h4 class="text-lg font-semibold text-center">Add User</h4><input id=newUid class="w-full border px-2 py-1" placeholder=UserID><select id=newRole class="w-full border px-2 py-1"><option>Employee</option><option>Manager</option><option>HR</option><option>DEV</option></select><input id=newPw1 type=password class="w-full border px-2 py-1" placeholder=Password> <input id=newPw2 type=password class="w-full border px-2 py-1" placeholder="Confirm Password"><div class="flex justify-between"><button type=button class=primary onclick=addNewUser()>Save</button><button type=button onclick='document.getElementById("newUserModal").classList.add("hidden")'>Cancel</button></div></div></div><div id=resetPwModal class="modal hidden"><div class="bg-white rounded-xl p-6 w-80 space-y-4"><h4 class="text-lg font-semibold text-center">Reset Password</h4><input id=resetPw1 type=password class="w-full border px-2 py-1" placeholder="New Password"> <input id=resetPw2 type=password class="w-full border px-2 py-1" placeholder="Confirm Password"><div class="flex justify-between"><button type=button class=primary onclick=resetPassword()>Save</button><button type=button onclick='document.getElementById("resetPwModal").classList.add("hidden")'>Cancel</button></div></div></div></section><section id=accessDenied class="hidden fixed inset-0 flex items-center justify-center bg-white/90"><div class="bg-white rounded-xl shadow-xl p-8 text-center space-y-4"><h3 class="text-xl font-semibold">Access Denied</h3><p>You are not authorized to use this console.</p><button type=button class=primary onclick='document.getElementById("accessDenied").classList.add("hidden")'>Close</button></div></section><form id=login class="hidden flex justify-center mt-8" onsubmit="return login(),!1"><div class="max-w-[420px] w-[90%] bg-white/80 backdrop-blur rounded-2xl shadow-xl p-8 flex flex-col gap-6"><img loading="lazy" src=https://www.dublincleaners.com/wp-content/uploads/2024/12/Dublin-Logos-stacked.png alt=Logo class=mx-auto style=height:120px><h1 class="text-2xl font-semibold text-gray-800 text-center" data-i18n-key=navTitle>Employee Annual Reviews</h1><label class=w-full><span class="text-sm text-gray-500" data-i18n-key=userId>User ID</span><input class="w-full h-11 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent" type=text id=userId data-i18n-key=userId data-i18n-placeholder></label><label class=w-full><span class="text-sm text-gray-500" data-i18n-key=password>Password</span><input class="w-full h-11 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent" type=password id=password data-i18n-key=password data-i18n-placeholder></label><button class="primary w-full h-12 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold tracking-wide transition-transform active:scale-95" type=submit data-i18n-key=login>Login</button></div></form></body></html>
+    </section>`
+  }
+};
+function t(key){
+  if(config[key]&&config[key][lang])return config[key][lang];
+  if(translations[lang]&&translations[lang][key])return translations[lang][key];
+  return key;
+}
+function startLoading(){
+  document.body.style.background='#fff';
+  const lb=document.getElementById('loadingBar');
+  if(lb)lb.classList.remove('hidden');
+  loadingReviews=true;
+}
+function stopLoading(){
+  document.body.style.background='';
+  const lb=document.getElementById('loadingBar');
+  if(lb)lb.classList.add('hidden');
+  loadingReviews=false;
+}
+function show(id){
+  if((id==='reviews' || id==='schedule') && !user){
+    pendingSection=id;
+    document.querySelectorAll('body>section').forEach(s=>s.classList.add('hidden'));
+    document.getElementById('login').classList.remove('hidden');
+    return;
+  }
+  document.getElementById('login').classList.add('hidden');
+  document.querySelectorAll('body>section').forEach(s=>s.classList.add('hidden'));
+  if(id==='reviews'){
+    startLoading();
+    if(user){
+      loadReviews();
+      loadSavedReview();
+    }
+    loadQuestions();
+  }else if(id==='schedule'){
+    initCalendar();
+    document.getElementById(id).classList.remove('hidden');
+  }else{
+    if(id==='home'){
+      const list=document.getElementById('reviewsList');
+      if(list)list.innerHTML='';
+    }
+    document.getElementById(id).classList.remove('hidden');
+  }
+}
+
+function openSchedule(){
+  const menu=document.getElementById('navItems');
+  if(menu) menu.classList.remove('show');
+  show('schedule');
+}
+function applyTranslations(){
+  document.querySelectorAll('[data-i18n-key]').forEach(el=>{
+    const key=el.dataset.i18nKey;
+    if(el.hasAttribute('data-i18n-placeholder'))el.placeholder=t(key);
+    else if(el.hasAttribute('data-i18n-html'))el.innerHTML=t(key);
+    else if(el.hasAttribute('data-i18n-alt'))el.alt=t(key);
+    else el.textContent=t(key);
+  });
+  const toggle=document.getElementById('langToggle');
+  if(toggle)toggle.checked=lang==='es';
+  const loginBtn=document.getElementById('navLoginBtn');
+  if(loginBtn)loginBtn.textContent=user?t('logout'):t('login');
+}
+function toggleMenu(){
+  const items=document.getElementById('navItems');
+  if(items) items.classList.toggle('show');
+}
+function init(){
+  show('home');
+  applyTranslations();
+  document.getElementById('empSign').addEventListener('input',()=>updateSignDate('empSign','empSignDate'));
+  document.getElementById('mgrSign').addEventListener('input',()=>updateSignDate('mgrSign','mgrSignDate'));
+  loadQuestions();
+  initCalendar();
+  google.script.run.withSuccessHandler(c=>{
+    config=c;
+    applyTranslations();
+    showDevButton();
+  }).loadConfig();
+}
+function login(){
+  const e=document.getElementById('userId').value;
+  const p=document.getElementById('password').value;
+  document.body.style.cursor='wait';
+  startLoading();
+  google.script.run
+    .withSuccessHandler(r=>{
+      document.body.style.cursor='';
+      stopLoading();
+      if(r.success){
+        user=r.user;
+        lang=user.lang;
+        localStorage.setItem('lang',lang);
+        document.getElementById('login').classList.add('hidden');
+        document.getElementById('navLoginBtn').textContent=t('logout');
+        applyTranslations();
+        showDevButton();
+        loadReviews();
+        if(user.role==='DEV'){
+          openDevPanel();
+        }else{
+          const target=pendingSection||'reviews';
+          pendingSection=null;
+          show(target);
+        }
+      }else{
+        let msg='';
+        if(r.error==='invalid_password')msg=t('invalidPwd');
+        else if(r.error==='user_not_found')msg=t('noAccount');
+        else msg=t('loginFail');
+        alert(msg);
+    }
+    })
+    .withFailureHandler(err=>{
+      document.body.style.cursor='';
+      stopLoading();
+      alert(err.message||t('loginFail'));
+    })
+    .login(e,p);
+}
+
+function navLogin(){
+  const loginDiv=document.getElementById('login');
+  if(user){
+    if(typeof google!==
+      'undefined' && google.script && google.script.run){
+      google.script.run.logout();
+    }
+    user=null;
+    reviews=[];
+    loginDiv.classList.add('hidden');
+    document.getElementById('navLoginBtn').textContent=t('login');
+    show('home');
+  }else{
+    loginDiv.classList.toggle('hidden');
+    // hide dev panel when showing login
+    const dev=document.getElementById('devPanel');
+    if(dev)dev.classList.add('hidden');
+  }
+}
+
+function toggleLang(){
+  lang=document.getElementById('langToggle').checked?'es':'en';
+  if(user) user.lang=lang;
+  if(typeof google!=='undefined' && google.script && google.script.run){
+    google.script.run.saveLang(lang);
+  }
+  localStorage.setItem('lang',lang);
+  applyTranslations();
+  renderReviews();
+  renderQuestionList();
+}
+let reviews=[];
+function loadReviews(){
+  google.script.run.withSuccessHandler(r=>{
+    reviews=r;
+    renderReviews();
+    fillSavedAnswers();
+  }).listReviews();
+}
+
+function loadSavedReview(){
+  if(!user || typeof google==='undefined' || !google.script || !google.script.run) return;
+  google.script.run.withSuccessHandler(r=>{
+    if(r){
+      // replace existing saved review for selected year
+      reviews=reviews.filter(rv=>!(rv.type==='SELF' && rv.employeeId==user.id && rv.data && Number(rv.data.year)==Number(selectedYear)));
+      reviews.push(r);
+    }
+    fillSavedAnswers();
+  }).getReviewByYear(selectedYear);
+}
+function renderReviews(){const c=document.getElementById('reviewsList');if(!c)return;c.innerHTML='';reviews.forEach(rv=>{const div=document.createElement('div');div.className='card';div.innerHTML='<b>'+rv.type+'</b> '+rv.status+'<br>'+JSON.stringify(rv.data);c.appendChild(div);});}
+
+function showDevButton(){
+  const btn=document.getElementById('devBtn');
+  if(!btn)return;
+  btn.classList.remove('hidden');
+  btn.disabled=false;
+}
+
+function devOAuthLogin(){
+  if(typeof google==='undefined' || !google.script || !google.script.run){
+    return;
+  }
+  startLoading();
+  google.script.run
+    .withSuccessHandler(r=>{
+      stopLoading();
+      if(r && r.authorized){
+        user={userId:r.email,name:r.email,role:'DEV',lang:'en',id:r.email};
+        document.getElementById('navLoginBtn').textContent=t('logout');
+        openDevPanel();
+      }else{
+        document.getElementById('accessDenied').classList.remove('hidden');
+      }
+    })
+    .withFailureHandler(err=>{
+      stopLoading();
+      alert(err.message||'Auth failed');
+    })
+    .authorizeDev();
+}
+
+function devLink(){
+  if(user && user.role==='DEV'){
+    openDevPanel();
+  }else{
+    devOAuthLogin();
+  }
+}
+
+function openDevPanel(){
+  if(!user || user.role!=='DEV'){
+    document.getElementById('accessDenied').classList.remove('hidden');
+    return;
+  }
+  document.querySelectorAll('body>section').forEach(s=>s.classList.add('hidden'));
+  const loginDiv=document.getElementById('login');
+  if(loginDiv)loginDiv.classList.add('hidden');
+  const nu=document.getElementById('newUserModal');
+  if(nu)nu.classList.add('hidden');
+  const rp=document.getElementById('resetPwModal');
+  if(rp)rp.classList.add('hidden');
+  loadUsers();
+  document.getElementById('devPanel').classList.remove('hidden');
+}
+
+let questions=[];
+function loadQuestions(){
+  if(typeof google==='undefined'||!google.script||!google.script.run){
+    questions=defaultQuestions;
+    renderQuestionList();
+    return;
+  }
+  google.script.run
+    .withSuccessHandler(q=>{
+      questions=(q&&q.length)?q:defaultQuestions;
+      renderQuestionList();
+    })
+    .withFailureHandler(err=>{
+      console.error('loadQuestions failed',err);
+      questions=defaultQuestions;
+      renderQuestionList();
+    })
+    .getQuestions();
+}
+function renderQuestionList(){
+  const qd=document.getElementById('questionList');
+  if(!qd)return;
+  qd.innerHTML='';
+  questions.forEach(q=>{
+    const div=document.createElement('div');
+    div.className='card q';
+    div.dataset.id=q.id;
+    let html='<label class="question-title">'+q[lang]+'</label>';
+    if(q.rating!==false){
+      html+='<div class="rating-group">'
+        +'<label><input type="radio" class="rating" name="rating-'+q.id+'" value="1"> 1 - '+t('below')+'</label>'
+        +'<label><input type="radio" class="rating" name="rating-'+q.id+'" value="2"> 2 - '+t('meets')+'</label>'
+        +'<label><input type="radio" class="rating" name="rating-'+q.id+'" value="3"> 3 - '+t('exceeds')+'</label>'
+        +'</div>';
+    }else{
+      html+='<input type="hidden" class="rating" value="">';
+    }
+    if(Array.isArray(q.extras)){
+      q.extras.forEach(ex=>{
+        let lbl=ex['label_'+lang]||ex.label;
+        if(ex.type==='textarea' && ex.id!=='managerComments') lbl=t('employeeComments');
+        html+='<label>'+lbl;
+        if(ex.type==='textarea')html+='<textarea class="extra" data-sub="'+ex.id+'"></textarea>';
+        else if(ex.type==='select'){
+          html+='<select class="extra" data-sub="'+ex.id+'">';
+          ex.options.forEach(o=>{html+='<option value="'+o+'">'+o+'</option>';});
+          html+='</select>';
+        }else {
+          let attrs='';
+          if(ex.type==='number' && (ex.id==='absences' || ex.id==='late')){
+            attrs=' min="0" step="1"';
+          }
+          html+='<input type="'+ex.type+'" class="extra" data-sub="'+ex.id+'"'+attrs+'>';
+        }
+        html+='</label>';
+      });
+    }else if(q.extra==='textarea'){
+      html+='<label>'+t('employeeComments')+'<textarea class="extra" data-sub="employeeComments"></textarea></label>';
+    }else if(q.extra==='number'){
+      html+='<input type="number" class="extra">';
+    }
+    html+='<label>'+t('managerComments')+'<textarea class="extra" data-sub="managerComments"></textarea></label>';
+    div.innerHTML=html;
+    qd.appendChild(div);
+  });
+  fillSavedAnswers();
+  if(user&&user.role&&(['MANAGER','HR','DEV'].indexOf(user.role)!==-1)){
+    document.getElementById('compAdjust').classList.remove('hidden');
+  }
+  if(loadingReviews){
+    document.getElementById('reviews').classList.remove('hidden');
+    stopLoading();
+  }
+  setupAutosave();
+}
+
+function fillSavedAnswers(){
+  document.querySelectorAll('#questionList input.rating').forEach(r=>{r.checked=false;});
+  document.querySelectorAll('#questionList .extra').forEach(e=>{e.value='';});
+  document.querySelectorAll('#finalBlock input[name=finalExp]').forEach(r=>{r.checked=false;});
+  document.getElementById('finalNotes').value='';
+  document.getElementById('empSign').value='';
+  document.getElementById('empSignDate').value='';
+  document.getElementById('empSignDate').dataset.iso='';
+  document.getElementById('mgrSign').value='';
+  document.getElementById('mgrSignDate').value='';
+  document.getElementById('mgrSignDate').dataset.iso='';
+  currentReviewId=null;
+  if(!user||!reviews||!reviews.length) return;
+  const matches=reviews.filter(r=>
+    r.type==='SELF' &&
+    r.employeeId==user.id &&
+    r.data && Number(r.data.year)==Number(selectedYear)
+  );
+  if(!matches.length) return;
+  const rev=matches.sort((a,b)=>new Date(b.ts)-new Date(a.ts))[0];
+  if(!rev.data || !rev.data.answers) return;
+  currentReviewId=rev.id;
+  const ans=rev.data.answers;
+  Object.keys(ans).forEach(qid=>{
+    const qDiv=document.querySelector('#questionList .q[data-id="'+qid+'"]');
+    if(!qDiv) return;
+    const val=ans[qid];
+    if(val.score){
+      const radio=qDiv.querySelector('input.rating[value="'+val.score+'"]');
+      if(radio) radio.checked=true;
+    }
+    if(val.extra!==undefined){
+      if(typeof val.extra==='object'){
+        Object.keys(val.extra).forEach(k=>{
+          const el=qDiv.querySelector('.extra[data-sub="'+k+'"]');
+          if(el) el.value=val.extra[k];
+        });
+      }else{
+        const el=qDiv.querySelector('.extra');
+        if(el) el.value=val.extra;
+      }
+    }
+  });
+  if(rev.data.finalExpectation){
+    const fe=rev.data.finalExpectation;
+    if(fe.result){
+      const r=document.querySelector('#finalBlock input[name=finalExp][value="'+fe.result+'"]');
+      if(r) r.checked=true;
+    }
+    if(fe.notes) document.getElementById('finalNotes').value=fe.notes;
+    if(fe.empSign){
+      document.getElementById('empSign').value=fe.empSign.name||'';
+      if(fe.empSign.ts){
+        const d=new Date(fe.empSign.ts);
+        document.getElementById('empSignDate').value=d.toLocaleString();
+        document.getElementById('empSignDate').dataset.iso=fe.empSign.ts;
+      }
+    }
+    if(fe.mgrSign){
+      document.getElementById('mgrSign').value=fe.mgrSign.name||'';
+      if(fe.mgrSign.ts){
+        const d=new Date(fe.mgrSign.ts);
+        document.getElementById('mgrSignDate').value=d.toLocaleString();
+        document.getElementById('mgrSignDate').dataset.iso=fe.mgrSign.ts;
+      }
+    }
+  }
+}
+function calcPct(){const c=parseFloat(document.getElementById('curWage').value||0);const n=parseFloat(document.getElementById('newWage').value||0);const pct=document.getElementById('pctInc');pct.textContent=c?(((n-c)/c)*100).toFixed(2):'0';}
+function gatherAnswers(){
+  const ans={};
+  document.querySelectorAll('#questionList .q').forEach(d=>{
+    const id=d.dataset.id;
+    const ratingEl=d.querySelector('input.rating:checked, select.rating');
+    const rating=ratingEl?ratingEl.value:'';
+    const extraEls=d.querySelectorAll('.extra');
+    let extra='';
+    if(extraEls.length===1 && !extraEls[0].dataset.sub){
+      extra=extraEls[0].value||'';
+    }else if(extraEls.length>0){
+      extra={};
+      extraEls.forEach(e=>{extra[e.dataset.sub||'value']=e.value;});
+    }
+    ans[id]={score:rating,extra:extra};
+  });
+  return ans;
+}
+function gatherReviewData(){
+  const answers=gatherAnswers();
+  let comp=null;
+  const adjBlock=document.getElementById('compAdjust');
+  if(adjBlock&&!adjBlock.classList.contains('hidden')){
+    comp={employeeId:user.id,current:document.getElementById('curWage').value,new:document.getElementById('newWage').value,pct:document.getElementById('pctInc').textContent};
+  }
+  const empDate=document.getElementById('empSignDate').dataset.iso;
+  const mgrDate=document.getElementById('mgrSignDate').dataset.iso;
+  const finalExp={
+    result:document.querySelector('input[name=finalExp]:checked')?.value||'',
+    notes:document.getElementById('finalNotes').value,
+    empSign:{name:document.getElementById('empSign').value},
+    mgrSign:{name:document.getElementById('mgrSign').value}
+  };
+  if(empDate) finalExp.empSign.ts=empDate;
+  if(mgrDate) finalExp.mgrSign.ts=mgrDate;
+  return {answers,comp,finalExp};
+}
+
+function updateSignDate(signId,dateId){
+  const input=document.getElementById(signId);
+  const dateField=document.getElementById(dateId);
+  if(!input||!dateField) return;
+  if(input.value.trim()){
+    const now=new Date();
+    dateField.value=now.toLocaleString();
+    dateField.dataset.iso=now.toISOString();
+  }else{
+    dateField.value='';
+    dateField.dataset.iso='';
+  }
+}
+
+let autosaveTimeout;
+let submitMsgTimeout;
+function scheduleAutosave(){
+  clearTimeout(autosaveTimeout);
+  autosaveTimeout=setTimeout(autosaveReview,1000);
+}
+function autosaveReview(){
+  if(!user) return;
+  const data=gatherReviewData();
+  const review={id:currentReviewId,employeeId:user.id,type:'SELF',status:'DRAFT',data:{year:selectedYear,answers:data.answers,finalExpectation:data.finalExp}};
+  google.script.run.withFailureHandler(e=>console.error('autosave failed',e)).saveFullReview(review,data.comp);
+}
+function setupAutosave(){
+  const form=document.getElementById('reviewForm');
+  if(!form)return;
+  const fields=form.querySelectorAll('input,textarea,select');
+  fields.forEach(f=>{
+    f.removeEventListener('input',scheduleAutosave);
+    f.removeEventListener('change',scheduleAutosave);
+    f.addEventListener('input',scheduleAutosave);
+    f.addEventListener('change',scheduleAutosave);
+  });
+  window.addEventListener('beforeunload',autosaveReview);
+}
+function submitReview(){
+  const data=gatherReviewData();
+  const review={id:currentReviewId,employeeId:user.id,type:'SELF',status:'SUBMITTED',data:{year:selectedYear,answers:data.answers,finalExpectation:data.finalExp}};
+  const msgEl=document.getElementById('submitMsg');
+  msgEl.textContent='Saved';
+  clearTimeout(submitMsgTimeout);
+  submitMsgTimeout=setTimeout(()=>{msgEl.textContent='';},5000);
+  google.script.run.withSuccessHandler(r=>{
+    currentReviewId=r.id;
+    loadReviews();
+  }).saveFullReview(review,data.comp);
+}
+
+function loadUsers(){
+  google.script.run.withSuccessHandler(renderUserTable).getAllUsers();
+}
+
+function renderUserTable(list){
+  const body=document.querySelector('#userTable tbody');
+  if(!body)return;
+  body.innerHTML='';
+  list.forEach(u=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><span class="uid">${u.userId}</span><input class="uidEdit hidden border px-1" type="text" value="${u.userId}"></td>`+
+      `<td><select class="roleSel" disabled><option>Employee</option><option>Manager</option><option>HR</option><option>DEV</option></select></td>`+
+      `<td class="actions"><button type="button" class="editBtn" title="Edit">✏️</button>`+
+      `<button type="button" class="saveBtn hidden" title="Save">💾</button>`+
+      `<button type="button" class="cancelBtn hidden" title="Cancel">✖</button>`+
+      `<button type="button" class="pwBtn" title="Change Password">🔑</button></td>`;
+    tr.querySelector('.roleSel').value=u.role;
+    tr.querySelector('.uid').onclick=()=>enableEdit(tr,u.userId);
+    tr.querySelector('.editBtn').onclick=()=>enableEdit(tr,u.userId);
+    tr.querySelector('.cancelBtn').onclick=()=>disableEdit(tr);
+    tr.querySelector('.saveBtn').onclick=()=>saveRow(tr,u.userId);
+    tr.querySelector('.pwBtn').onclick=()=>showResetPwModal(u.userId);
+    body.appendChild(tr);
+  });
+}
+
+function enableEdit(tr,id){
+  tr.querySelector('.uid').classList.add('hidden');
+  tr.querySelector('.uidEdit').classList.remove('hidden');
+  tr.querySelector('.roleSel').disabled=false;
+  tr.querySelector('.editBtn').classList.add('hidden');
+  tr.querySelector('.saveBtn').classList.remove('hidden');
+  tr.querySelector('.cancelBtn').classList.remove('hidden');
+}
+
+function disableEdit(tr){
+  tr.querySelector('.uid').classList.remove('hidden');
+  tr.querySelector('.uidEdit').classList.add('hidden');
+  tr.querySelector('.roleSel').disabled=true;
+  tr.querySelector('.editBtn').classList.remove('hidden');
+  tr.querySelector('.saveBtn').classList.add('hidden');
+  tr.querySelector('.cancelBtn').classList.add('hidden');
+}
+
+function saveRow(tr,oldId){
+  const newId=tr.querySelector('.uidEdit').value.trim();
+  const role=tr.querySelector('.roleSel').value;
+  const after=()=>{disableEdit(tr);loadUsers();};
+  if(newId!==oldId){
+    google.script.run.withSuccessHandler(()=>{
+      google.script.run.withSuccessHandler(after).updateUserRole(newId,role);
+    }).withFailureHandler(err=>alert(err.message)).updateUserID(oldId,newId);
+  }else{
+    google.script.run.withSuccessHandler(after).withFailureHandler(err=>alert(err.message)).updateUserRole(oldId,role);
+  }
+}
+
+
+function showNewUserModal(){
+  document.getElementById('newUid').value='';
+  document.getElementById('newRole').value='Employee';
+  document.getElementById('newPw1').value='';
+  document.getElementById('newPw2').value='';
+  document.getElementById('newUserModal').classList.remove('hidden');
+}
+
+function addNewUser(){
+  const uid=document.getElementById('newUid').value.trim();
+  const r=document.getElementById('newRole').value;
+  const p1=document.getElementById('newPw1').value;
+  const p2=document.getElementById('newPw2').value;
+  if(p1!==p2){alert('Passwords do not match');return;}
+  google.script.run.withSuccessHandler(()=>{document.getElementById('newUserModal').classList.add('hidden');loadUsers();}).withFailureHandler(err=>alert(err.message)).addNewUser({userId:uid,password:p1,role:r});
+}
+
+function showResetPwModal(uid){
+  resetUid=uid;
+  document.getElementById('resetPw1').value='';
+  document.getElementById('resetPw2').value='';
+  document.getElementById('resetPwModal').classList.remove('hidden');
+}
+
+function resetPassword(){
+  const p1=document.getElementById('resetPw1').value;
+  const p2=document.getElementById('resetPw2').value;
+  if(p1!==p2){alert('Passwords do not match');return;}
+  google.script.run.withSuccessHandler(()=>{document.getElementById('resetPwModal').classList.add('hidden');loadUsers();}).withFailureHandler(err=>alert(err.message)).updateUserPassword(resetUid,p1);
+}
+
+function confirmClearReviews(){
+  if(!confirm('Delete all review data?')) return;
+  google.script.run
+    .withSuccessHandler(()=>alert('All reviews deleted'))
+    .withFailureHandler(err=>alert(err.message))
+    .deleteAllReviews();
+}
+
+// ---- Modern Calendar Scheduling -----
+let calendar;
+function initCalendar(){
+  if(!document.getElementById('calendar')) return;
+  if(!calendar){
+    calendar=new FullCalendar.Calendar(document.getElementById('calendar'),{
+      initialView:'dayGridMonth',
+      locale:lang==='es'?'es':'en',
+      headerToolbar:{start:'prev,next today',center:'title',end:''},
+      height:'auto',
+      eventClick:slotClick,
+      datesSet:loadSlots
+    });
+    calendar.render();
+  }else{
+    calendar.setOption('locale',lang==='es'?'es':'en');
+    loadSlots();
+  }
+  const role=user?String(user.role||'').toUpperCase():'';
+  document.getElementById('availForm').classList.toggle('hidden',!(role==='MANAGER'||role==='DEV'));
+}
+function loadSlots(){
+  if(!user) return;
+  google.script.run.withSuccessHandler(res=>{
+    calendar.getEvents().forEach(e=>e.remove());
+    res.forEach(s=>{
+      const end=new Date(s.date+'T'+s.time);end.setMinutes(end.getMinutes()+30);
+      let color='#d1fae5',text='#000';
+      if(s.bookedBy){color='#e5e7eb';text='#666';if(s.bookedBy===user.userId){color='#0A5C30';text='#fff';}}
+      calendar.addEvent({id:s.id,title:s.time,start:s.date+'T'+s.time,end:end.toISOString(),backgroundColor:color,borderColor:color,textColor:text,extendedProps:{bookedBy:s.bookedBy}});
+    });
+    const view=calendar.view;
+    for(let d=new Date(view.currentStart);d<view.currentEnd;d.setDate(d.getDate()+1)){
+      const s=d.toISOString().slice(0,10)+'T12:00:00';
+      const e=d.toISOString().slice(0,10)+'T14:00:00';
+      calendar.addEvent({start:s,end:e,display:'background',backgroundColor:'#FFEDBA'});
+    }
+  }).listAvailability(user.role);
+}
+function slotClick(info){
+  const b=info.event.extendedProps.bookedBy;
+  if(b){alert(t('conflict'));return;}
+  if(!confirm(t('bookPrompt'))) return;
+  google.script.run.withSuccessHandler(r=>{if(r.status==='ok'){alert(t('bookOk'));loadSlots();}else{alert(t('conflict'));loadSlots();}}).bookSlot(user.userId,info.event.id);
+}
+function addAvailability(){
+  const sd=document.getElementById('availFromDate').value;
+  const st=document.getElementById('availFromTime').value;
+  const ed=document.getElementById('availToDate').value;
+  const et=document.getElementById('availToTime').value;
+  if(!sd||!st||!ed||!et){document.getElementById('availMsg').textContent=t('chooseTime');return;}
+  const slots=[];let start=new Date(sd+'T'+st);const end=new Date(ed+'T'+et);
+  while(start<end){slots.push({date:start.toISOString().slice(0,10),time:start.toISOString().slice(11,16)});start=new Date(start.getTime()+30*60000);}
+  google.script.run.withSuccessHandler(()=>{document.getElementById('availMsg').textContent='';loadSlots();}).withFailureHandler(()=>{document.getElementById('availMsg').textContent=t('error');}).addAvailability(user.userId,slots);
+}
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</head>
+<body>
+<nav>
+  <img src="https://www.dublincleaners.com/wp-content/uploads/2024/12/Dublin-Logos-stacked.png" alt="Logo" class="logo">
+  <button class="nav-toggle material-icons" onclick="toggleMenu()">menu</button>
+  <div class="nav-title" data-i18n-key="navTitle">Employee Annual Reviews</div>
+  <div id="navItems" class="nav-items">
+    <button type="button" onclick="show('home')" data-i18n-key="home">Home</button>
+    <button type="button" onclick="show('reviews')" data-i18n-key="reviews">Reviews</button>
+    <button type="button" onclick="openSchedule()" data-i18n-key="schedule">Schedule</button>
+    <div class="lang-switch">
+      <span>EN</span>
+      <label class="switch"><input type="checkbox" id="langToggle" onchange="toggleLang()"><span class="slider"></span></label>
+      <span>ES</span>
+    </div>
+    <button type="button" id="navLoginBtn" onclick="navLogin()">Login</button>
+    <button type="button" id="devBtn" onclick="devLink()">Dev</button>
+  </div>
+</nav>
+<div id="loadingBar" class="loading-bar hidden"><span></span></div>
+<section id="home" class="hidden">
+<h2 data-i18n-key="welcomeTitle">Welcome to the Employee Review Portal</h2>
+<p data-i18n-key="welcomeMsg">Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.</p>
+</section>
+<section id="reviews" class="hidden">
+<form id="reviewForm" onsubmit="submitReview();return false;">
+<div data-i18n-key="intro" data-i18n-html></div>
+<div id="reviewsList" class="mb-4"></div>
+<div id="questionList"></div>
+<div id="compAdjust" class="card hidden">
+<label><span data-i18n-key="curWage">Current Wage</span><input type="number" id="curWage" oninput="calcPct()"></label>
+<label><span data-i18n-key="newWage">New Wage</span><input type="number" id="newWage" oninput="calcPct()"></label>
+<div><span data-i18n-key="pctIncrease">% Increase:</span> <span id="pctInc">0</span>%</div>
+</div>
+<div id="finalBlock" class="card">
+<p data-i18n-key="finalExpTitle">Final Performance Expectation</p>
+<label><input type="radio" name="finalExp" value="below"> <span data-i18n-key="belowExp">Below Expectations</span></label>
+<label><input type="radio" name="finalExp" value="meets"> <span data-i18n-key="meetsExp">Meets Expectations</span></label>
+<label><input type="radio" name="finalExp" value="exceeds"> <span data-i18n-key="exceedsExp">Exceeds Expectations</span></label>
+<textarea id="finalNotes" data-i18n-key="notesPlaceholder" data-i18n-placeholder placeholder="Notes"></textarea>
+</div>
+<div class="card">
+  <label>
+    <span data-i18n-key="empSignature">Employee Signature</span>
+    <input type="text" id="empSign" class="signature">
+  </label>
+  <input type="text" id="empSignDate" class="sign-date" readonly data-i18n-key="signDate" data-i18n-placeholder placeholder="Date">
+  <label class="mt-4">
+    <span data-i18n-key="mgrSignature">Manager Signature</span>
+    <input type="text" id="mgrSign" class="signature">
+  </label>
+  <input type="text" id="mgrSignDate" class="sign-date" readonly data-i18n-key="signDate" data-i18n-placeholder placeholder="Date">
+</div>
+<button class="primary" type="submit" data-i18n-key="submitReview">Submit Review</button>
+<button id="btnSchedule" class="primary ml-4" onclick="show('schedule')" data-i18n-key="scheduleBtn"></button>
+<span id="submitMsg"></span>
+<div class="text-right mt-2"><small data-i18n-key="contactQuestions">Please contact Sea Khun HR/IT Manager with any questions or concerns.</small></div>
+</form>
+</section>
+<section id="schedule" class="hidden">
+  <div data-i18n-key="scheduleGuide" data-i18n-html class="mb-4"></div>
+  <div id="calendarWrapper" class="card">
+    <div id="calendar"></div>
+  </div>
+  <div id="availForm" class="card hidden">
+    <div class="font-semibold mb-2" data-i18n-key="addSlotTitle">Set Availability</div>
+    <label><span data-i18n-key="fromDate">Start Date</span>
+      <input type="date" id="availFromDate">
+    </label>
+    <label><span data-i18n-key="fromTime">Start Time</span>
+      <input type="time" id="availFromTime" step="1800">
+    </label>
+    <label><span data-i18n-key="toDate">End Date</span>
+      <input type="date" id="availToDate">
+    </label>
+    <label><span data-i18n-key="toTime">End Time</span>
+      <input type="time" id="availToTime" step="1800">
+    </label>
+    <button class="primary" onclick="addAvailability()" data-i18n-key="addSlotBtn">Add Slot</button>
+    <div id="availMsg" class="text-sm"></div>
+  </div>
+</section>
+<section id="devPanel" class="hidden fixed inset-0 p-4 pt-16 overflow-auto bg-black/30 flex items-start justify-center">
+  <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-3xl">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-semibold">Developer Console</h3>
+      <div class="flex items-center gap-4">
+        <button type="button" class="text-red-600" onclick="confirmClearReviews()">Clear Reviews</button>
+        <button onclick="document.getElementById('devPanel').classList.add('hidden')">✖</button>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table id="userTable">
+        <thead><tr><th>UserID</th><th>Role</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <button type="button" id="addUserFab" class="fixed bottom-6 right-6 bg-emerald-600 text-white rounded-full w-12 h-12 shadow-lg text-xl" onclick="showNewUserModal()" title="Add New User">+</button>
+  </div>
+  <div id="newUserModal" class="modal hidden">
+    <div class="bg-white rounded-xl p-6 w-80 space-y-4">
+      <h4 class="text-lg font-semibold text-center">Add User</h4>
+      <input id="newUid" class="w-full border px-2 py-1" placeholder="UserID">
+      <select id="newRole" class="w-full border px-2 py-1">
+        <option>Employee</option><option>Manager</option><option>HR</option><option>DEV</option>
+      </select>
+      <input id="newPw1" type="password" class="w-full border px-2 py-1" placeholder="Password">
+      <input id="newPw2" type="password" class="w-full border px-2 py-1" placeholder="Confirm Password">
+      <div class="flex justify-between">
+        <button type="button" class="primary" onclick="addNewUser()">Save</button>
+        <button type="button" onclick="document.getElementById('newUserModal').classList.add('hidden')">Cancel</button>
+      </div>
+    </div>
+  </div>
+  <div id="resetPwModal" class="modal hidden">
+    <div class="bg-white rounded-xl p-6 w-80 space-y-4">
+      <h4 class="text-lg font-semibold text-center">Reset Password</h4>
+      <input id="resetPw1" type="password" class="w-full border px-2 py-1" placeholder="New Password">
+      <input id="resetPw2" type="password" class="w-full border px-2 py-1" placeholder="Confirm Password">
+      <div class="flex justify-between">
+        <button type="button" class="primary" onclick="resetPassword()">Save</button>
+        <button type="button" onclick="document.getElementById('resetPwModal').classList.add('hidden')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="accessDenied" class="hidden fixed inset-0 flex items-center justify-center bg-white/90">
+  <div class="bg-white rounded-xl shadow-xl p-8 text-center space-y-4">
+    <h3 class="text-xl font-semibold">Access Denied</h3>
+    <p>You are not authorized to use this console.</p>
+    <button type="button" class="primary" onclick="document.getElementById('accessDenied').classList.add('hidden')">Close</button>
+  </div>
+</section>
+<form id="login" class="hidden flex justify-center mt-8" onsubmit="login();return false;">
+  <div class="max-w-[420px] w-[90%] bg-white/80 backdrop-blur rounded-2xl shadow-xl p-8 flex flex-col gap-6">
+    <img src="https://www.dublincleaners.com/wp-content/uploads/2024/12/Dublin-Logos-stacked.png" alt="Logo" class="mx-auto" style="height:120px">
+    <h1 class="text-2xl font-semibold text-gray-800 text-center" data-i18n-key="navTitle">Employee Annual Reviews</h1>
+    <label class="w-full">
+      <span class="text-sm text-gray-500" data-i18n-key="userId">User ID</span>
+      <input class="w-full h-11 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent" type="text" id="userId" data-i18n-key="userId" data-i18n-placeholder>
+    </label>
+    <label class="w-full">
+      <span class="text-sm text-gray-500" data-i18n-key="password">Password</span>
+      <input class="w-full h-11 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent" type="password" id="password" data-i18n-key="password" data-i18n-placeholder>
+    </label>
+    <button class="primary w-full h-12 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold tracking-wide transition-transform active:scale-95" type="submit" data-i18n-key="login">Login</button>
+  </div>
+</form>
+</body>
+</html>
