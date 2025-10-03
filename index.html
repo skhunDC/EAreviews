@@ -334,8 +334,12 @@ input[type=radio],input[type=checkbox]{width:auto;padding:0;border-radius:999px;
   gap:1.5rem;
 }
 #review-intro h1{text-align:center;color:var(--emerald-700);font-weight:700;}
-#review-intro .intro-cards{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));}
-#review-intro .info-card{background:#fff;border-radius:1rem;box-shadow:0 12px 30px rgba(6,55,31,0.08);padding:1.25rem;display:flex;flex-direction:column;gap:0.75rem;}
+#review-intro .intro-cards{display:flex;flex-direction:column;gap:1.25rem;}
+#review-intro .info-card{background:#fff;border-radius:1rem;box-shadow:0 12px 30px rgba(6,55,31,0.08);padding:clamp(1.25rem,3vw,1.75rem);display:flex;flex-direction:column;gap:1rem;}
+#review-intro .info-card--combined{gap:1.25rem;}
+#review-intro .info-card--combined .info-section{display:flex;flex-direction:column;gap:0.75rem;}
+#review-intro .info-card--combined hr{border:none;height:1px;background:linear-gradient(90deg,rgba(10,92,48,0),rgba(10,92,48,0.3),rgba(10,92,48,0));}
+#review-intro .info-card--combined h3{font-size:1.05rem;color:var(--emerald-700);margin:0;}
 .values-list{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:0.5rem;}
 .values-list li{background:var(--emerald-600);color:#fff;padding:0.35rem 0.9rem;border-radius:999px;font-size:0.85rem;}
 .form-actions{
@@ -594,45 +598,49 @@ const translations={
     intro:`<section id="review-intro">
       <h1>Your Opportunity to Shine</h1>
       <div class="intro-cards">
-        <div class="info-card">
-          <h2>Purpose</h2>
-          <p>Highlight achievements, live our core values, and explain why you deserve a pay increase while receiving growth feedback.</p>
-        </div>
-        <div class="info-card">
-          <h2>Core Values</h2>
-          <ul class="values-list">
-            <li>Accountable</li>
-            <li>Attention to Details</li>
-            <li>Team Player</li>
-            <li>Tactical Risk Taker</li>
-            <li>Better than Yesterday</li>
-            <li>Value Reputation</li>
-          </ul>
-        </div>
-        <div class="info-card">
-          <h2>Rating System &amp; Process</h2>
-          <p><strong>Rating System:</strong> For each question, please select a rating using the scale below:</p>
-          <div class="rating-badges">
-            <span class="badge badge-gray">1 = Below Expectations</span>
-            <span class="badge badge-green">2 = Meets Expectations</span>
-            <span class="badge badge-gold">3 = Exceeds Expectations</span>
+        <div class="info-card info-card--combined">
+          <div class="info-section">
+            <h2>Purpose</h2>
+            <p>Highlight achievements, live our core values, and explain why you deserve a pay increase while receiving growth feedback.</p>
           </div>
-          <p>Important: Attendance and punctuality (Question&nbsp;1) carry significant weight in determining your overall score.</p>
-          <h3 class="mt-2 font-semibold">Review Process</h3>
-          <p><strong>When:</strong> Reviews will be held throughout July.</p>
-          <p><strong>How to Schedule:</strong></p>
-          <div class="process">
-            <span>Complete this form &amp;</span>
-            <svg viewBox="0 0 16 16"><path d="M5 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-            <span>Submit to your Department Manager</span>
-            <svg viewBox="0 0 16 16"><path d="M5 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-            <span>Schedule an appointment w/ your Manager through this site.</span>
+          <hr>
+          <div class="info-section">
+            <h3>Core Values</h3>
+            <ul class="values-list">
+              <li>Accountable</li>
+              <li>Attention to Details</li>
+              <li>Team Player</li>
+              <li>Tactical Risk Taker</li>
+              <li>Better than Yesterday</li>
+              <li>Value Reputation</li>
+            </ul>
           </div>
-          <p><strong>Timing:</strong> Each review lasts approximately 20 minutes, starting every half hour.</p>
-          <p>Submit your form at least one week before your scheduled appointment.</p>
-          <p><strong>Important Note:</strong> Please schedule your review outside of your regular working hours. If you attend on your day off or outside your scheduled shift, you will be compensated—just make sure to message HR or your manager with the times so it can be added to payroll.</p>
-          <h3 class="mt-2 font-semibold">Review Questions</h3>
-          <p>Please answer clearly and concisely. Select your rating for each question.</p>
+          <hr>
+          <div class="info-section">
+            <h3>Rating System &amp; Process</h3>
+            <p><strong>Rating System:</strong> For each question, please select a rating using the scale below:</p>
+            <div class="rating-badges">
+              <span class="badge badge-gray">1 = Below Expectations</span>
+              <span class="badge badge-green">2 = Meets Expectations</span>
+              <span class="badge badge-gold">3 = Exceeds Expectations</span>
+            </div>
+            <p>Important: Attendance and punctuality (Question&nbsp;1) carry significant weight in determining your overall score.</p>
+            <h3 class="mt-2 font-semibold">Review Process</h3>
+            <p><strong>When:</strong> Reviews will be held throughout July.</p>
+            <p><strong>How to Schedule:</strong></p>
+            <div class="process">
+              <span>Complete this form &amp;</span>
+              <svg viewBox="0 0 16 16"><path d="M5 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+              <span>Submit to your Department Manager</span>
+              <svg viewBox="0 0 16 16"><path d="M5 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+              <span>Schedule an appointment w/ your Manager through this site.</span>
+            </div>
+            <p><strong>Timing:</strong> Each review lasts approximately 20 minutes, starting every half hour.</p>
+            <p>Submit your form at least one week before your scheduled appointment.</p>
+            <p><strong>Important Note:</strong> Please schedule your review outside of your regular working hours. If you attend on your day off or outside your scheduled shift, you will be compensated—just make sure to message HR or your manager with the times so it can be added to payroll.</p>
+            <h3 class="mt-2 font-semibold">Review Questions</h3>
+            <p>Please answer clearly and concisely. Select your rating for each question.</p>
+          </div>
         </div>
       </div>
       <div class="callout">Raises take effect on the first pay period in August.</div>
@@ -723,45 +731,49 @@ const translations={
     intro:`<section id="review-intro">
       <h1>Tu oportunidad para destacar</h1>
       <div class="intro-cards">
-        <div class="info-card">
-          <h2>Propósito</h2>
-          <p>Destacar logros, vivir nuestros valores fundamentales y explicar por qué mereces un aumento mientras recibes comentarios para crecer.</p>
-        </div>
-        <div class="info-card">
-          <h2>Valores fundamentales</h2>
-          <ul class="values-list">
-            <li>Responsabilidad</li>
-            <li>Atención al detalle</li>
-            <li>Trabajo en equipo</li>
-            <li>Tomador de riesgos táctico</li>
-            <li>Mejor que ayer</li>
-            <li>Valorar la reputación</li>
-          </ul>
-        </div>
-        <div class="info-card">
-          <h2>Sistema de calificación y Proceso</h2>
-          <p><strong>Sistema de calificación:</strong> Para cada pregunta, seleccione una calificación usando la escala a continuación:</p>
-          <div class="rating-badges">
-            <span class="badge badge-gray">1 = Por debajo de las expectativas</span>
-            <span class="badge badge-green">2 = Cumple con las expectativas</span>
-            <span class="badge badge-gold">3 = Supera las expectativas</span>
+        <div class="info-card info-card--combined">
+          <div class="info-section">
+            <h2>Propósito</h2>
+            <p>Destacar logros, vivir nuestros valores fundamentales y explicar por qué mereces un aumento mientras recibes comentarios para crecer.</p>
           </div>
-          <p>Importante: La asistencia y la puntualidad (Pregunta&nbsp;1) tienen un peso significativo en su puntaje general.</p>
-          <h3 class="mt-2 font-semibold">Proceso de revisión</h3>
-          <p><strong>Cuándo:</strong> Las revisiones se realizarán durante todo julio.</p>
-          <p><strong>Cómo programar:</strong></p>
-          <div class="process">
-            <span>Complete este formulario</span>
-            <svg viewBox="0 0 16 16"><path d="M5 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-            <span>Entregue el formulario completo a su gerente de departamento (en persona o por correo electrónico)</span>
-            <svg viewBox="0 0 16 16"><path d="M5 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-            <span>Agende una cita con Sea Khun</span>
+          <hr>
+          <div class="info-section">
+            <h3>Valores fundamentales</h3>
+            <ul class="values-list">
+              <li>Responsabilidad</li>
+              <li>Atención al detalle</li>
+              <li>Trabajo en equipo</li>
+              <li>Tomador de riesgos táctico</li>
+              <li>Mejor que ayer</li>
+              <li>Valorar la reputación</li>
+            </ul>
           </div>
-          <p><strong>Tiempo:</strong> Cada revisión dura aproximadamente 20 minutos y comienza cada media hora.</p>
-          <p>Envíe su formulario al menos una semana antes de su cita programada.</p>
-          <p><strong>Nota importante:</strong> Programe su revisión fuera de su horario de trabajo habitual. Si asiste en su día libre o fuera de su turno programado, se le compensará; solo asegúrese de enviar un mensaje a Recursos Humanos o a su gerente con las horas para que puedan agregarse a la nómina.</p>
-          <h3 class="mt-2 font-semibold">Preguntas de revisión</h3>
-          <p>Responda de forma clara y concisa. Seleccione su calificación para cada pregunta.</p>
+          <hr>
+          <div class="info-section">
+            <h3>Sistema de calificación y Proceso</h3>
+            <p><strong>Sistema de calificación:</strong> Para cada pregunta, seleccione una calificación usando la escala a continuación:</p>
+            <div class="rating-badges">
+              <span class="badge badge-gray">1 = Por debajo de las expectativas</span>
+              <span class="badge badge-green">2 = Cumple con las expectativas</span>
+              <span class="badge badge-gold">3 = Supera las expectativas</span>
+            </div>
+            <p>Importante: La asistencia y la puntualidad (Pregunta&nbsp;1) tienen un peso significativo en su puntaje general.</p>
+            <h3 class="mt-2 font-semibold">Proceso de revisión</h3>
+            <p><strong>Cuándo:</strong> Las revisiones se realizarán durante todo julio.</p>
+            <p><strong>Cómo programar:</strong></p>
+            <div class="process">
+              <span>Complete este formulario</span>
+              <svg viewBox="0 0 16 16"><path d="M5 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+              <span>Entregue el formulario completo a su gerente de departamento (en persona o por correo electrónico)</span>
+              <svg viewBox="0 0 16 16"><path d="M5 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+              <span>Agende una cita con Sea Khun</span>
+            </div>
+            <p><strong>Tiempo:</strong> Cada revisión dura aproximadamente 20 minutos y comienza cada media hora.</p>
+            <p>Envíe su formulario al menos una semana antes de su cita programada.</p>
+            <p><strong>Nota importante:</strong> Programe su revisión fuera de su horario de trabajo habitual. Si asiste en su día libre o fuera de su turno programado, se le compensará; solo asegúrese de enviar un mensaje a Recursos Humanos o a su gerente con las horas para que puedan agregarse a la nómina.</p>
+            <h3 class="mt-2 font-semibold">Preguntas de revisión</h3>
+            <p>Responda de forma clara y concisa. Seleccione su calificación para cada pregunta.</p>
+          </div>
         </div>
       </div>
       <div class="callout">Los aumentos entran en vigor en el primer periodo de pago de agosto.</div>
