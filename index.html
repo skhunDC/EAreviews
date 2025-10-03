@@ -7,7 +7,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 <style>
@@ -318,6 +317,53 @@ input[type=radio],input[type=checkbox]{width:auto;padding:0;border-radius:999px;
 .rating-badges{display:flex;flex-wrap:wrap;gap:0.5rem;}
 .badge{display:inline-flex;align-items:center;justify-content:center;padding:0.35rem 0.85rem;border-radius:999px;font-size:0.85rem;font-weight:600;color:#fff;}
 .badge-gray{background:#6b7280;}
+.flex{display:flex;}
+.items-start{align-items:flex-start;}
+.items-center{align-items:center;}
+.justify-between{justify-content:space-between;}
+.justify-center{justify-content:center;}
+.gap-4{gap:1rem;}
+.space-y-1> * + *{margin-top:0.25rem;}
+.mb-4{margin-bottom:1rem;}
+.mb-1{margin-bottom:0.25rem;}
+.mt-2{margin-top:0.5rem;}
+.pl-4{padding-left:1rem;}
+.fixed{position:fixed;}
+.inset-0{top:0;right:0;bottom:0;left:0;}
+.p-4{padding:1rem;}
+.pt-16{padding-top:4rem;}
+.p-6{padding:1.5rem;}
+.p-8{padding:2rem;}
+.space-y-4> * + *{margin-top:1rem;}
+.w-full{width:100%;}
+.w-80{width:20rem;max-width:100%;}
+.max-w-3xl{max-width:48rem;}
+.w-12{width:3rem;}
+.h-12{height:3rem;}
+.bottom-6{bottom:1.5rem;}
+.right-6{right:1.5rem;}
+.overflow-auto{overflow:auto;}
+.overflow-x-auto{overflow-x:auto;}
+.bg-white{background:#fff;}
+.bg-white\/90{background:rgba(255,255,255,0.9);}
+.bg-black\/30{background:rgba(0,0,0,0.3);}
+.bg-emerald-600{background:var(--emerald-600);}
+.text-white{color:#fff;}
+.text-red-600{color:#dc2626;}
+.text-center{text-align:center;}
+.text-lg{font-size:1.125rem;}
+.text-xl{font-size:1.25rem;}
+.font-bold{font-weight:700;}
+.font-semibold{font-weight:600;}
+.rounded-xl{border-radius:0.75rem;}
+.rounded-full{border-radius:9999px;}
+.shadow-lg{box-shadow:0 20px 35px rgba(15,23,42,0.18);}
+.shadow-xl{box-shadow:0 25px 50px rgba(15,23,42,0.2);}
+.px-1{padding-left:0.25rem;padding-right:0.25rem;}
+.px-2{padding-left:0.5rem;padding-right:0.5rem;}
+.py-1{padding-top:0.25rem;padding-bottom:0.25rem;}
+.border{border:1px solid var(--gray-200);border-radius:0.75rem;}
+.list-disc{list-style:disc;padding-left:1.25rem;}
 .badge-green{background:var(--emerald-600);}
 .badge-gold{background:var(--gold-400);color:#1f2937;}
 .process{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;font-size:0.95rem;color:#374151;}
@@ -1523,9 +1569,13 @@ function initCalendar(){
   }
   const initialView=window.innerWidth<768?'timeGridDay':'timeGridWeek';
   if(!calendar){
-    const plugins=['timeGrid','dayGrid','list','interaction'];
-    calendar=new fc.Calendar(el,{
-      plugins:plugins,
+    const plugins=[
+      fc.interactionPlugin,
+      fc.dayGridPlugin,
+      fc.timeGridPlugin,
+      fc.listPlugin
+    ].filter(Boolean);
+    const options={
       initialView:initialView,
       locale:lang==='es'?'es':'en',
       headerToolbar:{start:'prev,next today',center:'title',end:'timeGridDay,timeGridWeek,dayGridMonth'},
@@ -1547,7 +1597,11 @@ function initCalendar(){
         return classes;
       },
       eventClick:onCalendarEventClick
-    });
+    };
+    if(plugins.length){
+      options.plugins=plugins;
+    }
+    calendar=new fc.Calendar(el,options);
   }else{
     calendar.setOption('initialView',initialView);
   }
