@@ -11,96 +11,382 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css">
 <script type="module">import {Calendar} from "https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/+esm";window.FullCalendar={Calendar};</script>
 <style>
-h1,h2{font-family:'Inter',Arial,sans-serif;}
-body{font-family:'Inter',Roboto,Arial,sans-serif;margin:0;padding:0;background:linear-gradient(135deg,#f6f8fa 0%,#eaf4ff 100%);color:#333;font-size:1rem;line-height:1.6;}
-h1{font-size:clamp(1.75rem,4vw,2.5rem);margin:0 0 1rem 0;}
-h2{font-size:1.25rem;margin-top:0;color:#0A5C30;}
-#review-intro h1{text-align:center;color:#0A5C30;font-weight:700;margin-bottom:1.5rem;}
-#review-intro{max-width:900px;margin:auto;padding:2rem;background:#fefdf9;color:#333;}
-#review-intro .intro-cards{display:flex;flex-wrap:wrap;gap:1.5rem;}
-#review-intro .info-card{background:#fff;border-radius:1rem;box-shadow:0 4px 12px rgba(0,0,0,0.08);padding:1.5rem;flex:1 1 100%;animation:slideUp 0.5s ease forwards;}
-@media(min-width:640px){#review-intro .info-card{flex-basis:calc(50% - 0.75rem);}}
-.values-list{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));}
-.values-list li{display:inline-block;background:#0A5C30;color:#fff;padding:0.2rem 0.75rem;border-radius:9999px;font-size:0.9rem;margin:0.2rem;text-align:center;}
-.rating-badges{display:flex;gap:0.5rem;margin-bottom:0.5rem;flex-wrap:wrap;}
-.badge{display:inline-block;padding:0.25rem 0.75rem;border-radius:9999px;font-size:0.9rem;color:#fff;}
-.badge-gray{background:#888;}
-.badge-green{background:#0A5C30;}
-.badge-gold{background:#C9A14A;color:#000;}
-.process{display:flex;flex-wrap:wrap;align-items:center;gap:0.3rem;margin-bottom:0.5rem;font-size:0.9rem;}
-.process svg{width:12px;height:12px;fill:none;stroke:#0A5C30;stroke-width:2;}
-.callout{margin-top:1rem;background:#C9A14A1A;border-left:4px solid #C9A14A;padding:0.75rem;font-size:0.9rem;}
-@keyframes slideUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-.nav-items{display:flex;gap:10px;align-items:center;margin-left:auto;}
-.nav-toggle{display:none;background:none;border:none;color:white;font-size:24px;cursor:pointer;margin-left:auto;}
-nav{display:flex;gap:10px;background:#0A5C30;color:white;padding:10px;align-items:center;position:relative;z-index:50;}
-nav button{background:none;border:none;color:white;font-size:16px;cursor:pointer;padding:6px 12px;}
-.lang-switch{display:flex;align-items:center;gap:4px;}
-.logo{width:125px;height:125px;}
-.nav-title{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:24px;font-weight:bold;}
-.switch{position:relative;display:inline-block;width:40px;height:24px;}
+:root{
+  --emerald-50:#f0f8f3;
+  --emerald-100:#e3f4ea;
+  --emerald-600:#0A5C30;
+  --emerald-700:#084725;
+  --emerald-800:#06371f;
+  --gold-400:#C9A14A;
+  --gray-100:#f6f8fa;
+  --gray-200:#e5e7eb;
+  --gray-400:#94a3b8;
+  --gray-600:#475569;
+  --surface:#ffffff;
+  --shadow:0 18px 36px rgba(10,92,48,0.12);
+}
+*,*::before,*::after{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:'Inter',Roboto,Arial,sans-serif;
+  line-height:1.6;
+  background:linear-gradient(135deg,#f6f8fa 0%,#eaf4ff 100%);
+  color:#1f2933;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+h1,h2,h3,h4{
+  font-family:'Inter',Arial,sans-serif;
+  color:var(--emerald-700);
+  margin:0;
+}
+h1{font-size:clamp(1.75rem,4vw,2.5rem);}
+h2{font-size:clamp(1.25rem,3vw,1.75rem);}
+main{flex:1;width:100%;}
+.app-header{
+  background:var(--emerald-600);
+  color:#fff;
+  position:sticky;
+  top:0;
+  z-index:70;
+  box-shadow:0 16px 40px rgba(8,71,37,0.32);
+}
+.nav-bar{
+  position:relative;
+  width:min(1100px,100%);
+  margin:0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  padding:0.75rem clamp(1.25rem,4vw,2.75rem);
+}
+.nav-brand{
+  display:flex;
+  align-items:center;
+  gap:0.9rem;
+}
+.nav-brand img{
+  width:3.5rem;
+  height:3.5rem;
+  object-fit:contain;
+  filter:drop-shadow(0 10px 18px rgba(0,0,0,0.25));
+}
+.brand-text{display:flex;flex-direction:column;gap:0.15rem;}
+.brand-title{font-size:1.05rem;font-weight:600;line-height:1.2;letter-spacing:0.01em;}
+.brand-sub{font-size:0.8rem;opacity:0.75;}
+.nav-toggle{
+  background:rgba(255,255,255,0.1);
+  border:1px solid rgba(255,255,255,0.25);
+  border-radius:0.9rem;
+  color:#fff;
+  width:44px;
+  height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:background .2s ease,transform .2s ease;
+}
+.nav-toggle:hover{background:rgba(255,255,255,0.22);}
+.nav-toggle:active{transform:scale(0.96);}
+.nav-items{
+  position:absolute;
+  left:0;
+  right:0;
+  top:100%;
+  display:flex;
+  flex-direction:column;
+  gap:0.75rem;
+  background:var(--emerald-700);
+  padding:1rem clamp(1.25rem,5vw,2.5rem);
+  transform:scaleY(0);
+  transform-origin:top;
+  transition:transform .25s ease,opacity .25s ease;
+  opacity:0;
+  pointer-events:none;
+  border-bottom-left-radius:1.25rem;
+  border-bottom-right-radius:1.25rem;
+  box-shadow:0 22px 36px rgba(8,71,37,0.4);
+}
+.nav-items.show{
+  transform:scaleY(1);
+  opacity:1;
+  pointer-events:auto;
+}
+.nav-items button{
+  background:none;
+  border:none;
+  color:#fff;
+  font-size:1rem;
+  font-weight:500;
+  padding:0.5rem 0;
+  text-align:left;
+  display:flex;
+  align-items:center;
+  gap:0.4rem;
+  cursor:pointer;
+  transition:opacity .2s ease;
+}
+.nav-items button:hover{opacity:0.8;}
+.lang-switch{display:flex;align-items:center;gap:0.35rem;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;}
+.switch{position:relative;display:inline-block;width:42px;height:24px;}
 .switch input{opacity:0;width:0;height:0;}
 .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#d1d5db;transition:.4s;border-radius:9999px;}
-.slider:before{position:absolute;content:"";height:20px;width:20px;left:2px;bottom:2px;background:white;transition:.4s;border-radius:50%;}
+.slider:before{position:absolute;content:"";height:20px;width:20px;left:2px;bottom:2px;background:white;transition:.4s;border-radius:50%;box-shadow:0 4px 10px rgba(15,23,42,0.25);}
 .switch input:checked + .slider{background:#059669;}
-.switch input:checked + .slider:before{transform:translateX(16px);}
-#devPanel{z-index:70;}
-#devPanel table{width:100%;border-collapse:collapse;}
-#devPanel th,#devPanel td{padding:8px;border-bottom:1px solid #ddd;}
-#devPanel td .actions button{margin-left:4px;}
-#devPanel .modal{position:fixed;top:0;right:0;bottom:0;left:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);z-index:50;}
-#devPanel .modal.hidden{display:none;}
-.modal{position:fixed;top:0;right:0;bottom:0;left:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);z-index:50;}
-.modal.hidden{display:none;}
-#snackbar{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#323232;color:#fff;padding:0.75rem 1.25rem;border-radius:4px;opacity:0;transition:opacity 0.3s;z-index:60;}
-#snackbar.show{opacity:1;}
-#accessDenied{z-index:60;}
-#addUserFab{z-index:50;}
-section{padding:20px;}
-#login{background:linear-gradient(135deg,#f6f8fa 0%,#eaf4ff 100%);}
-#reviewForm{max-width:900px;margin:auto;padding:2rem;background:#fefdf9;color:#333;}
-.question-title{display:block;font-size:1.25rem;color:#0A5C30;margin-bottom:0.5rem;font-weight:600;}
-.card{background:#fff;padding:1.5rem;margin-bottom:1.5rem;border-radius:1rem;box-shadow:0 4px 12px rgba(0,0,0,0.08);animation:slideUp 0.5s ease forwards;}
-.hidden{display:none;}
-label{display:block;margin-top:10px;}
-input[type=text],textarea{width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:4px;}
-input[type=number]{width:100%;padding:8px;margin-top:4px;border:1px solid #ccc;border-radius:4px;}
-.signature{font-family:'Dancing Script',cursive;font-size:1.2rem;}
-.sign-date{width:auto;margin-left:8px;}
-select{padding:8px;}
- .rating-group label{display:inline-block;margin-right:10px;}
-button.primary{background:#0A5C30;color:white;border:none;border-radius:4px;padding:8px 16px;cursor:pointer;}
-
-#submitMsg{display:block;margin-top:0.5rem;font-weight:bold;}
-/* Dropdown styles */
-.dropdown{position:relative;}
-.dropdown-content{display:none;position:absolute;top:100%;left:0;background:#0A5C30;color:white;min-width:80px;z-index:10;}
-.dropdown-content button{background:none;border:none;color:white;cursor:pointer;display:block;width:100%;padding:6px 12px;text-align:left;}
-.dropdown-content.show{display:block;}
-/* Loading bar styles */
-.loading-bar{height:4px;background:#eee;position:relative;overflow:hidden;}
-.loading-bar span{display:block;height:100%;background:#0A5C30;width:100%;animation:loadAnim 1.2s linear infinite;}
-@keyframes loadAnim{from{transform:translateX(-100%);}to{transform:translateX(100%);}}
-.calendar{width:100%;border-collapse:collapse;}
-.calendar th,.calendar td{border:1px solid #ddd;padding:4px;vertical-align:top;height:90px;}
-.calendar td.disabled{background:#f3f4f6;color:#999;}
-.calendar .date-num{font-weight:600;}
-.calendar .slot{margin-top:2px;padding:2px 4px;border-radius:4px;font-size:0.75rem;cursor:pointer;}
-.calendar .slot.available{background:#d1fae5;}
-.calendar .slot.booked{background:#e5e7eb;color:#888;cursor:not-allowed;}
-.calendar .slot.mine{background:#0A5C30;color:#fff;}
-.calendar .slot:hover{box-shadow:0 2px 4px rgba(0,0,0,0.1);}
-@media(max-width:640px){
-  .logo{width:80px;height:80px;}
-  nav{flex-wrap:wrap;}
-  .nav-title{position:static;transform:none;margin:0 auto;}
-  #navItems{display:none;width:100%;flex-direction:column;gap:8px;margin-top:10px;}
-  #navItems.show{display:flex;}
-  .nav-toggle{display:block;}
-  .lang-switch{margin-left:0;}
+.switch input:checked + .slider:before{transform:translateX(18px);}
+.hidden{display:none !important;}
+section[data-view]{
+  width:min(1100px,100%);
+  margin:0 auto;
+  padding:clamp(1.75rem,4vw,3rem) clamp(1.25rem,4vw,2.75rem);
+  display:flex;
+  flex-direction:column;
+  gap:1.5rem;
 }
-@media(min-width:641px){
-  #navItems{display:flex;}
+.home-hero{
+  display:flex;
+  flex-direction:column;
+  gap:0.75rem;
+}
+.home-actions{
+  display:grid;
+  gap:1rem;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+}
+.home-card{
+  background:var(--surface);
+  padding:1.5rem;
+  border-radius:1.25rem;
+  box-shadow:var(--shadow);
+  display:flex;
+  flex-direction:column;
+  gap:0.9rem;
+}
+.home-card p{margin:0;color:var(--gray-600);}
+.home-card button{
+  align-self:flex-start;
+  border:none;
+  border-radius:9999px;
+  padding:0.65rem 1.25rem;
+  font-weight:600;
+  font-size:0.95rem;
+  cursor:pointer;
+  background:var(--emerald-600);
+  color:#fff;
+  transition:transform .2s ease,box-shadow .2s ease;
+}
+.home-card button:hover{transform:translateY(-1px);box-shadow:0 12px 18px rgba(10,92,48,0.18);}
+.home-card.secondary button{background:transparent;color:var(--emerald-700);border:1px solid rgba(10,92,48,0.25);}
+.home-card.secondary button:hover{background:var(--emerald-50);box-shadow:none;}
+.card{
+  background:var(--surface);
+  border-radius:1.25rem;
+  box-shadow:var(--shadow);
+  padding:clamp(1.25rem,3vw,1.75rem);
+  display:flex;
+  flex-direction:column;
+  gap:1rem;
+}
+#reviewForm{
+  display:flex;
+  flex-direction:column;
+  gap:1.5rem;
+}
+.question-title{font-size:1.15rem;font-weight:600;color:var(--emerald-700);}
+.card-title{font-weight:600;font-size:1rem;color:var(--emerald-700);}
+label{
+  display:flex;
+  flex-direction:column;
+  gap:0.35rem;
+  font-size:0.95rem;
+  color:#1f2937;
+  font-weight:500;
+}
+input,textarea,select{
+  font:inherit;
+  border-radius:0.85rem;
+  border:1px solid var(--gray-200);
+  background:#fff;
+  padding:0.65rem 0.9rem;
+  transition:border .2s ease,box-shadow .2s ease;
+  width:100%;
+}
+input:focus,textarea:focus,select:focus{
+  outline:none;
+  border-color:rgba(10,92,48,0.45);
+  box-shadow:0 0 0 3px rgba(10,92,48,0.18);
+}
+textarea{min-height:140px;resize:vertical;}
+input[type=radio],input[type=checkbox]{width:auto;padding:0;border-radius:999px;}
+.signature{font-family:'Dancing Script',cursive;font-size:1.35rem;}
+.sign-date{width:auto;max-width:240px;align-self:flex-start;}
+.rating-group{
+  display:flex;
+  flex-direction:column;
+  gap:0.65rem;
+  padding-top:0.5rem;
+}
+.rating-group label{
+  display:flex;
+  align-items:center;
+  gap:0.6rem;
+  flex-wrap:wrap;
+  border:1px solid rgba(10,92,48,0.2);
+  border-radius:0.85rem;
+  padding:0.6rem 0.9rem;
+  font-weight:500;
+}
+.rating-group input{accent-color:var(--emerald-600);}
+#questionList{display:flex;flex-direction:column;gap:1.25rem;}
+#reviewsList{display:grid;gap:1rem;}
+.callout{
+  background:rgba(201,161,74,0.12);
+  border-left:4px solid var(--gold-400);
+  border-radius:0.75rem;
+  padding:1rem 1.25rem;
+  color:#4b5563;
+}
+.rating-badges{display:flex;flex-wrap:wrap;gap:0.5rem;}
+.badge{display:inline-flex;align-items:center;justify-content:center;padding:0.35rem 0.85rem;border-radius:999px;font-size:0.85rem;font-weight:600;color:#fff;}
+.badge-gray{background:#6b7280;}
+.badge-green{background:var(--emerald-600);}
+.badge-gold{background:var(--gold-400);color:#1f2937;}
+.process{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;font-size:0.95rem;color:#374151;}
+.process svg{width:12px;height:12px;stroke:var(--emerald-700);stroke-width:2;}
+#review-intro{
+  background:linear-gradient(135deg,rgba(255,255,255,0.95),rgba(235,250,243,0.95));
+  border-radius:1.5rem;
+  padding:clamp(1.5rem,4vw,2.25rem);
+  display:flex;
+  flex-direction:column;
+  gap:1.5rem;
+}
+#review-intro h1{text-align:center;color:var(--emerald-700);font-weight:700;}
+#review-intro .intro-cards{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));}
+#review-intro .info-card{background:#fff;border-radius:1rem;box-shadow:0 12px 30px rgba(6,55,31,0.08);padding:1.25rem;display:flex;flex-direction:column;gap:0.75rem;}
+.values-list{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:0.5rem;}
+.values-list li{background:var(--emerald-600);color:#fff;padding:0.35rem 0.9rem;border-radius:999px;font-size:0.85rem;}
+.form-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:0.75rem;
+  align-items:center;
+}
+.form-footnote{margin-left:auto;font-size:0.85rem;color:var(--gray-600);text-align:right;}
+.form-footnote small{color:inherit;}
+button.primary{
+  background:var(--emerald-600);
+  color:#fff;
+  border:none;
+  border-radius:9999px;
+  padding:0.75rem 1.5rem;
+  font-size:1rem;
+  font-weight:600;
+  cursor:pointer;
+  box-shadow:0 12px 22px rgba(10,92,48,0.18);
+  transition:transform .2s ease,box-shadow .2s ease;
+}
+button.primary:hover{transform:translateY(-1px);box-shadow:0 18px 28px rgba(10,92,48,0.22);}
+button.primary:active{transform:translateY(0);box-shadow:0 8px 18px rgba(10,92,48,0.2);}
+button.secondary{
+  background:transparent;
+  color:var(--emerald-700);
+  border:1px solid rgba(10,92,48,0.3);
+  box-shadow:none;
+}
+button.secondary:hover{background:var(--emerald-50);box-shadow:none;}
+#submitMsg{font-weight:600;color:var(--emerald-700);}
+.loading-bar{height:4px;background:rgba(15,118,110,0.12);position:sticky;top:0;z-index:60;overflow:hidden;}
+.loading-bar span{display:block;height:100%;background:var(--emerald-600);width:100%;animation:loadAnim 1.2s linear infinite;}
+@keyframes loadAnim{from{transform:translateX(-100%);}to{transform:translateX(100%);}}
+#snackbar{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#1f2937;color:#fff;padding:0.75rem 1.5rem;border-radius:999px;opacity:0;transition:opacity .3s ease,transform .3s ease;z-index:80;}
+#snackbar.show{opacity:1;transform:translate(-50%,0);}
+#scheduleFlex{display:grid;gap:1.25rem;}
+.schedule-form{display:flex;flex-direction:column;gap:1.25rem;}
+#calendarWrapper{min-height:380px;}
+#calendar{min-height:340px;}
+#slotList{display:flex;flex-direction:column;gap:0.5rem;max-height:260px;overflow-y:auto;padding-right:0.35rem;}
+#availMsg{font-size:0.85rem;color:var(--emerald-700);}
+.slot-row{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem 0.75rem;justify-content:flex-start;padding:0.75rem 0.9rem;border:1px solid var(--gray-200);border-radius:0.85rem;background:#fff;box-shadow:0 8px 18px rgba(15,23,42,0.08);}
+.slot-row-booked{background:var(--emerald-100);border-color:rgba(10,92,48,0.25);}
+.slot-range{flex:1 1 100%;font-weight:600;color:var(--emerald-700);}
+.slot-assign{flex:1 1 160px;max-width:220px;}
+.slot-save{padding:0.45rem 1rem;font-size:0.85rem;box-shadow:none;margin-left:auto;}
+.slot-save:hover{box-shadow:0 10px 20px rgba(10,92,48,0.16);}
+.calendar{width:100%;border-collapse:collapse;font-size:0.9rem;}
+.calendar th,.calendar td{border:1px solid var(--gray-200);padding:0.75rem;vertical-align:top;background:#fff;}
+.calendar th{background:var(--emerald-100);color:var(--emerald-800);text-align:left;font-weight:600;}
+.calendar td.disabled{background:var(--gray-100);color:var(--gray-400);}
+.calendar .date-num{font-weight:600;margin-bottom:0.4rem;display:block;color:var(--emerald-700);}
+.calendar .slot{margin-top:0.3rem;padding:0.35rem 0.55rem;border-radius:0.65rem;font-size:0.75rem;cursor:pointer;display:inline-flex;gap:0.35rem;align-items:center;}
+.calendar .slot.available{background:#d1fae5;color:#047857;}
+.calendar .slot.booked{background:#e5e7eb;color:#6b7280;cursor:not-allowed;}
+.calendar .slot.mine{background:var(--emerald-600);color:#fff;}
+.calendar .slot:hover{box-shadow:0 6px 14px rgba(15,118,110,0.15);}
+#devPanel{z-index:70;}
+#devPanel table{width:100%;border-collapse:collapse;font-size:0.95rem;}
+#devPanel th,#devPanel td{padding:0.75rem;border-bottom:1px solid var(--gray-200);text-align:left;}
+#devPanel th{background:var(--emerald-100);color:var(--emerald-800);}
+#devPanel .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(15,23,42,0.45);z-index:80;}
+#devPanel .modal.hidden{display:none;}
+.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(15,23,42,0.4);z-index:80;}
+.modal.hidden{display:none;}
+#errorModal .card,#devPanel .modal .card{box-shadow:0 18px 32px rgba(15,23,42,0.25);}
+#addUserFab{z-index:90;}
+#accessDenied{z-index:90;}
+#login{
+  background:linear-gradient(135deg,#f6f8fa 0%,#eaf4ff 100%);
+  min-height:calc(100vh - 64px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:clamp(2rem,6vw,4rem);
+}
+#login .card-like{
+  background:rgba(255,255,255,0.9);
+  border-radius:1.5rem;
+  box-shadow:0 32px 60px rgba(15,23,42,0.18);
+  padding:clamp(1.75rem,4vw,2.75rem);
+  display:flex;
+  flex-direction:column;
+  gap:1.25rem;
+  width:min(420px,100%);
+}
+#login img{height:100px;object-fit:contain;}
+#login button.primary{width:100%;}
+#submitMsg{min-width:120px;}
+@media(min-width:768px){
+  .nav-toggle{display:none;}
+  .nav-items{
+    position:static;
+    transform:none;
+    opacity:1;
+    pointer-events:auto;
+    flex-direction:row;
+    align-items:center;
+    gap:1.25rem;
+    background:transparent;
+    padding:0;
+    box-shadow:none;
+    border-radius:0;
+  }
+  .nav-items button{
+    padding:0.55rem 1rem;
+    border-radius:9999px;
+    background:rgba(255,255,255,0.12);
+  }
+  .nav-items button:hover{opacity:1;background:rgba(255,255,255,0.22);}
+  #scheduleFlex{grid-template-columns:280px 1fr;align-items:start;}
+}
+@media(min-width:1024px){
+  #scheduleFlex{grid-template-columns:320px 1fr;}
+  #calendarWrapper{padding:1rem 1.25rem;}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;scroll-behavior:auto !important;}
 }
 </style>
 <script>
@@ -132,9 +418,15 @@ const defaultQuestions=[
 ];
 const translations={
   en:{
-    home:'Home',reviews:'Reviews',schedule:'Schedule',navTitle:'Employee Annual Reviews',
+    home:'Home',reviews:'Reviews',schedule:'Schedule',navTitle:'Employee Annual Reviews',navSubtitle:'Empower your review journey',
     welcomeTitle:'Welcome to the Employee Review Portal',
     welcomeMsg:'Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.',
+    homeReviewsCardTitle:'Complete your self-review',
+    homeReviewsCardBody:'Stay prepared by answering each question with clear examples and track your progress in one place.',
+    homeScheduleCardTitle:'Reserve your review time',
+    homeScheduleCardBody:'Browse available slots, see what\'s already booked, and lock in a time that works for you and your manager.',
+    homeGuideCardTitle:'Need a hand?',
+    homeGuideButton:'Open portal',
     comingSoon:'Coming soon...',userId:'User ID',password:'Password',login:'Login',logout:'Logout',
     loginFail:'Login failed',invalidPwd:'Invalid password.',
     noAccount:'Account not found. Please reach out to Sea Khun to be added.',
@@ -159,6 +451,8 @@ const translations={
     bookOk:'Meeting booked',
     error:'Error occurred',
     scheduleGuide:`<div class="callout"><h3 class="font-bold mb-1">Booking & Availability Guidelines</h3><ul class="list-disc pl-4 space-y-1"><li><strong>Production Team</strong> – Reserve reviews <strong>12:00 PM – 2:00 PM</strong> (post-production). These slots have priority for the conference room.</li><li><strong>Delivery Drivers</strong> – Aim for <strong>Wednesdays</strong> (non-Route day).</li><li><strong>CSRs</strong> – Book any other open time that works for you and your manager.</li><li><strong>One Room. One Slot. One Team.</strong> – Only <strong>one 30-minute</strong> booking at a time; no double-booking allowed.</li></ul></div>`,
+    compAdjustTitle:'Compensation Adjustment',
+    saveSlotBtn:'Save',
     addSlotTitle:'Set Availability',
     addSlotBtn:'Add Slot',
     slotListTitle:'Slots',
@@ -217,9 +511,15 @@ const translations={
     </section>`
   },
   es:{
-    home:'Inicio',reviews:'Reseñas',schedule:'Agenda',navTitle:'Revisiones Anuales de Empleados',
+    home:'Inicio',reviews:'Reseñas',schedule:'Agenda',navTitle:'Revisiones Anuales de Empleados',navSubtitle:'Impulsa tu proceso de evaluación',
     welcomeTitle:'Bienvenido al Portal de Evaluaciones',
     welcomeMsg:'Seleccione una opción en la barra de navegación para ver sus evaluaciones o programar una reunión. Use el botón de idioma para cambiar entre inglés y español.',
+    homeReviewsCardTitle:'Completa tu autoevaluación',
+    homeReviewsCardBody:'Prepárate respondiendo cada pregunta con ejemplos claros y lleva un registro de tu progreso en un solo lugar.',
+    homeScheduleCardTitle:'Reserva tu horario de revisión',
+    homeScheduleCardBody:'Explora los horarios disponibles, verifica los ya reservados y asegura un momento que funcione para ti y tu gerente.',
+    homeGuideCardTitle:'¿Necesitas ayuda?',
+    homeGuideButton:'Abrir portal',
     comingSoon:'Próximamente...',userId:'ID de usuario',password:'Contraseña',login:'Iniciar sesión',logout:'Cerrar sesión',
     loginFail:'Error al iniciar sesión',invalidPwd:'Contraseña inválida.',
     noAccount:'Cuenta no encontrada. Por favor contacte a Sea Khun para ser agregado.',
@@ -244,6 +544,8 @@ const translations={
     bookOk:'Reunión programada',
     error:'Ocurrió un error',
     scheduleGuide:`<div class="callout"><h3 class="font-bold mb-1">Pautas de reserva y disponibilidad</h3><ul class="list-disc pl-4 space-y-1"><li><strong>Equipo de Producción</strong> – Reserve revisiones <strong>12:00 PM – 2:00 PM</strong> (después de producción). Estas horas tienen prioridad para la sala de conferencias.</li><li><strong>Conductores de Entrega</strong> – Trate de reservar <strong>los miércoles</strong> (día sin ruta).</li><li><strong>CSRs</strong> – Programe cualquier otro horario disponible que funcione para usted y su gerente.</li><li><strong>Una sala. Un turno. Un equipo.</strong> – Solo una reserva de <strong>30 minutos</strong>; no se permiten dobles reservas.</li></ul></div>`,
+    compAdjustTitle:'Ajuste de compensación',
+    saveSlotBtn:'Guardar',
     addSlotTitle:'Establecer disponibilidad',
     addSlotBtn:'Agregar horario',
     slotListTitle:'Horarios',
@@ -319,15 +621,28 @@ function stopLoading(){
   if(lb)lb.classList.add('hidden');
   loadingReviews=false;
 }
+function setMenuState(open){
+  const items=document.getElementById('navItems');
+  const toggle=document.getElementById('navToggle');
+  if(items){
+    items.classList.toggle('show',!!open);
+  }
+  if(toggle){
+    toggle.setAttribute('aria-expanded',open?'true':'false');
+  }
+}
+function closeMenu(){setMenuState(false);}
 function show(id){
+  const sections=document.querySelectorAll('section[data-view]');
   if((id==='reviews' || id==='schedule') && !user){
     pendingSection=id;
-    document.querySelectorAll('body>section').forEach(s=>s.classList.add('hidden'));
+    sections.forEach(s=>s.classList.add('hidden'));
     document.getElementById('login').classList.remove('hidden');
     return;
   }
   document.getElementById('login').classList.add('hidden');
-  document.querySelectorAll('body>section').forEach(s=>s.classList.add('hidden'));
+  closeMenu();
+  sections.forEach(s=>s.classList.add('hidden'));
   if(id==='reviews'){
     startLoading();
     if(user){
@@ -348,10 +663,8 @@ function show(id){
 }
 
 function openSchedule(){
-  const menu=document.getElementById("navItems");
-  if(menu) menu.classList.remove("show");
-  show("schedule");
-  initCalendar();
+  closeMenu();
+  show('schedule');
   loadAvailability();
 }
 function applyTranslations(){
@@ -369,8 +682,22 @@ function applyTranslations(){
 }
 function toggleMenu(){
   const items=document.getElementById('navItems');
-  if(items) items.classList.toggle('show');
+  if(!items)return;
+  const isOpen=!items.classList.contains('show');
+  setMenuState(isOpen);
 }
+window.addEventListener('resize',()=>{
+  if(window.innerWidth>=768){
+    setMenuState(false);
+  }
+});
+document.addEventListener('click',e=>{
+  const items=document.getElementById('navItems');
+  if(!items || !items.classList.contains('show')) return;
+  const toggle=document.getElementById('navToggle');
+  if((toggle && toggle.contains(e.target)) || items.contains(e.target)) return;
+  setMenuState(false);
+});
 function init(){
   show('home');
   applyTranslations();
@@ -378,11 +705,15 @@ function init(){
   document.getElementById('mgrSign').addEventListener('input',()=>updateSignDate('mgrSign','mgrSignDate'));
   loadQuestions();
   initCalendar();
-  google.script.run.withSuccessHandler(c=>{
-    config=c;
-    applyTranslations();
+  if(typeof google!=='undefined' && google.script && google.script.run){
+    google.script.run.withSuccessHandler(c=>{
+      config=c;
+      applyTranslations();
+      showDevButton();
+    }).loadConfig();
+  }else{
     showDevButton();
-  }).loadConfig();
+  }
 }
 function login(){
   const e=document.getElementById('userId').value;
@@ -426,6 +757,7 @@ function login(){
 }
 
 function navLogin(){
+  closeMenu();
   const loginDiv=document.getElementById('login');
   if(user){
     if(typeof google!==
@@ -455,6 +787,10 @@ function toggleLang(){
   applyTranslations();
   renderReviews();
   renderQuestionList();
+  if(user){
+    loadSlots();
+    loadAvailability();
+  }
 }
 let reviews=[];
 function loadReviews(){
@@ -940,23 +1276,25 @@ function renderSlotList(slots){
     if(s.userId!==user.userId) return;
     count++;
     const row=document.createElement('div');
-    row.className='flex items-center gap-2 border rounded p-1';
+    row.className='slot-row';
     const span=document.createElement('span');
+    span.className='slot-range';
     span.textContent=formatRange(s.start,s.end);
     row.appendChild(span);
     const inp=document.createElement('input');
     inp.type='text';
-    inp.className='border px-1 py-0 flex-1';
+    inp.className='slot-assign';
     inp.value=s.employeeId||'';
     if(s.employeeId){
       inp.disabled=true;
-      row.classList.add('bg-emerald-50');
+      row.classList.add('slot-row-booked');
     }
     row.appendChild(inp);
     if(!s.employeeId){
       const btn=document.createElement('button');
-      btn.textContent='Save';
-      btn.className='primary text-xs';
+      btn.type='button';
+      btn.textContent=t('saveSlotBtn');
+      btn.className='primary slot-save';
       btn.onclick=()=>saveSlot(s.id,inp.value,inp);
       row.appendChild(btn);
     }
@@ -1004,23 +1342,30 @@ document.addEventListener('DOMContentLoaded',init);
 </script>
 </head>
 <body>
-<nav>
-  <img src="https://www.dublincleaners.com/wp-content/uploads/2024/12/Dublin-Logos-stacked.png" alt="Logo" class="logo">
-  <button class="nav-toggle material-icons" onclick="toggleMenu()">menu</button>
-  <div class="nav-title" data-i18n-key="navTitle">Employee Annual Reviews</div>
-  <div id="navItems" class="nav-items">
-    <button type="button" onclick="show('home')" data-i18n-key="home">Home</button>
-    <button type="button" onclick="show('reviews')" data-i18n-key="reviews">Reviews</button>
-    <button type="button" onclick="openSchedule()" data-i18n-key="schedule">Schedule</button>
-    <div class="lang-switch">
-      <span>EN</span>
-      <label class="switch"><input type="checkbox" id="langToggle" onchange="toggleLang()"><span class="slider"></span></label>
-      <span>ES</span>
+<header class="app-header">
+  <div class="nav-bar">
+    <div class="nav-brand">
+      <img src="https://www.dublincleaners.com/wp-content/uploads/2024/12/Dublin-Logos-stacked.png" alt="Logo">
+      <div class="brand-text">
+        <span class="brand-title" data-i18n-key="navTitle">Employee Annual Reviews</span>
+        <span class="brand-sub" data-i18n-key="navSubtitle">Empower your review journey</span>
+      </div>
     </div>
-    <button type="button" id="navLoginBtn" onclick="navLogin()">Login</button>
-    <button type="button" id="devBtn" onclick="devLink()">Dev</button>
+    <button type="button" id="navToggle" class="nav-toggle material-icons" aria-expanded="false" aria-controls="navItems" onclick="toggleMenu()">menu</button>
+    <div id="navItems" class="nav-items">
+      <button type="button" onclick="show('home')" data-i18n-key="home">Home</button>
+      <button type="button" onclick="show('reviews')" data-i18n-key="reviews">Reviews</button>
+      <button type="button" onclick="openSchedule()" data-i18n-key="schedule">Schedule</button>
+      <div class="lang-switch">
+        <span>EN</span>
+        <label class="switch"><input type="checkbox" id="langToggle" onchange="toggleLang()"><span class="slider"></span></label>
+        <span>ES</span>
+      </div>
+      <button type="button" id="navLoginBtn" onclick="navLogin()" data-i18n-key="login">Login</button>
+      <button type="button" id="devBtn" onclick="devLink()">Dev</button>
+    </div>
   </div>
-</nav>
+</header>
 <div id="loadingBar" class="loading-bar hidden"><span></span></div>
 <div id="snackbar"></div>
 <div id="errorModal" class="modal hidden">
@@ -1029,77 +1374,102 @@ document.addEventListener('DOMContentLoaded',init);
     <button type="button" class="primary w-full" onclick="closeError()">OK</button>
   </div>
 </div>
-<section id="home" class="hidden">
-<h2 data-i18n-key="welcomeTitle">Welcome to the Employee Review Portal</h2>
-<p data-i18n-key="welcomeMsg">Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.</p>
-</section>
-<section id="reviews" class="hidden">
-<form id="reviewForm" onsubmit="submitReview();return false;">
-<div data-i18n-key="intro" data-i18n-html></div>
-<div id="reviewsList" class="mb-4"></div>
-<div id="questionList"></div>
-<div id="compAdjust" class="card hidden">
-<label><span data-i18n-key="curWage">Current Wage</span><input type="number" id="curWage" oninput="calcPct()"></label>
-<label><span data-i18n-key="newWage">New Wage</span><input type="number" id="newWage" oninput="calcPct()"></label>
-<div><span data-i18n-key="pctIncrease">% Increase:</span> <span id="pctInc">0</span>%</div>
-</div>
-<div id="finalBlock" class="card">
-<p data-i18n-key="finalExpTitle">Final Performance Expectation</p>
-<label><input type="radio" name="finalExp" value="below"> <span data-i18n-key="belowExp">Below Expectations</span></label>
-<label><input type="radio" name="finalExp" value="meets"> <span data-i18n-key="meetsExp">Meets Expectations</span></label>
-<label><input type="radio" name="finalExp" value="exceeds"> <span data-i18n-key="exceedsExp">Exceeds Expectations</span></label>
-<textarea id="finalNotes" data-i18n-key="notesPlaceholder" data-i18n-placeholder placeholder="Notes"></textarea>
-</div>
-<div class="card">
-  <label>
-    <span data-i18n-key="empSignature">Employee Signature</span>
-    <input type="text" id="empSign" class="signature">
-  </label>
-  <input type="text" id="empSignDate" class="sign-date" readonly data-i18n-key="signDate" data-i18n-placeholder placeholder="Date">
-  <label class="mt-4">
-    <span data-i18n-key="mgrSignature">Manager Signature</span>
-    <input type="text" id="mgrSign" class="signature">
-  </label>
-  <input type="text" id="mgrSignDate" class="sign-date" readonly data-i18n-key="signDate" data-i18n-placeholder placeholder="Date">
-</div>
-<button class="primary" type="submit" data-i18n-key="submitReview">Submit Review</button>
-<button id="btnSchedule" class="primary ml-4" onclick="show('schedule')" data-i18n-key="scheduleBtn"></button>
-<span id="submitMsg"></span>
-<div class="text-right mt-2"><small data-i18n-key="contactQuestions">Please contact Sea Khun HR/IT Manager with any questions or concerns.</small></div>
-</form>
-</section>
-<section id="schedule" class="hidden">
-  <div data-i18n-key="scheduleGuide" data-i18n-html class="mb-4"></div>
-  <div id="scheduleFlex" class="flex flex-col md:flex-row gap-4 items-start">
-    <div class="flex flex-col gap-4 w-full md:basis-[30%] md:min-w-[280px]">
-      <div id="availForm" class="card hidden">
-        <div class="font-semibold mb-2" data-i18n-key="addSlotTitle">Set Availability</div>
-        <label><span data-i18n-key="fromDate">Start Date</span>
-          <input type="date" id="availFromDate">
-        </label>
-        <label><span data-i18n-key="fromTime">Start Time</span>
-          <input type="time" id="availFromTime" step="1800">
-        </label>
-        <label><span data-i18n-key="toDate">End Date</span>
-          <input type="date" id="availToDate">
-        </label>
-        <label><span data-i18n-key="toTime">End Time</span>
-          <input type="time" id="availToTime" step="1800">
-        </label>
-        <button class="primary" onclick="addAvailability()" data-i18n-key="addSlotBtn">Add Slot</button>
-        <div id="availMsg" class="text-sm"></div>
+<main>
+  <section id="home" class="hidden" data-view>
+    <div class="home-hero">
+      <h1 data-i18n-key="welcomeTitle">Welcome to the Employee Review Portal</h1>
+      <p data-i18n-key="welcomeMsg">Select an option from the navigation bar to view your reviews or schedule a meeting. Use the language button to switch between English and Spanish.</p>
+    </div>
+    <div class="home-actions">
+      <article class="home-card">
+        <h2 data-i18n-key="homeReviewsCardTitle">Complete your self-review</h2>
+        <p data-i18n-key="homeReviewsCardBody">Stay prepared by answering each question with clear examples and track your progress in one place.</p>
+        <button type="button" onclick="show('reviews')" data-i18n-key="reviews">Reviews</button>
+      </article>
+      <article class="home-card">
+        <h2 data-i18n-key="homeScheduleCardTitle">Reserve your review time</h2>
+        <p data-i18n-key="homeScheduleCardBody">Browse available slots, see what’s already booked, and lock in a time that works for you and your manager.</p>
+        <button type="button" onclick="openSchedule()" data-i18n-key="schedule">Schedule</button>
+      </article>
+      <article class="home-card secondary">
+        <h2 data-i18n-key="homeGuideCardTitle">Need a hand?</h2>
+        <p data-i18n-key="contactQuestions">Please contact Sea Khun HR/IT Manager with any questions or concerns.</p>
+        <button type="button" onclick="if(user){show('reviews');}else{navLogin();}" data-i18n-key="homeGuideButton">Open portal</button>
+      </article>
+    </div>
+  </section>
+  <section id="reviews" class="hidden" data-view>
+    <form id="reviewForm" onsubmit="submitReview();return false;">
+      <div data-i18n-key="intro" data-i18n-html></div>
+      <div id="reviewsList"></div>
+      <div id="questionList"></div>
+      <div id="compAdjust" class="card hidden">
+        <div class="card-title" data-i18n-key="compAdjustTitle">Compensation Adjustment</div>
+        <label><span data-i18n-key="curWage">Current Wage</span><input type="number" id="curWage" oninput="calcPct()"></label>
+        <label><span data-i18n-key="newWage">New Wage</span><input type="number" id="newWage" oninput="calcPct()"></label>
+        <div><span data-i18n-key="pctIncrease">% Increase:</span> <span id="pctInc">0</span>%</div>
       </div>
-      <div id="slotCard" class="card hidden">
-        <div class="font-semibold mb-2" data-i18n-key="slotListTitle">Slots</div>
-        <hr class="mb-2">
-        <div id="slotList" class="max-h-60 overflow-y-auto space-y-1"></div>
+      <div id="finalBlock" class="card">
+        <p class="card-title" data-i18n-key="finalExpTitle">Final Performance Expectation</p>
+        <label><input type="radio" name="finalExp" value="below"> <span data-i18n-key="belowExp">Below Expectations</span></label>
+        <label><input type="radio" name="finalExp" value="meets"> <span data-i18n-key="meetsExp">Meets Expectations</span></label>
+        <label><input type="radio" name="finalExp" value="exceeds"> <span data-i18n-key="exceedsExp">Exceeds Expectations</span></label>
+        <label><span data-i18n-key="notesPlaceholder">Notes</span>
+          <textarea id="finalNotes" data-i18n-key="notesPlaceholder" data-i18n-placeholder placeholder="Notes"></textarea>
+        </label>
+      </div>
+      <div class="card">
+        <label>
+          <span data-i18n-key="empSignature">Employee Signature</span>
+          <input type="text" id="empSign" class="signature">
+        </label>
+        <input type="text" id="empSignDate" class="sign-date" readonly data-i18n-key="signDate" data-i18n-placeholder placeholder="Date">
+        <label>
+          <span data-i18n-key="mgrSignature">Manager Signature</span>
+          <input type="text" id="mgrSign" class="signature">
+        </label>
+        <input type="text" id="mgrSignDate" class="sign-date" readonly data-i18n-key="signDate" data-i18n-placeholder placeholder="Date">
+      </div>
+      <div class="form-actions">
+        <button class="primary" type="submit" data-i18n-key="submitReview">Submit Review</button>
+        <button id="btnSchedule" class="primary secondary" type="button" onclick="show('schedule')" data-i18n-key="scheduleBtn"></button>
+        <span id="submitMsg"></span>
+      </div>
+      <div class="form-footnote"><small data-i18n-key="contactQuestions">Please contact Sea Khun HR/IT Manager with any questions or concerns.</small></div>
+    </form>
+  </section>
+  <section id="schedule" class="hidden" data-view>
+    <div data-i18n-key="scheduleGuide" data-i18n-html></div>
+    <div id="scheduleFlex">
+      <div class="schedule-form">
+        <div id="availForm" class="card hidden">
+          <div class="card-title" data-i18n-key="addSlotTitle">Set Availability</div>
+          <label><span data-i18n-key="fromDate">Start Date</span>
+            <input type="date" id="availFromDate">
+          </label>
+          <label><span data-i18n-key="fromTime">Start Time</span>
+            <input type="time" id="availFromTime" step="1800">
+          </label>
+          <label><span data-i18n-key="toDate">End Date</span>
+            <input type="date" id="availToDate">
+          </label>
+          <label><span data-i18n-key="toTime">End Time</span>
+            <input type="time" id="availToTime" step="1800">
+          </label>
+          <button class="primary" type="button" onclick="addAvailability()" data-i18n-key="addSlotBtn">Add Slot</button>
+          <div id="availMsg"></div>
+        </div>
+        <div id="slotCard" class="card hidden">
+          <div class="card-title" data-i18n-key="slotListTitle">Slots</div>
+          <div id="slotList"></div>
+        </div>
+      </div>
+      <div id="calendarWrapper" class="card">
+        <div id="calendar"></div>
       </div>
     </div>
-    <div id="calendarWrapper" class="card w-full md:basis-[70%] flex-1">
-      <div id="calendar"></div>
-    </div>
-  </div>
-</section>
+  </section>
+</main>
 <section id="devPanel" class="hidden fixed inset-0 p-4 pt-16 overflow-auto bg-black/30 flex items-start justify-center">
   <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-3xl">
     <div class="flex justify-between items-center mb-4">
@@ -1151,19 +1521,19 @@ document.addEventListener('DOMContentLoaded',init);
     <button type="button" class="primary" onclick="document.getElementById('accessDenied').classList.add('hidden')">Close</button>
   </div>
 </section>
-<form id="login" class="hidden flex justify-center mt-8" onsubmit="login();return false;">
-  <div class="max-w-[420px] w-[90%] bg-white/80 backdrop-blur rounded-2xl shadow-xl p-8 flex flex-col gap-6">
-    <img src="https://www.dublincleaners.com/wp-content/uploads/2024/12/Dublin-Logos-stacked.png" alt="Logo" class="mx-auto" style="height:120px">
-    <h1 class="text-2xl font-semibold text-gray-800 text-center" data-i18n-key="navTitle">Employee Annual Reviews</h1>
-    <label class="w-full">
-      <span class="text-sm text-gray-500" data-i18n-key="userId">User ID</span>
-      <input class="w-full h-11 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent" type="text" id="userId" data-i18n-key="userId" data-i18n-placeholder>
+<form id="login" class="hidden" onsubmit="login();return false;">
+  <div class="card-like">
+    <img src="https://www.dublincleaners.com/wp-content/uploads/2024/12/Dublin-Logos-stacked.png" alt="Logo">
+    <h1 data-i18n-key="navTitle">Employee Annual Reviews</h1>
+    <label>
+      <span data-i18n-key="userId">User ID</span>
+      <input type="text" id="userId" data-i18n-key="userId" data-i18n-placeholder>
     </label>
-    <label class="w-full">
-      <span class="text-sm text-gray-500" data-i18n-key="password">Password</span>
-      <input class="w-full h-11 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent" type="password" id="password" data-i18n-key="password" data-i18n-placeholder>
+    <label>
+      <span data-i18n-key="password">Password</span>
+      <input type="password" id="password" data-i18n-key="password" data-i18n-placeholder>
     </label>
-    <button class="primary w-full h-12 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold tracking-wide transition-transform active:scale-95" type="submit" data-i18n-key="login">Login</button>
+    <button class="primary" type="submit" data-i18n-key="login">Login</button>
   </div>
 </form>
 </body>
