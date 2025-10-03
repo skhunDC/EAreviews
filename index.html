@@ -1523,8 +1523,13 @@ function initCalendar(){
   }
   const initialView=window.innerWidth<768?'timeGridDay':'timeGridWeek';
   if(!calendar){
+    const plugins=[fc.timeGridPlugin,fc.dayGridPlugin,fc.listPlugin,fc.interactionPlugin].filter(Boolean);
+    if(plugins.length===0){
+      console.error('FullCalendar plugins failed to load');
+      return;
+    }
     calendar=new fc.Calendar(el,{
-      plugins:[fc.timeGridPlugin,fc.dayGridPlugin,fc.listPlugin,fc.interactionPlugin],
+      plugins:plugins,
       initialView:initialView,
       locale:lang==='es'?'es':'en',
       headerToolbar:{start:'prev,next today',center:'title',end:'timeGridDay,timeGridWeek,dayGridMonth'},
