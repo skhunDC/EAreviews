@@ -23,6 +23,9 @@
   --gray-600:#475569;
   --surface:#ffffff;
   --shadow:0 18px 36px rgba(10,92,48,0.12);
+  --status-available:#16a34a;
+  --status-booked:#dc2626;
+  --status-mine:#2563eb;
 }
 *,*::before,*::after{box-sizing:border-box;}
 body{
@@ -554,9 +557,9 @@ button.secondary:hover{background:var(--emerald-50);box-shadow:none;}
 .booking-legend{display:flex;flex-wrap:wrap;gap:0.75rem;}
 .booking-legend span{display:inline-flex;align-items:center;gap:0.4rem;font-size:0.85rem;color:var(--gray-600);}
 .booking-dot{width:10px;height:10px;border-radius:999px;display:inline-block;}
-.booking-dot.available{background:#10b981;}
-.booking-dot.booked{background:#94a3b8;}
-.booking-dot.mine{background:var(--emerald-600);}
+.booking-dot.available{background:var(--status-available);}
+.booking-dot.booked{background:var(--status-booked);}
+.booking-dot.mine{background:var(--status-mine);}
 .booking-list{display:flex;flex-direction:column;gap:1rem;}
 .booking-item{background:#fff;border:1px solid var(--gray-200);border-radius:1rem;padding:0.85rem 1rem;box-shadow:0 12px 24px rgba(15,23,42,0.08);}
 .booking-item h4{margin:0 0 0.3rem;font-size:1rem;color:var(--emerald-700);}
@@ -582,9 +585,9 @@ button.secondary:hover{background:var(--emerald-50);box-shadow:none;}
 .slot-save:hover{box-shadow:0 10px 20px rgba(10,92,48,0.16);}
 #calendar{width:100%;}
 .fc .booking-event{border:none !important;box-shadow:none !important;font-weight:600;}
-.fc .booking-open{background:#d1fae5 !important;color:#047857 !important;}
-.fc .booking-booked{background:#e5e7eb !important;color:#4b5563 !important;}
-.fc .booking-mine{background:var(--emerald-600) !important;color:#fff !important;}
+.fc .booking-open{background:#dcfce7 !important;color:#166534 !important;}
+.fc .booking-booked{background:#fee2e2 !important;color:#b91c1c !important;}
+.fc .booking-mine{background:#dbeafe !important;color:#1d4ed8 !important;}
 .fc .booking-past{opacity:0.5;}
 #devPanel{z-index:70;}
 #devPanel table{width:100%;border-collapse:collapse;font-size:0.95rem;}
@@ -715,7 +718,7 @@ const translations={
     scheduleHeroTitle:'Book your review',
     scheduleHeroSubtitle:'Choose a 30-minute slot that works for both you and your manager.',
     scheduleCalendarTitle:'Pick a time that works',
-    scheduleCalendarSubtitle:'Tap any green slot to instantly reserve it. Gray slots are already taken.',
+    scheduleCalendarSubtitle:'Tap any green slot to instantly reserve it. Red slots are already taken and blue slots are the ones you\'ve booked.',
     scheduleLegendAvailable:'Open slot',
     scheduleLegendMine:'Booked by you',
     scheduleLegendBooked:'Booked',
@@ -858,7 +861,7 @@ const translations={
     scheduleHeroTitle:'Reserva tu revisión',
     scheduleHeroSubtitle:'Elige un bloque de 30 minutos que funcione para ti y tu gerente.',
     scheduleCalendarTitle:'Elige un horario',
-    scheduleCalendarSubtitle:'Toca cualquier espacio verde para reservarlo al instante. Los grises ya están ocupados.',
+    scheduleCalendarSubtitle:'Toca cualquier espacio verde para reservarlo al instante. Los espacios rojos ya están ocupados y los azules son los que reservaste.',
     scheduleLegendAvailable:'Espacio disponible',
     scheduleLegendMine:'Reservado por ti',
     scheduleLegendBooked:'Reservado',
