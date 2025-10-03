@@ -1523,11 +1523,7 @@ function initCalendar(){
   }
   const initialView=window.innerWidth<768?'timeGridDay':'timeGridWeek';
   if(!calendar){
-    const plugins=[fc.timeGridPlugin,fc.dayGridPlugin,fc.listPlugin,fc.interactionPlugin].filter(Boolean);
-    if(plugins.length===0){
-      console.error('FullCalendar plugins failed to load');
-      return;
-    }
+    const plugins=['timeGrid','dayGrid','list','interaction'];
     calendar=new fc.Calendar(el,{
       plugins:plugins,
       initialView:initialView,
