@@ -9,3 +9,6 @@ There are no automated tests or build steps. When updating the project, simply e
 
 ## Mobile + Desktop Compatibility
 The interface is fully responsive. Tailwind CSS utilities together with Flexbox, Grid and media queries provide a mobile-first layout that adapts to desktops. Always approach new UI work with a mobile-first strategy while verifying the experience remains polished on tablet and desktop breakpoints. Bilingual functionality is preserved at all screen sizes.
+
+## Design Mindset
+Approach every UI change like an experienced web designer: craft intentional spacing, maintain visual hierarchy, and ensure accessibility and responsiveness remain first-class considerations.
