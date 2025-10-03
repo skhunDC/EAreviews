@@ -193,6 +193,72 @@ section[data-view]{
   flex-direction:column;
   gap:1rem;
 }
+.review-summary{
+  gap:0.75rem;
+}
+.review-summary-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:0.75rem;
+}
+.review-summary-title{
+  font-size:1.1rem;
+  font-weight:600;
+  color:var(--emerald-700);
+}
+.review-status-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0.25rem 0.75rem;
+  border-radius:9999px;
+  font-size:0.8rem;
+  font-weight:600;
+  text-transform:capitalize;
+  background:var(--gray-200);
+  color:var(--gray-600);
+}
+.review-status-badge.status-draft{
+  background:#f1f5f9;
+  color:#475569;
+}
+.review-status-badge.status-submitted{
+  background:#fef3c7;
+  color:#b45309;
+}
+.review-status-badge.status-final{
+  background:#dcfce7;
+  color:#166534;
+}
+.review-summary-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:1.25rem;
+  font-size:0.9rem;
+  color:var(--gray-600);
+}
+.review-meta-item{
+  display:flex;
+  flex-direction:column;
+  gap:0.2rem;
+  min-width:150px;
+}
+.review-meta-label{
+  font-size:0.75rem;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--gray-400);
+}
+.review-meta-value{
+  font-weight:600;
+  color:var(--emerald-700);
+}
+.reviews-empty{
+  margin:0;
+  color:var(--gray-600);
+  font-style:italic;
+}
 #reviewForm{
   display:flex;
   flex-direction:column;
@@ -462,6 +528,19 @@ const translations={
     notesPlaceholder:'Notes',contactQuestions:'Please contact Sea Khun HR/IT Manager with any questions or concerns.',empSignature:'Employee Signature',mgrSignature:'Manager Signature',signDate:'Date',submitReview:'Submit Review',
     employeeComments:"Employee's Comments",managerComments:"Manager's Comments",
     reviewSaved:'Review saved',saveFailed:'Failed to save review',saving:'Saving...',
+    reviewListEmpty:'No reviews available yet.',
+    reviewTypeSELF:'Self review',
+    reviewTypeMANAGER:'Manager review',
+    reviewTypeHR:'HR review',
+    reviewStatusDRAFT:'Draft',
+    reviewStatusSUBMITTED:'Submitted',
+    reviewStatusFINAL:'Finalized',
+    reviewYearLabel:'Review year',
+    reviewLastUpdated:'Last updated',
+    reviewFinalExpectation:'Final expectation',
+    reviewFinalNotSet:'Not set',
+    reviewAssignedTo:'Employee',
+    reviewOwnedByYou:'You',
     scheduleBtn:'Schedule Review Meeting',
     scheduleHeroTitle:'Book your review',
     scheduleHeroSubtitle:'Choose a 30-minute slot that works for both you and your manager.',
@@ -578,6 +657,19 @@ const translations={
     notesPlaceholder:'Notas',contactQuestions:'Comuníquese con Sea Khun, gerente de HR/IT, si tiene alguna pregunta o inquietud.',empSignature:'Firma del empleado',mgrSignature:'Firma del gerente',signDate:'Fecha',submitReview:'Enviar revisión',
     employeeComments:'Comentarios del empleado',managerComments:'Comentarios del gerente',
     reviewSaved:'Revisión guardada',saveFailed:'No se pudo guardar la revisión',saving:'Guardando...',
+    reviewListEmpty:'No hay revisiones disponibles.',
+    reviewTypeSELF:'Autoevaluación',
+    reviewTypeMANAGER:'Revisión del gerente',
+    reviewTypeHR:'Revisión de RR. HH.',
+    reviewStatusDRAFT:'Borrador',
+    reviewStatusSUBMITTED:'Enviada',
+    reviewStatusFINAL:'Finalizada',
+    reviewYearLabel:'Año de revisión',
+    reviewLastUpdated:'Última actualización',
+    reviewFinalExpectation:'Expectativa final',
+    reviewFinalNotSet:'Sin definir',
+    reviewAssignedTo:'Empleado',
+    reviewOwnedByYou:'Tú',
     scheduleBtn:'Agendar Reunión de Revisión',
     scheduleHeroTitle:'Reserva tu revisión',
     scheduleHeroSubtitle:'Elige un bloque de 30 minutos que funcione para ti y tu gerente.',
@@ -893,7 +985,129 @@ function loadSavedReview(){
     fillSavedAnswers();
   }).getReviewByYear(selectedYear);
 }
-function renderReviews(){const c=document.getElementById('reviewsList');if(!c)return;c.innerHTML='';reviews.forEach(rv=>{const div=document.createElement('div');div.className='card';div.innerHTML='<b>'+rv.type+'</b> '+rv.status+'<br>'+JSON.stringify(rv.data);c.appendChild(div);});}
+function renderReviews(){
+  const container=document.getElementById('reviewsList');
+  if(!container) return;
+  container.innerHTML='';
+  if(!Array.isArray(reviews) || reviews.length===0){
+    const empty=document.createElement('p');
+    empty.className='reviews-empty';
+    empty.textContent=t('reviewListEmpty');
+    container.appendChild(empty);
+    return;
+  }
+  const sorted=[...reviews].sort((a,b)=>{
+    const aDate=new Date(a.ts||0).getTime();
+    const bDate=new Date(b.ts||0).getTime();
+    return bDate-aDate;
+  });
+  sorted.forEach(rv=>{
+    const card=document.createElement('article');
+    card.className='card review-summary';
+
+    const head=document.createElement('div');
+    head.className='review-summary-head';
+
+    const title=document.createElement('h3');
+    title.className='review-summary-title';
+    title.textContent=getReviewTypeLabel(rv);
+    head.appendChild(title);
+
+    const statusText=getReviewStatusLabel(rv.status);
+    if(statusText){
+      const statusBadge=document.createElement('span');
+      statusBadge.className='review-status-badge';
+      if(rv.status){
+        statusBadge.classList.add('status-'+rv.status.toLowerCase());
+      }
+      statusBadge.textContent=statusText;
+      head.appendChild(statusBadge);
+    }
+
+    card.appendChild(head);
+
+    const meta=document.createElement('div');
+    meta.className='review-summary-meta';
+
+    addMeta(meta,t('reviewYearLabel'),getReviewYear(rv));
+
+    if(rv.employeeId){
+      const value=(user && rv.employeeId==user.id)?t('reviewOwnedByYou'):(rv.employeeName||rv.employeeId);
+      addMeta(meta,t('reviewAssignedTo'),value);
+    }
+
+    const updatedLabel=getUpdatedLabel(rv.ts);
+    if(updatedLabel){
+      addMeta(meta,t('reviewLastUpdated'),updatedLabel);
+    }
+
+    addMeta(meta,t('reviewFinalExpectation'),getFinalExpectationValue(rv));
+
+    if(meta.children.length){
+      card.appendChild(meta);
+    }
+
+    container.appendChild(card);
+  });
+
+  function addMeta(wrapper,label,value){
+    if(!value) return;
+    const item=document.createElement('div');
+    item.className='review-meta-item';
+    const labelEl=document.createElement('span');
+    labelEl.className='review-meta-label';
+    labelEl.textContent=label;
+    const valueEl=document.createElement('span');
+    valueEl.className='review-meta-value';
+    valueEl.textContent=value;
+    item.appendChild(labelEl);
+    item.appendChild(valueEl);
+    wrapper.appendChild(item);
+  }
+
+  function getReviewYear(rv){
+    const year=rv && rv.data && rv.data.year;
+    return year?String(year):'';
+  }
+
+  function getUpdatedLabel(ts){
+    if(!ts) return '';
+    const date=new Date(ts);
+    if(isNaN(date.getTime())) return '';
+    return date.toLocaleString(lang==='es'?'es':'en');
+  }
+
+  function getFinalExpectationValue(rv){
+    const final=rv && rv.data && rv.data.finalExpectation;
+    if(!final || !final.result){
+      return t('reviewFinalNotSet');
+    }
+    const map={below:'belowExp',meets:'meetsExp',exceeds:'exceedsExp'};
+    const key=map[final.result];
+    if(key){
+      const val=t(key);
+      return val===key?final.result:val;
+    }
+    return final.result;
+  }
+
+  function getReviewTypeLabel(rv){
+    const type=(rv&&rv.type)||'';
+    const key='reviewType'+type.toUpperCase();
+    const translated=t(key);
+    if(translated!==key) return translated;
+    if(!type) return '';
+    return type.charAt(0)+type.slice(1).toLowerCase();
+  }
+
+  function getReviewStatusLabel(status){
+    if(!status) return '';
+    const key='reviewStatus'+status.toUpperCase();
+    const translated=t(key);
+    if(translated!==key) return translated;
+    return status.charAt(0)+status.slice(1).toLowerCase();
+  }
+}
 
 function showDevButton(){
   const btn=document.getElementById('devBtn');
