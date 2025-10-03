@@ -9,10 +9,7 @@
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css">
-<script type="module">
-import {Calendar,timeGridPlugin,dayGridPlugin,listPlugin,interactionPlugin} from "https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/+esm";
-window.FullCalendar={Calendar,timeGridPlugin,dayGridPlugin,listPlugin,interactionPlugin};
-</script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 <style>
 :root{
   --emerald-50:#f0f8f3;
@@ -1515,10 +1512,15 @@ function getRole(){
 function initCalendar(){
   const el=document.getElementById('calendar');
   if(!el) return;
+  const fc=window.FullCalendar;
+  if(!fc||typeof fc.Calendar!=='function'){
+    console.error('FullCalendar library failed to load');
+    return;
+  }
   const initialView=window.innerWidth<768?'timeGridDay':'timeGridWeek';
   if(!calendar){
-    calendar=new FullCalendar.Calendar(el,{
-      plugins:[FullCalendar.timeGridPlugin,FullCalendar.dayGridPlugin,FullCalendar.listPlugin,FullCalendar.interactionPlugin],
+    calendar=new fc.Calendar(el,{
+      plugins:[fc.timeGridPlugin,fc.dayGridPlugin,fc.listPlugin,fc.interactionPlugin],
       initialView:initialView,
       locale:lang==='es'?'es':'en',
       headerToolbar:{start:'prev,next today',center:'title',end:'timeGridDay,timeGridWeek,dayGridMonth'},
