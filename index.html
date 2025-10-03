@@ -260,6 +260,110 @@ section[data-view]{
   flex-direction:column;
   gap:1.5rem;
 }
+.review-sidebar{
+  display:flex;
+  flex-direction:column;
+  gap:0.85rem;
+}
+.review-sidebar .sidebar-head{
+  display:flex;
+  flex-direction:column;
+  gap:0.35rem;
+}
+.review-sidebar .sidebar-head h2{
+  font-size:1.05rem;
+}
+.review-sidebar .sidebar-head p{
+  margin:0;
+  color:var(--gray-600);
+  font-size:0.9rem;
+}
+.form-actions{
+  display:flex;
+  flex-direction:column;
+  gap:0.75rem;
+}
+.form-actions #submitMsg{
+  font-weight:600;
+  color:var(--emerald-700);
+}
+.form-actions .primary{
+  min-width:200px;
+}
+.form-actions .primary.secondary{
+  background:transparent;
+  color:var(--emerald-700);
+  border:1px solid rgba(10,92,48,0.3);
+}
+.form-actions .primary.secondary:hover{
+  background:var(--emerald-50);
+}
+@media (max-width:639px){
+  .form-actions .primary{
+    width:100%;
+  }
+}
+.form-footnote{
+  text-align:center;
+  color:var(--gray-600);
+}
+.form-footnote small{color:inherit;}
+@media (min-width:640px){
+  .form-actions{
+    flex-direction:row;
+    align-items:center;
+    gap:1rem;
+    justify-content:flex-start;
+  }
+  .form-actions #submitMsg{
+    margin-left:auto;
+  }
+}
+@media (min-width:1024px){
+  #reviewForm{
+    display:grid;
+    grid-template-columns:minmax(260px,320px) minmax(0,1fr);
+    gap:1.75rem;
+    align-items:start;
+  }
+  #reviewForm>[data-i18n-key="intro"]{
+    grid-column:1/-1;
+  }
+  #reviewSidebar{
+    grid-column:1;
+    position:sticky;
+    top:1.5rem;
+    align-self:start;
+  }
+  #reviewsList{
+    max-height:calc(100vh - 220px);
+    overflow:auto;
+    padding-right:0.25rem;
+  }
+  #questionList,
+  #finalBlock,
+  #signaturesCard{
+    grid-column:2;
+  }
+  #questionList,
+  #finalBlock,
+  #signaturesCard{
+    max-width:720px;
+    width:100%;
+    justify-self:start;
+  }
+  #compAdjust{
+    grid-column:1;
+    align-self:start;
+  }
+  #reviewForm .form-actions,
+  #reviewForm .form-footnote{
+    grid-column:1/-1;
+  }
+  #questionList{
+    gap:1.5rem;
+  }
+}
 .question-title{font-size:1.15rem;font-weight:600;color:var(--emerald-700);}
 .card-title{font-weight:600;font-size:1rem;color:var(--emerald-700);}
 label{
@@ -385,14 +489,6 @@ input[type=radio],input[type=checkbox]{width:auto;padding:0;border-radius:999px;
 #review-intro .info-card--combined h3{font-size:1.05rem;color:var(--emerald-700);margin:0;}
 .values-list{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:0.5rem;}
 .values-list li{background:var(--emerald-600);color:#fff;padding:0.35rem 0.9rem;border-radius:999px;font-size:0.85rem;}
-.form-actions{
-  display:flex;
-  flex-wrap:wrap;
-  gap:0.75rem;
-  align-items:center;
-}
-.form-footnote{margin-left:auto;font-size:0.85rem;color:var(--gray-600);text-align:right;}
-.form-footnote small{color:inherit;}
 button.primary{
   background:var(--emerald-600);
   color:#fff;
@@ -575,6 +671,8 @@ const translations={
     notesPlaceholder:'Notes',contactQuestions:'Please contact Sea Khun HR/IT Manager with any questions or concerns.',empSignature:'Employee Signature',mgrSignature:'Manager Signature',signDate:'Date',submitReview:'Submit Review',
     employeeComments:"Employee's Comments",managerComments:"Manager's Comments",
     reviewSaved:'Review saved',saveFailed:'Failed to save review',saving:'Saving...',
+    reviewSidebarTitle:'Your reviews',
+    reviewSidebarSubtitle:'Track progress and revisit submitted forms.',
     reviewListEmpty:'No reviews available yet.',
     reviewTypeSELF:'Self review',
     reviewTypeMANAGER:'Manager review',
@@ -708,6 +806,8 @@ const translations={
     notesPlaceholder:'Notas',contactQuestions:'Comuníquese con Sea Khun, gerente de HR/IT, si tiene alguna pregunta o inquietud.',empSignature:'Firma del empleado',mgrSignature:'Firma del gerente',signDate:'Fecha',submitReview:'Enviar revisión',
     employeeComments:'Comentarios del empleado',managerComments:'Comentarios del gerente',
     reviewSaved:'Revisión guardada',saveFailed:'No se pudo guardar la revisión',saving:'Guardando...',
+    reviewSidebarTitle:'Tus reseñas',
+    reviewSidebarSubtitle:'Sigue tu progreso y vuelve a ver los formularios enviados.',
     reviewListEmpty:'No hay revisiones disponibles.',
     reviewTypeSELF:'Autoevaluación',
     reviewTypeMANAGER:'Revisión del gerente',
@@ -1944,7 +2044,13 @@ document.addEventListener('DOMContentLoaded',init);
   <section id="reviews" class="hidden" data-view>
     <form id="reviewForm" onsubmit="submitReview();return false;">
       <div data-i18n-key="intro" data-i18n-html></div>
-      <div id="reviewsList"></div>
+      <aside id="reviewSidebar" class="card review-sidebar">
+        <div class="sidebar-head">
+          <h2 data-i18n-key="reviewSidebarTitle">Your reviews</h2>
+          <p data-i18n-key="reviewSidebarSubtitle">Track progress and revisit submitted forms.</p>
+        </div>
+        <div id="reviewsList"></div>
+      </aside>
       <div id="questionList"></div>
       <div id="compAdjust" class="card hidden">
         <div class="card-title" data-i18n-key="compAdjustTitle">Compensation Adjustment</div>
@@ -1961,7 +2067,7 @@ document.addEventListener('DOMContentLoaded',init);
           <textarea id="finalNotes" data-i18n-key="notesPlaceholder" data-i18n-placeholder placeholder="Notes"></textarea>
         </label>
       </div>
-      <div class="card">
+      <div id="signaturesCard" class="card">
         <label>
           <span data-i18n-key="empSignature">Employee Signature</span>
           <input type="text" id="empSign" class="signature">
