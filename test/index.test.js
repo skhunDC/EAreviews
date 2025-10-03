@@ -39,3 +39,11 @@ test('FullCalendar initialization safely accesses plugins', () => {
     assert.ok(html.includes(snippet), `Expected initCalendar to include snippet: ${snippet}`);
   }
 });
+
+test('Navigation logo dimensions remain doubled', () => {
+  const match = html.match(/\.nav-brand img\{[^}]*\}/);
+  assert.ok(match, 'Expected to find nav-brand logo styles in CSS block');
+  const block = match[0];
+  assert.ok(/width:\s*6\.5rem/.test(block), 'Expected nav-brand logo width to remain 6.5rem');
+  assert.ok(/height:\s*6\.5rem/.test(block), 'Expected nav-brand logo height to remain 6.5rem');
+});
