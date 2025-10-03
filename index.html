@@ -369,13 +369,32 @@ button.secondary:hover{background:rgba(15,118,110,0.08);}
 .availability-form label span{color:var(--text-muted);font-weight:600;font-size:0.88rem;text-transform:uppercase;letter-spacing:0.12em;}
 .manager-slots{display:flex;flex-direction:column;gap:0.85rem;}
 #slotList{display:flex;flex-direction:column;gap:0.75rem;max-height:320px;overflow-y:auto;padding-right:0.35rem;}
-.slot-row{display:flex;flex-wrap:wrap;align-items:center;gap:0.65rem 1rem;justify-content:flex-start;padding:0.9rem 1.1rem;border:1px solid var(--border-soft);border-radius:var(--radius-sm);background:var(--surface);box-shadow:var(--shadow-sm);}
+.slot-row{display:flex;flex-direction:column;align-items:stretch;gap:0.9rem;padding:0.9rem 1.1rem;border:1px solid var(--border-soft);border-radius:var(--radius-sm);background:var(--surface);box-shadow:var(--shadow-sm);}
 .slot-row-booked{background:rgba(15,118,110,0.08);border-color:rgba(15,118,110,0.2);}
-.slot-range{flex:1 1 160px;font-weight:600;color:var(--primary-700);}
+.slot-row-editing{border-color:var(--primary-500);box-shadow:0 0 0 2px rgba(15,118,110,0.15);}
+.slot-info{display:flex;flex-wrap:wrap;align-items:center;gap:0.35rem 1rem;}
+.slot-range{flex:1 1 auto;font-weight:600;color:var(--primary-700);}
 .slot-status{flex:1 1 100%;font-size:0.85rem;color:var(--text-muted);}
-.slot-assign{flex:1 1 160px;max-width:240px;}
-.slot-save{padding:0.55rem 1.1rem;font-size:0.85rem;box-shadow:none;margin-left:auto;}
+.slot-control-bar{display:flex;flex-wrap:wrap;align-items:center;gap:0.6rem;}
+.slot-assign-wrap{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;}
+.slot-assign{flex:1 1 160px;min-width:160px;max-width:260px;}
+.slot-save{padding:0.55rem 1.1rem;font-size:0.85rem;box-shadow:none;}
 .slot-save:hover{box-shadow:0 10px 20px rgba(15,118,110,0.16);}
+.slot-actions{display:flex;gap:0.45rem;margin-left:auto;}
+.slot-action{border:1px solid var(--border-soft);background:var(--surface-muted);color:var(--primary-700);border-radius:999px;padding:0.45rem 0.9rem;font-weight:600;cursor:pointer;transition:background .2s ease,color .2s ease,box-shadow .2s ease;}
+.slot-action:hover{background:rgba(15,118,110,0.12);}
+.slot-action.danger{background:rgba(220,38,38,0.08);color:#b91c1c;border-color:rgba(220,38,38,0.2);}
+.slot-action.danger:hover{background:rgba(220,38,38,0.14);}
+.slot-action.ghost{background:transparent;color:var(--text-secondary);border-color:transparent;}
+.slot-locked{font-size:0.85rem;color:var(--text-muted);}
+.slot-editor{border-top:1px dashed var(--border-soft);padding-top:0.75rem;display:flex;flex-direction:column;gap:0.75rem;}
+.slot-editor-grid{display:flex;flex-wrap:wrap;gap:0.75rem;}
+.slot-editor-field{display:flex;flex-direction:column;gap:0.35rem;min-width:160px;flex:1 1 160px;}
+.slot-editor-field span{font-size:0.72rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);}
+.slot-editor-actions{display:flex;flex-wrap:wrap;gap:0.6rem;}
+.slot-editor-actions .primary{padding:0.55rem 1.1rem;}
+.slot-editor-help{font-size:0.85rem;color:var(--text-muted);}
+#calendar{width:100%;}
 #calendar{width:100%;}
 .fc .booking-event{border:none !important;box-shadow:none !important;font-weight:600;}
 .fc .booking-open{background:#dcfce7 !important;color:#065f46 !important;}
@@ -625,12 +644,25 @@ const translations={
     addSlotBtn:'Add Slot',
     slotListTitle:'Slots',
     slotsSaved:'slot(s) saved',
+    slotEditBtn:'Edit',
+    slotDeleteBtn:'Delete',
+    slotUpdateBtn:'Save changes',
+    slotDeleteSuccess:'Availability removed.',
+    slotUpdateSuccess:'Availability updated.',
+    slotDeleteConfirm:'Remove the slot on {date} at {time}?',
+    slotEditDateLabel:'New date',
+    slotEditTimeLabel:'New start time',
+    slotEditHelp:'Choose a new date and start time, then select Save changes.',
+    slotLockedLabel:'Booked slots cannot be changed here.',
     availableShort:'Available',
     bookedShort:'Booked',
     errorPast:'Cannot add slots in the past.',
     errorOverlap:'Slot overlaps with existing.',
     errorMissing:'Please fill all fields.',
     errorInvalid:'Invalid time range.',
+    errorBooked:'This slot has already been booked and cannot be changed.',
+    errorDenied:'You do not have permission to change this slot.',
+    errorNotFound:'Slot could not be found.',
     intro:`<section id="review-intro">
       <h1>Your Opportunity to Shine</h1>
       <div class="intro-cards">
@@ -776,12 +808,25 @@ const translations={
     addSlotBtn:'Agregar horario',
     slotListTitle:'Horarios',
     slotsSaved:'horario(s) guardado(s)',
+    slotEditBtn:'Editar',
+    slotDeleteBtn:'Eliminar',
+    slotUpdateBtn:'Guardar cambios',
+    slotDeleteSuccess:'Disponibilidad eliminada.',
+    slotUpdateSuccess:'Disponibilidad actualizada.',
+    slotDeleteConfirm:'¿Quitar la disponibilidad del {date} a las {time}?',
+    slotEditDateLabel:'Nueva fecha',
+    slotEditTimeLabel:'Nueva hora de inicio',
+    slotEditHelp:'Elige una nueva fecha y hora de inicio y luego guarda los cambios.',
+    slotLockedLabel:'Los espacios reservados no se pueden cambiar aquí.',
     availableShort:'Disponible',
     bookedShort:'Reservado',
     errorPast:'No se pueden agregar horarios en el pasado.',
     errorOverlap:'El horario se superpone con uno existente.',
     errorMissing:'Complete todos los campos.',
     errorInvalid:'Rango de tiempo inválido.',
+    errorBooked:'Este espacio ya está reservado y no se puede cambiar.',
+    errorDenied:'No tienes permiso para cambiar este espacio.',
+    errorNotFound:'No se encontró el espacio.',
     intro:`<section id="review-intro">
       <h1>Tu oportunidad para destacar</h1>
       <div class="intro-cards">
@@ -1822,29 +1867,206 @@ function renderSlotList(slots){
     const row=document.createElement('div');
     row.className='slot-row';
     if(slot.employeeId) row.classList.add('slot-row-booked');
+    const info=document.createElement('div');
+    info.className='slot-info';
     const range=document.createElement('span');
     range.className='slot-range';
     range.textContent=details.shortDate+' · '+details.timeLabel;
-    row.appendChild(range);
+    info.appendChild(range);
     const status=document.createElement('span');
     status.className='slot-status';
     status.textContent=slot.employeeId?`${t('scheduleBookedBy')} ${slot.employeeId}`:t('scheduleAvailableLabel');
-    row.appendChild(status);
+    info.appendChild(status);
+    row.appendChild(info);
+
+    const controls=document.createElement('div');
+    controls.className='slot-control-bar';
+    let editor=null;
     if(!slot.employeeId){
+      const assignWrap=document.createElement('div');
+      assignWrap.className='slot-assign-wrap';
       const inp=document.createElement('input');
       inp.type='text';
       inp.className='slot-assign';
       inp.placeholder=t('userId');
-      row.appendChild(inp);
+      assignWrap.appendChild(inp);
       const btn=document.createElement('button');
       btn.type='button';
       btn.textContent=t('saveSlotBtn');
       btn.className='primary slot-save';
       btn.onclick=()=>saveSlot(slot.id,inp.value.trim(),inp);
-      row.appendChild(btn);
+      assignWrap.appendChild(btn);
+      controls.appendChild(assignWrap);
+
+      const actions=document.createElement('div');
+      actions.className='slot-actions';
+      const editBtn=document.createElement('button');
+      editBtn.type='button';
+      editBtn.className='slot-action';
+      editBtn.textContent=t('slotEditBtn');
+      actions.appendChild(editBtn);
+      const deleteBtn=document.createElement('button');
+      deleteBtn.type='button';
+      deleteBtn.className='slot-action danger';
+      deleteBtn.textContent=t('slotDeleteBtn');
+      actions.appendChild(deleteBtn);
+      controls.appendChild(actions);
+
+      editor=createSlotEditor();
+      row.appendChild(editor.panel);
+
+      editBtn.addEventListener('click',()=>{
+        const isOpen=!editor.panel.classList.contains('hidden');
+        if(isOpen){
+          closeAllSlotEditors();
+          return;
+        }
+        closeAllSlotEditors();
+        setSlotEditorValues(editor,slot);
+        editor.panel.classList.remove('hidden');
+        row.classList.add('slot-row-editing');
+        editor.dateInput.focus();
+      });
+
+      editor.cancelBtn.addEventListener('click',()=>closeAllSlotEditors());
+
+      editor.saveBtn.addEventListener('click',()=>{
+        updateSlot(slot.id,editor.dateInput.value,editor.timeInput.value,editor.saveBtn);
+      });
+
+      deleteBtn.addEventListener('click',()=>{
+        const msg=t('slotDeleteConfirm')
+          .replace('{date}',details.shortDate)
+          .replace('{time}',details.timeLabel);
+        if(!confirm(msg)) return;
+        closeAllSlotEditors();
+        deleteSlot(slot.id,deleteBtn);
+      });
+    }else{
+      const locked=document.createElement('span');
+      locked.className='slot-locked';
+      locked.textContent=t('slotLockedLabel');
+      controls.appendChild(locked);
     }
+
+    if(controls.childElementCount>0){
+      row.appendChild(controls);
+    }
+
     list.appendChild(row);
   });
+}
+
+function createSlotEditor(){
+  const panel=document.createElement('div');
+  panel.className='slot-editor hidden';
+  const grid=document.createElement('div');
+  grid.className='slot-editor-grid';
+
+  const dateField=document.createElement('label');
+  dateField.className='slot-editor-field';
+  const dateLabel=document.createElement('span');
+  dateLabel.textContent=t('slotEditDateLabel');
+  const dateInput=document.createElement('input');
+  dateInput.type='date';
+  dateField.appendChild(dateLabel);
+  dateField.appendChild(dateInput);
+  grid.appendChild(dateField);
+
+  const timeField=document.createElement('label');
+  timeField.className='slot-editor-field';
+  const timeLabel=document.createElement('span');
+  timeLabel.textContent=t('slotEditTimeLabel');
+  const timeInput=document.createElement('input');
+  timeInput.type='time';
+  timeInput.step='1800';
+  timeField.appendChild(timeLabel);
+  timeField.appendChild(timeInput);
+  grid.appendChild(timeField);
+
+  panel.appendChild(grid);
+
+  const help=document.createElement('p');
+  help.className='slot-editor-help';
+  help.textContent=t('slotEditHelp');
+  panel.appendChild(help);
+
+  const actions=document.createElement('div');
+  actions.className='slot-editor-actions';
+
+  const saveBtn=document.createElement('button');
+  saveBtn.type='button';
+  saveBtn.className='primary slot-update';
+  saveBtn.textContent=t('slotUpdateBtn');
+  actions.appendChild(saveBtn);
+
+  const cancelBtn=document.createElement('button');
+  cancelBtn.type='button';
+  cancelBtn.className='slot-action ghost';
+  cancelBtn.textContent=t('cancel');
+  actions.appendChild(cancelBtn);
+
+  panel.appendChild(actions);
+
+  return {panel,dateInput,timeInput,saveBtn,cancelBtn};
+}
+
+function setSlotEditorValues(editor,slot){
+  if(!editor||!slot) return;
+  const start=new Date(slot.start);
+  if(isNaN(start)) return;
+  const local=new Date(start.getTime()-start.getTimezoneOffset()*60000);
+  const iso=local.toISOString();
+  editor.dateInput.value=iso.slice(0,10);
+  editor.timeInput.value=iso.slice(11,16);
+}
+
+function closeAllSlotEditors(){
+  document.querySelectorAll('.slot-editor').forEach(panel=>panel.classList.add('hidden'));
+  document.querySelectorAll('.slot-row').forEach(row=>row.classList.remove('slot-row-editing'));
+}
+
+function updateSlot(slotId,dateVal,timeVal,btn){
+  if(!dateVal||!timeVal){
+    showSnackbar(t('errorMissing'));
+    return;
+  }
+  const start=new Date(dateVal+'T'+timeVal);
+  if(isNaN(start)){
+    showSnackbar(t('errorInvalid'));
+    return;
+  }
+  const end=new Date(start.getTime()+30*60000);
+  const payload={slotId:Number(slotId),start:start.toISOString(),end:end.toISOString()};
+  if(btn) btn.disabled=true;
+  google.script.run
+    .withSuccessHandler(()=>{
+      if(btn) btn.disabled=false;
+      showSnackbar(t('slotUpdateSuccess'));
+      closeAllSlotEditors();
+      loadAvailability();
+    })
+    .withFailureHandler(err=>{
+      if(btn) btn.disabled=false;
+      showSnackbar(mapError(err));
+    })
+    .updateAvailabilitySlot(payload);
+}
+
+function deleteSlot(slotId,btn){
+  if(btn) btn.disabled=true;
+  google.script.run
+    .withSuccessHandler(()=>{
+      if(btn) btn.disabled=false;
+      showSnackbar(t('slotDeleteSuccess'));
+      closeAllSlotEditors();
+      loadAvailability();
+    })
+    .withFailureHandler(err=>{
+      if(btn) btn.disabled=false;
+      showSnackbar(mapError(err));
+    })
+    .deleteAvailabilitySlot(Number(slotId));
 }
 function saveSlot(id,val,inputEl){
   if(!val){
@@ -1966,6 +2188,9 @@ function mapError(err){
   if(m==='overlap') return t('errorOverlap');
   if(m==='missing') return t('errorMissing');
   if(m==='invalid') return t('errorInvalid');
+  if(m==='booked') return t('errorBooked');
+  if(m==='denied') return t('errorDenied');
+  if(m==='not_found') return t('errorNotFound');
   return t('error');
 }
 document.addEventListener('DOMContentLoaded',init);

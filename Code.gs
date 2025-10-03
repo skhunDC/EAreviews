@@ -848,3 +848,69 @@ function bookSlot(args){
     lock.releaseLock();
   }
 }
+
+function updateAvailabilitySlot(obj){
+  const user=checkAuth_();
+  const role=String(user.role||'').toUpperCase();
+  if(role!=='MANAGER' && role!=='DEV') throw new Error('denied');
+  if(!obj || typeof obj.slotId==='undefined' || !obj.start) throw new Error('missing');
+  const slotId=Number(obj.slotId);
+  if(!slotId) throw new Error('missing');
+  let start=new Date(obj.start);
+  let end=obj.end?new Date(obj.end):new Date(start.getTime()+30*60000);
+  if(isNaN(start) || isNaN(end) || start>=end) throw new Error('invalid');
+  if(!isHalfHour_(start) || !isHalfHour_(end)) throw new Error('invalid');
+  if(start.getDay()===0 || start.getDay()===6) throw new Error('invalid');
+  if(start < new Date()) throw new Error('past');
+  const lock=LockService.getDocumentLock();
+  lock.waitLock(10000);
+  try{
+    const sheet=getAvailabilitySheet();
+    const last=sheet.getLastRow();
+    if(slotId<1 || slotId>last-1) throw new Error('not_found');
+    const row=slotId+1;
+    const owner=sheet.getRange(row,1).getValue();
+    if(owner!==user.userId && role!=='DEV') throw new Error('denied');
+    const booked=sheet.getRange(row,4).getValue();
+    if(booked) throw new Error('booked');
+    const rows=sheet.getDataRange().getValues();
+    const startIso=start.toISOString();
+    const endIso=end.toISOString();
+    for(let i=1;i<rows.length;i++){
+      if(i===row-1) continue;
+      const [uid,s,e]=rows[i];
+      if(uid!==owner) continue;
+      const otherStart=new Date(s);
+      const otherEnd=new Date(e);
+      if(start < otherEnd && end > otherStart) throw new Error('overlap');
+    }
+    sheet.getRange(row,2,1,2).setValues([[startIso,endIso]]);
+    return {status:'ok'};
+  }finally{
+    lock.releaseLock();
+  }
+}
+
+function deleteAvailabilitySlot(slotId){
+  const user=checkAuth_();
+  const role=String(user.role||'').toUpperCase();
+  if(role!=='MANAGER' && role!=='DEV') throw new Error('denied');
+  const id=Number(slotId);
+  if(!id) throw new Error('missing');
+  const lock=LockService.getDocumentLock();
+  lock.waitLock(10000);
+  try{
+    const sheet=getAvailabilitySheet();
+    const last=sheet.getLastRow();
+    if(id<1 || id>last-1) throw new Error('not_found');
+    const row=id+1;
+    const owner=sheet.getRange(row,1).getValue();
+    if(owner!==user.userId && role!=='DEV') throw new Error('denied');
+    const booked=sheet.getRange(row,4).getValue();
+    if(booked) throw new Error('booked');
+    sheet.deleteRow(row);
+    return {status:'deleted'};
+  }finally{
+    lock.releaseLock();
+  }
+}
