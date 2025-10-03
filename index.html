@@ -330,6 +330,26 @@ button.secondary:hover{background:rgba(15,118,110,0.08);}
 .schedule-sidebar{display:flex;flex-direction:column;gap:1.1rem;}
 .calendar-card{gap:1.25rem;}
 .calendar-head p{color:var(--text-muted);}
+.calendar-controls{display:flex;flex-direction:column;gap:0.75rem;align-items:flex-start;}
+.calendar-title{font-size:1.05rem;font-weight:600;color:var(--primary-700);}
+.calendar-actions{display:flex;flex-wrap:wrap;gap:0.6rem;align-items:center;}
+.calendar-nav{display:flex;align-items:center;gap:0.4rem;}
+.calendar-btn{border:none;border-radius:999px;background:var(--surface-muted);color:var(--primary-700);display:inline-flex;align-items:center;gap:0.35rem;padding:0.5rem 0.9rem;font-weight:600;cursor:pointer;transition:background .2s ease,color .2s ease,box-shadow .2s ease;box-shadow:0 6px 12px rgba(16,36,58,0.08);}
+.calendar-btn:hover{background:rgba(15,118,110,0.12);color:var(--primary-700);}
+.calendar-btn:focus-visible{outline:2px solid rgba(15,118,110,0.4);outline-offset:2px;}
+.calendar-btn:disabled,.calendar-btn.is-disabled{background:var(--surface-muted);color:var(--text-muted);cursor:default;box-shadow:none;}
+.calendar-icon-btn{width:38px;height:38px;padding:0;justify-content:center;}
+.calendar-views{display:flex;align-items:center;gap:0.4rem;}
+.calendar-view-btn{background:var(--surface);color:var(--text-secondary);border:1px solid var(--border-soft);padding:0.45rem 0.9rem;border-radius:999px;font-weight:600;cursor:pointer;transition:background .2s ease,color .2s ease,border .2s ease,box-shadow .2s ease;}
+.calendar-view-btn:hover{background:rgba(15,118,110,0.08);color:var(--primary-700);}
+.calendar-view-btn.is-active{background:var(--primary-600);color:#fff;border-color:var(--primary-600);box-shadow:0 12px 24px rgba(15,118,110,0.16);}
+.calendar-view-btn.is-active:hover{background:var(--primary-500);}
+.calendar-views .calendar-view-btn{min-width:70px;text-transform:capitalize;}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+@media (min-width:768px){
+  .calendar-controls{flex-direction:row;justify-content:space-between;align-items:center;}
+  .calendar-actions{justify-content:flex-end;}
+}
 .booking-legend{display:flex;flex-wrap:wrap;gap:0.75rem;font-size:0.85rem;color:var(--text-muted);}
 .booking-dot{width:10px;height:10px;border-radius:999px;display:inline-block;}
 .booking-dot.available{background:var(--status-available);}
@@ -575,6 +595,14 @@ const translations={
     scheduleAvailableLabel:'Available',
     scheduleBookedBy:'Booked by',
     scheduleManagerLabel:'Manager',
+    schedulePrev:'Previous',
+    scheduleNext:'Next',
+    scheduleToday:'Today',
+    scheduleViewDay:'Day',
+    scheduleViewWeek:'Week',
+    scheduleViewMonth:'Month',
+    scheduleNavLabel:'Calendar navigation',
+    scheduleViewsLabel:'Calendar view options',
     scheduleViewOnly:'This slot is already reserved.',
     scheduleAssignPrompt:'Enter the employee ID to assign this slot:',
     scheduleAssignError:'Employee ID is required.',
@@ -718,6 +746,14 @@ const translations={
     scheduleAvailableLabel:'Disponible',
     scheduleBookedBy:'Reservado por',
     scheduleManagerLabel:'Gerente',
+    schedulePrev:'Anterior',
+    scheduleNext:'Siguiente',
+    scheduleToday:'Hoy',
+    scheduleViewDay:'Día',
+    scheduleViewWeek:'Semana',
+    scheduleViewMonth:'Mes',
+    scheduleNavLabel:'Navegación del calendario',
+    scheduleViewsLabel:'Opciones de vista del calendario',
     scheduleViewOnly:'Este horario ya está ocupado.',
     scheduleAssignPrompt:'Ingresa el ID del empleado para asignar este horario:',
     scheduleAssignError:'Debes ingresar un ID de empleado.',
@@ -879,6 +915,14 @@ function applyTranslations(){
     else if(el.hasAttribute('data-i18n-html'))el.innerHTML=t(key);
     else if(el.hasAttribute('data-i18n-alt'))el.alt=t(key);
     else el.textContent=t(key);
+  });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el=>{
+    const key=el.dataset.i18nAria;
+    if(key)el.setAttribute('aria-label',t(key));
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(el=>{
+    const key=el.dataset.i18nTitle;
+    if(key)el.title=t(key);
   });
   const toggle=document.getElementById('langToggle');
   if(toggle)toggle.checked=lang==='es';
@@ -1539,6 +1583,7 @@ function confirmClearReviews(){
 // ---- Modern Calendar Scheduling -----
 let calendar;
 let calendarSlots=[];
+let calendarControlsReady=false;
 function getRole(){
   return user?String(user.role||'').toUpperCase():'';
 }
@@ -1561,7 +1606,7 @@ function initCalendar(){
     const options={
       initialView:initialView,
       locale:lang==='es'?'es':'en',
-      headerToolbar:{start:'prev,next today',center:'title',end:'timeGridDay,timeGridWeek,dayGridMonth'},
+      headerToolbar:false,
       height:'auto',
       slotDuration:'00:30:00',
       slotMinTime:'07:00:00',
@@ -1579,7 +1624,8 @@ function initCalendar(){
         if(arg.event.extendedProps.past) classes.push('booking-past');
         return classes;
       },
-      eventClick:onCalendarEventClick
+      eventClick:onCalendarEventClick,
+      datesSet:syncCalendarControls
     };
     if(plugins.length){
       options.plugins=plugins;
@@ -1587,9 +1633,12 @@ function initCalendar(){
     calendar=new fc.Calendar(el,options);
   }else{
     calendar.setOption('initialView',initialView);
+    calendar.setOption('datesSet',syncCalendarControls);
   }
   calendar.setOption('locale',lang==='es'?'es':'en');
   calendar.render();
+  setupCalendarControls();
+  syncCalendarControls();
   updateCalendarView();
 }
 function addAvailability(){
@@ -1653,6 +1702,59 @@ function renderCalendarSlots(slots){
       extendedProps:{slot,status,past}
     });
   });
+}
+function setupCalendarControls(){
+  if(calendarControlsReady) return;
+  const wrapper=document.getElementById('calendarWrapper');
+  if(!wrapper) return;
+  wrapper.querySelectorAll('[data-calendar-action]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      if(!calendar) return;
+      const action=btn.dataset.calendarAction;
+      if(action==='prev')calendar.prev();
+      else if(action==='next')calendar.next();
+      else if(action==='today')calendar.today();
+    });
+  });
+  wrapper.querySelectorAll('[data-calendar-view]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      if(!calendar) return;
+      const view=btn.dataset.calendarView;
+      if(view && (!calendar.view || calendar.view.type!==view)){
+        calendar.changeView(view);
+      }
+    });
+  });
+  calendarControlsReady=true;
+}
+function syncCalendarControls(){
+  if(!calendar) return;
+  const wrapper=document.getElementById('calendarWrapper');
+  if(!wrapper) return;
+  const titleEl=wrapper.querySelector('[data-calendar-title]');
+  if(titleEl){
+    const title=calendar.view && calendar.view.title?calendar.view.title:'';
+    titleEl.textContent=title;
+  }
+  const activeView=calendar.view?calendar.view.type:'';
+  wrapper.querySelectorAll('[data-calendar-view]').forEach(btn=>{
+    const isActive=btn.dataset.calendarView===activeView;
+    btn.classList.toggle('is-active',isActive);
+    btn.setAttribute('aria-pressed',isActive?'true':'false');
+  });
+  const todayBtn=wrapper.querySelector('[data-calendar-action="today"]');
+  if(todayBtn){
+    let disable=false;
+    if(calendar.view){
+      const now=new Date();
+      const start=calendar.view.currentStart;
+      const end=calendar.view.currentEnd;
+      disable=now>=start && now<end;
+    }
+    todayBtn.disabled=disable;
+    todayBtn.setAttribute('aria-disabled',disable?'true':'false');
+    todayBtn.classList.toggle('is-disabled',disable);
+  }
 }
 function renderBookingSummary(slots){
   const list=document.getElementById('bookingList');
@@ -1774,6 +1876,8 @@ function updateCalendarView(){
   const desired=window.innerWidth<768?'timeGridDay':'timeGridWeek';
   if(calendar.view && calendar.view.type!==desired){
     calendar.changeView(desired);
+  }else{
+    syncCalendarControls();
   }
 }
 function onCalendarEventClick(info){
@@ -2027,6 +2131,27 @@ document.addEventListener('DOMContentLoaded',init);
           <div class="calendar-head">
             <h3 data-i18n-key="scheduleCalendarTitle">Pick a time that works</h3>
             <p data-i18n-key="scheduleCalendarSubtitle">Tap any green slot to instantly reserve it. Red slots are already taken and blue slots are the ones you've booked.</p>
+            <div class="calendar-controls">
+              <div class="calendar-title" data-calendar-title></div>
+              <div class="calendar-actions">
+                <div class="calendar-nav" role="group" aria-label="Calendar navigation" data-i18n-aria="scheduleNavLabel">
+                  <button type="button" class="calendar-btn calendar-icon-btn" data-calendar-action="prev">
+                    <span class="material-icons" aria-hidden="true">chevron_left</span>
+                    <span class="sr-only" data-i18n-key="schedulePrev">Previous</span>
+                  </button>
+                  <button type="button" class="calendar-btn" data-calendar-action="today" data-i18n-key="scheduleToday">Today</button>
+                  <button type="button" class="calendar-btn calendar-icon-btn" data-calendar-action="next">
+                    <span class="material-icons" aria-hidden="true">chevron_right</span>
+                    <span class="sr-only" data-i18n-key="scheduleNext">Next</span>
+                  </button>
+                </div>
+                <div class="calendar-views" role="group" aria-label="Calendar views" data-i18n-aria="scheduleViewsLabel">
+                  <button type="button" class="calendar-view-btn" data-calendar-view="timeGridDay" aria-pressed="false" data-i18n-key="scheduleViewDay">Day</button>
+                  <button type="button" class="calendar-view-btn" data-calendar-view="timeGridWeek" aria-pressed="false" data-i18n-key="scheduleViewWeek">Week</button>
+                  <button type="button" class="calendar-view-btn" data-calendar-view="dayGridMonth" aria-pressed="false" data-i18n-key="scheduleViewMonth">Month</button>
+                </div>
+              </div>
+            </div>
             <div class="booking-legend">
               <span><span class="booking-dot available"></span><span data-i18n-key="scheduleLegendAvailable">Open slot</span></span>
               <span><span class="booking-dot mine"></span><span data-i18n-key="scheduleLegendMine">Booked by you</span></span>
