@@ -22,3 +22,12 @@ The entire site now uses a **mobile-first** design. Layouts rely on Tailwind CSS
 
 ### Testing Responsiveness
 Use your browser's DevTools or a mobile emulator to resize the viewport. Keeping the width under **480&nbsp;px** closely simulates a phone.
+
+## Automated Tests
+This repository now includes a lightweight Node-based test suite. To run it locally:
+
+```bash
+npm test
+```
+
+The tests verify that production-safe styling utilities are defined locally and that the FullCalendar integration defensively checks for plugin availability.
