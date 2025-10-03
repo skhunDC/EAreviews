@@ -285,24 +285,54 @@ section[data-view]{
   display:flex;
   flex-direction:column;
   gap:0.75rem;
+  align-items:stretch;
 }
-.form-actions #submitMsg{
-  font-weight:600;
-  color:var(--emerald-700);
+.form-actions__buttons{
+  display:flex;
+  flex-direction:column;
+  gap:0.75rem;
 }
-.form-actions .primary{
-  min-width:200px;
+.form-actions__buttons .primary{
+  width:100%;
 }
-.form-actions .primary.secondary{
+.form-actions__buttons .primary.secondary{
   background:transparent;
   color:var(--emerald-700);
   border:1px solid rgba(10,92,48,0.3);
 }
-.form-actions .primary.secondary:hover{
+.form-actions__buttons .primary.secondary:hover{
   background:var(--emerald-50);
 }
+.form-actions__buttons .material-icons{
+  font-size:1.25rem;
+  line-height:1;
+}
+.form-actions #submitMsg{
+  font-weight:600;
+  color:var(--emerald-700);
+  text-align:center;
+  min-height:1.5rem;
+}
+@media (min-width:640px){
+  .form-actions{
+    align-items:flex-start;
+    gap:0.5rem;
+  }
+  .form-actions__buttons{
+    flex-direction:row;
+    align-items:center;
+    gap:0.85rem;
+  }
+  .form-actions__buttons .primary{
+    width:auto;
+  }
+  .form-actions #submitMsg{
+    text-align:left;
+    padding-left:0.35rem;
+  }
+}
 @media (max-width:639px){
-  .form-actions .primary{
+  .form-actions__buttons .primary{
     width:100%;
   }
 }
@@ -311,17 +341,6 @@ section[data-view]{
   color:var(--gray-600);
 }
 .form-footnote small{color:inherit;}
-@media (min-width:640px){
-  .form-actions{
-    flex-direction:row;
-    align-items:center;
-    gap:1rem;
-    justify-content:flex-start;
-  }
-  .form-actions #submitMsg{
-    margin-left:auto;
-  }
-}
 @media (min-width:1024px){
   #reviewForm{
     display:grid;
@@ -518,6 +537,10 @@ input[type=radio],input[type=checkbox]{width:auto;padding:0;border-radius:999px;
   #review-intro .info-card__grid{grid-template-columns:repeat(2,minmax(0,1fr));}
 }
 button.primary{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:0.5rem;
   background:var(--emerald-600);
   color:#fff;
   border:none;
@@ -525,6 +548,7 @@ button.primary{
   padding:0.75rem 1.5rem;
   font-size:1rem;
   font-weight:600;
+  line-height:1;
   cursor:pointer;
   box-shadow:0 12px 22px rgba(10,92,48,0.18);
   transition:transform .2s ease,box-shadow .2s ease;
@@ -2124,9 +2148,17 @@ document.addEventListener('DOMContentLoaded',init);
         <input type="text" id="mgrSignDate" class="sign-date" readonly data-i18n-key="signDate" data-i18n-placeholder placeholder="Date">
       </div>
       <div class="form-actions">
-        <button class="primary" type="submit" data-i18n-key="submitReview">Submit Review</button>
-        <button id="btnSchedule" class="primary secondary" type="button" onclick="show('schedule')" data-i18n-key="scheduleBtn"></button>
-        <span id="submitMsg"></span>
+        <div class="form-actions__buttons">
+          <button class="primary" type="submit">
+            <span class="material-icons" aria-hidden="true">check_circle</span>
+            <span data-i18n-key="submitReview">Submit Review</span>
+          </button>
+          <button id="btnSchedule" class="primary secondary" type="button" onclick="show('schedule')">
+            <span class="material-icons" aria-hidden="true">event_available</span>
+            <span data-i18n-key="scheduleBtn">Schedule Review Meeting</span>
+          </button>
+        </div>
+        <span id="submitMsg" role="status" aria-live="polite"></span>
       </div>
       <div class="form-footnote"><small data-i18n-key="contactQuestions">Please contact Sea Khun HR/IT Manager with any questions or concerns.</small></div>
     </form>
