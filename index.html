@@ -9,7 +9,10 @@
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css">
-<script type="module">import {Calendar} from "https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/+esm";window.FullCalendar={Calendar};</script>
+<script type="module">
+import {Calendar,timeGridPlugin,dayGridPlugin,listPlugin,interactionPlugin} from "https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/+esm";
+window.FullCalendar={Calendar,timeGridPlugin,dayGridPlugin,listPlugin,interactionPlugin};
+</script>
 <style>
 :root{
   --emerald-50:#f0f8f3;
@@ -304,28 +307,51 @@ button.secondary:hover{background:var(--emerald-50);box-shadow:none;}
 @keyframes loadAnim{from{transform:translateX(-100%);}to{transform:translateX(100%);}}
 #snackbar{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#1f2937;color:#fff;padding:0.75rem 1.5rem;border-radius:999px;opacity:0;transition:opacity .3s ease,transform .3s ease;z-index:80;}
 #snackbar.show{opacity:1;transform:translate(-50%,0);}
-#scheduleFlex{display:grid;gap:1.25rem;}
-.schedule-form{display:flex;flex-direction:column;gap:1.25rem;}
-#calendarWrapper{min-height:380px;}
-#calendar{min-height:340px;}
-#slotList{display:flex;flex-direction:column;gap:0.5rem;max-height:260px;overflow-y:auto;padding-right:0.35rem;}
+.schedule-layout{display:flex;flex-direction:column;gap:1.5rem;}
+.schedule-hero{display:flex;flex-direction:column;gap:0.6rem;}
+.schedule-hero h2{margin:0;color:var(--emerald-700);}
+.schedule-hero p{margin:0;color:var(--gray-600);}
+.schedule-columns{display:grid;gap:1.5rem;}
+.schedule-sidebar{display:flex;flex-direction:column;gap:1.25rem;}
+.calendar-card{display:flex;flex-direction:column;gap:1rem;}
+.calendar-head{display:flex;flex-direction:column;gap:0.35rem;}
+.calendar-head p{margin:0;color:var(--gray-600);}
+.booking-calendar{min-height:520px;}
+.booking-legend{display:flex;flex-wrap:wrap;gap:0.75rem;}
+.booking-legend span{display:inline-flex;align-items:center;gap:0.4rem;font-size:0.85rem;color:var(--gray-600);}
+.booking-dot{width:10px;height:10px;border-radius:999px;display:inline-block;}
+.booking-dot.available{background:#10b981;}
+.booking-dot.booked{background:#94a3b8;}
+.booking-dot.mine{background:var(--emerald-600);}
+.booking-list{display:flex;flex-direction:column;gap:1rem;}
+.booking-item{background:#fff;border:1px solid var(--gray-200);border-radius:1rem;padding:0.85rem 1rem;box-shadow:0 12px 24px rgba(15,23,42,0.08);}
+.booking-item h4{margin:0 0 0.3rem;font-size:1rem;color:var(--emerald-700);}
+.booking-item time{display:block;font-weight:600;color:var(--emerald-700);}
+.booking-item span{display:block;font-size:0.9rem;color:var(--gray-600);}
+.booking-empty{font-size:0.95rem;color:var(--gray-500);}
+.booking-help{margin-top:0.5rem;font-size:0.85rem;color:var(--gray-500);}
+.manager-tools{display:flex;flex-direction:column;gap:1rem;}
+.availability-form{display:flex;flex-direction:column;gap:0.75rem;}
+.availability-form label{display:flex;flex-direction:column;gap:0.35rem;font-weight:600;color:var(--emerald-700);}
+.availability-form input{padding:0.55rem 0.75rem;border-radius:0.65rem;border:1px solid var(--gray-200);font-size:0.95rem;}
+.manager-slots{display:flex;flex-direction:column;gap:0.75rem;}
+#bookingSummary h3{margin-top:0;margin-bottom:0.35rem;color:var(--emerald-700);}
+#guideCard{overflow:hidden;}
+#slotList{display:flex;flex-direction:column;gap:0.75rem;max-height:320px;overflow-y:auto;padding-right:0.35rem;}
 #availMsg{font-size:0.85rem;color:var(--emerald-700);}
-.slot-row{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem 0.75rem;justify-content:flex-start;padding:0.75rem 0.9rem;border:1px solid var(--gray-200);border-radius:0.85rem;background:#fff;box-shadow:0 8px 18px rgba(15,23,42,0.08);}
+.slot-row{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem 0.75rem;justify-content:flex-start;padding:0.85rem 1rem;border:1px solid var(--gray-200);border-radius:1rem;background:#fff;box-shadow:0 10px 22px rgba(15,23,42,0.08);}
 .slot-row-booked{background:var(--emerald-100);border-color:rgba(10,92,48,0.25);}
-.slot-range{flex:1 1 100%;font-weight:600;color:var(--emerald-700);}
-.slot-assign{flex:1 1 160px;max-width:220px;}
-.slot-save{padding:0.45rem 1rem;font-size:0.85rem;box-shadow:none;margin-left:auto;}
+.slot-range{flex:1 1 160px;font-weight:600;color:var(--emerald-700);}
+.slot-status{flex:1 1 100%;font-size:0.85rem;color:var(--gray-500);}
+.slot-assign{flex:1 1 160px;max-width:240px;}
+.slot-save{padding:0.5rem 1.1rem;font-size:0.85rem;box-shadow:none;margin-left:auto;}
 .slot-save:hover{box-shadow:0 10px 20px rgba(10,92,48,0.16);}
-.calendar{width:100%;border-collapse:collapse;font-size:0.9rem;}
-.calendar th,.calendar td{border:1px solid var(--gray-200);padding:0.75rem;vertical-align:top;background:#fff;}
-.calendar th{background:var(--emerald-100);color:var(--emerald-800);text-align:left;font-weight:600;}
-.calendar td.disabled{background:var(--gray-100);color:var(--gray-400);}
-.calendar .date-num{font-weight:600;margin-bottom:0.4rem;display:block;color:var(--emerald-700);}
-.calendar .slot{margin-top:0.3rem;padding:0.35rem 0.55rem;border-radius:0.65rem;font-size:0.75rem;cursor:pointer;display:inline-flex;gap:0.35rem;align-items:center;}
-.calendar .slot.available{background:#d1fae5;color:#047857;}
-.calendar .slot.booked{background:#e5e7eb;color:#6b7280;cursor:not-allowed;}
-.calendar .slot.mine{background:var(--emerald-600);color:#fff;}
-.calendar .slot:hover{box-shadow:0 6px 14px rgba(15,118,110,0.15);}
+#calendar{width:100%;}
+.fc .booking-event{border:none !important;box-shadow:none !important;font-weight:600;}
+.fc .booking-open{background:#d1fae5 !important;color:#047857 !important;}
+.fc .booking-booked{background:#e5e7eb !important;color:#4b5563 !important;}
+.fc .booking-mine{background:var(--emerald-600) !important;color:#fff !important;}
+.fc .booking-past{opacity:0.5;}
 #devPanel{z-index:70;}
 #devPanel table{width:100%;border-collapse:collapse;font-size:0.95rem;}
 #devPanel th,#devPanel td{padding:0.75rem;border-bottom:1px solid var(--gray-200);text-align:left;}
@@ -379,11 +405,11 @@ button.secondary:hover{background:var(--emerald-50);box-shadow:none;}
     background:rgba(255,255,255,0.12);
   }
   .nav-items button:hover{opacity:1;background:rgba(255,255,255,0.22);}
-  #scheduleFlex{grid-template-columns:280px 1fr;align-items:start;}
+  .schedule-columns{grid-template-columns:minmax(0,300px) minmax(0,1fr);align-items:start;}
 }
 @media(min-width:1024px){
-  #scheduleFlex{grid-template-columns:320px 1fr;}
-  #calendarWrapper{padding:1rem 1.25rem;}
+  .schedule-columns{grid-template-columns:minmax(0,360px) minmax(0,1fr);}
+  .booking-calendar{min-height:640px;}
 }
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;scroll-behavior:auto !important;}
@@ -437,7 +463,30 @@ const translations={
     employeeComments:"Employee's Comments",managerComments:"Manager's Comments",
     reviewSaved:'Review saved',saveFailed:'Failed to save review',saving:'Saving...',
     scheduleBtn:'Schedule Review Meeting',
-    bookPrompt:'Book this time?',
+    scheduleHeroTitle:'Book your review',
+    scheduleHeroSubtitle:'Choose a 30-minute slot that works for both you and your manager.',
+    scheduleCalendarTitle:'Pick a time that works',
+    scheduleCalendarSubtitle:'Tap any green slot to instantly reserve it. Gray slots are already taken.',
+    scheduleLegendAvailable:'Open slot',
+    scheduleLegendMine:'Booked by you',
+    scheduleLegendBooked:'Booked',
+    scheduleNoBooking:'You haven\'t reserved a review yet. Choose an available time on the calendar to lock it in.',
+    scheduleNextBookingTitle:'Your review is booked',
+    scheduleUpcomingLabel:'Upcoming review',
+    scheduleBookingHelp:'Need to make a change? Contact your manager or HR for help.',
+    scheduleManagerToolsTitle:'Manager availability tools',
+    scheduleManagerSlotsTitle:'Posted availability',
+    scheduleManagerNoSlots:'You haven\'t shared any availability yet. Use the form above to add 30-minute blocks.',
+    scheduleBookConfirm:'Book this review on {date} at {time} with {manager}?',
+    scheduleBookSuccess:'Review booked!',
+    scheduleBookConflict:'Someone just booked that slot. Please choose another time.',
+    scheduleBookedLabel:'Booked',
+    scheduleAvailableLabel:'Available',
+    scheduleBookedBy:'Booked by',
+    scheduleManagerLabel:'Manager',
+    scheduleViewOnly:'This slot is already reserved.',
+    scheduleAssignPrompt:'Enter the employee ID to assign this slot:',
+    scheduleAssignError:'Employee ID is required.',
     cancel:'Cancel',
     conflict:'Slot already booked',
     selDate:'Select Date',
@@ -530,7 +579,30 @@ const translations={
     employeeComments:'Comentarios del empleado',managerComments:'Comentarios del gerente',
     reviewSaved:'Revisión guardada',saveFailed:'No se pudo guardar la revisión',saving:'Guardando...',
     scheduleBtn:'Agendar Reunión de Revisión',
-    bookPrompt:'¿Reservar esta hora?',
+    scheduleHeroTitle:'Reserva tu revisión',
+    scheduleHeroSubtitle:'Elige un bloque de 30 minutos que funcione para ti y tu gerente.',
+    scheduleCalendarTitle:'Elige un horario',
+    scheduleCalendarSubtitle:'Toca cualquier espacio verde para reservarlo al instante. Los grises ya están ocupados.',
+    scheduleLegendAvailable:'Espacio disponible',
+    scheduleLegendMine:'Reservado por ti',
+    scheduleLegendBooked:'Reservado',
+    scheduleNoBooking:'Todavía no has reservado tu revisión. Elige un horario disponible en el calendario para confirmarla.',
+    scheduleNextBookingTitle:'Tu revisión está reservada',
+    scheduleUpcomingLabel:'Próxima revisión',
+    scheduleBookingHelp:'¿Necesitas hacer un cambio? Comunícate con tu gerente o con RR. HH.',
+    scheduleManagerToolsTitle:'Herramientas de disponibilidad para gerentes',
+    scheduleManagerSlotsTitle:'Disponibilidad publicada',
+    scheduleManagerNoSlots:'Aún no has compartido disponibilidad. Usa el formulario de arriba para agregar bloques de 30 minutos.',
+    scheduleBookConfirm:'¿Deseas reservar esta revisión el {date} a las {time} con {manager}?',
+    scheduleBookSuccess:'¡Revisión reservada!',
+    scheduleBookConflict:'Alguien acaba de reservar ese horario. Elige otro momento.',
+    scheduleBookedLabel:'Reservado',
+    scheduleAvailableLabel:'Disponible',
+    scheduleBookedBy:'Reservado por',
+    scheduleManagerLabel:'Gerente',
+    scheduleViewOnly:'Este horario ya está ocupado.',
+    scheduleAssignPrompt:'Ingresa el ID del empleado para asignar este horario:',
+    scheduleAssignError:'Debes ingresar un ID de empleado.',
     cancel:'Cancelar',
     conflict:'Horario no disponible',
     selDate:'Seleccionar fecha',
@@ -652,7 +724,11 @@ function show(id){
     loadQuestions();
   }else if(id==='schedule'){
     initCalendar();
+    updateCalendarView();
     document.getElementById(id).classList.remove('hidden');
+    if(user){
+      loadAvailability();
+    }
   }else{
     if(id==='home'){
       const list=document.getElementById('reviewsList');
@@ -665,7 +741,6 @@ function show(id){
 function openSchedule(){
   closeMenu();
   show('schedule');
-  loadAvailability();
 }
 function applyTranslations(){
   document.querySelectorAll('[data-i18n-key]').forEach(el=>{
@@ -690,6 +765,7 @@ window.addEventListener('resize',()=>{
   if(window.innerWidth>=768){
     setMenuState(false);
   }
+  updateCalendarView();
 });
 document.addEventListener('click',e=>{
   const items=document.getElementById('navItems');
@@ -787,8 +863,13 @@ function toggleLang(){
   applyTranslations();
   renderReviews();
   renderQuestionList();
+  if(calendar){
+    calendar.setOption('locale',lang==='es'?'es':'en');
+    renderCalendarSlots(calendarSlots);
+  }
+  renderBookingSummary(calendarSlots);
+  renderSlotList(calendarSlots);
   if(user){
-    loadSlots();
     loadAvailability();
   }
 }
@@ -1201,52 +1282,45 @@ function confirmClearReviews(){
 
 // ---- Modern Calendar Scheduling -----
 let calendar;
+let calendarSlots=[];
+function getRole(){
+  return user?String(user.role||'').toUpperCase():'';
+}
 function initCalendar(){
   const el=document.getElementById('calendar');
   if(!el) return;
+  const initialView=window.innerWidth<768?'timeGridDay':'timeGridWeek';
   if(!calendar){
     calendar=new FullCalendar.Calendar(el,{
-      initialView:'dayGridMonth',
+      plugins:[FullCalendar.timeGridPlugin,FullCalendar.dayGridPlugin,FullCalendar.listPlugin,FullCalendar.interactionPlugin],
+      initialView:initialView,
       locale:lang==='es'?'es':'en',
-      headerToolbar:{start:'prev,next today',center:'title',end:''},
+      headerToolbar:{start:'prev,next today',center:'title',end:'timeGridDay,timeGridWeek,dayGridMonth'},
       height:'auto',
-      datesSet:loadSlots
+      slotDuration:'00:30:00',
+      slotMinTime:'07:00:00',
+      slotMaxTime:'19:00:00',
+      expandRows:true,
+      nowIndicator:true,
+      allDaySlot:false,
+      eventTimeFormat:{hour:'numeric',minute:'2-digit'},
+      eventClassNames:arg=>{
+        const classes=['booking-event'];
+        const status=arg.event.extendedProps.status;
+        if(status==='open') classes.push('booking-open');
+        if(status==='booked') classes.push('booking-booked');
+        if(status==='mine') classes.push('booking-mine');
+        if(arg.event.extendedProps.past) classes.push('booking-past');
+        return classes;
+      },
+      eventClick:onCalendarEventClick
     });
+  }else{
+    calendar.setOption('initialView',initialView);
   }
   calendar.setOption('locale',lang==='es'?'es':'en');
   calendar.render();
-  loadSlots();
-  const role=user?String(user.role||'').toUpperCase():'';
-  document.getElementById('availForm').classList.toggle('hidden',!(role==='MANAGER'||role==='DEV'));
-}
-function loadSlots(){
-  if(!user) return;
-  google.script.run.withSuccessHandler(res=>{
-    calendar.getEvents().forEach(e=>e.remove());
-    const map={};
-    res.forEach(s=>{
-      if(s.userId!==user.userId) return;
-      const d=s.start.slice(0,10);
-      if(!map[d]) map[d]={total:0,booked:0};
-      map[d].total++;
-      if(s.employeeId) map[d].booked++;
-    });
-    Object.keys(map).forEach(d=>{
-      const info=map[d];
-      const remaining=info.total-info.booked;
-      if(remaining>0){
-        calendar.addEvent({start:d,allDay:true,title:remaining+' '+t('availableShort'),backgroundColor:'#34d399',borderColor:'#34d399',textColor:'#fff'});
-      }else{
-        calendar.addEvent({start:d,allDay:true,title:info.booked+' '+t('bookedShort'),backgroundColor:'#ef4444',borderColor:'#ef4444',textColor:'#fff'});
-      }
-    });
-  }).getAvailability();
-}
-function slotClick(info){
-  const b=info.event.extendedProps.bookedBy;
-  if(b){alert(t('conflict'));return;}
-  if(!confirm(t('bookPrompt'))) return;
-  google.script.run.withSuccessHandler(r=>{if(r.status==='ok'){alert(t('bookOk'));loadSlots();loadAvailability();}else{alert(t('conflict'));loadSlots();}}).bookSlot({slotId:info.event.id,employeeId:user.userId});
+  updateCalendarView();
 }
 function addAvailability(){
   const sd=document.getElementById('availFromDate').value;
@@ -1256,7 +1330,6 @@ function addAvailability(){
   if(!sd||!st||!ed||!et){showError(t('errorMissing'));return;}
   google.script.run.withSuccessHandler(res=>{
     loadAvailability();
-    loadSlots();
     const n=(res.added||[]).length;
     if(n) showSnackbar(n+' '+t('slotsSaved'));
   }).withFailureHandler(err=>{
@@ -1264,47 +1337,230 @@ function addAvailability(){
   }).postAvailability({start:sd+'T'+st,end:ed+'T'+et});
 }
 function loadAvailability(){
-  google.script.run.withSuccessHandler(renderSlotList).getAvailability();
+  if(!user) return;
+  if(typeof google==='undefined' || !google.script || !google.script.run) return;
+  google.script.run
+    .withSuccessHandler(slots=>{
+      calendarSlots=Array.isArray(slots)?slots:[];
+      renderCalendarSlots(calendarSlots);
+      renderBookingSummary(calendarSlots);
+      renderSlotList(calendarSlots);
+    })
+    .withFailureHandler(err=>{
+      showError(mapError(err));
+    })
+    .getAvailability();
+}
+function renderCalendarSlots(slots){
+  if(!calendar) return;
+  calendar.removeAllEvents();
+  const now=new Date();
+  const myId=user?user.userId:null;
+  (slots||[]).forEach(slot=>{
+    const start=new Date(slot.start);
+    const end=new Date(slot.end);
+    if(isNaN(start)||isNaN(end)) return;
+    const booked=!!slot.employeeId;
+    const isMine=booked && slot.employeeId===myId;
+    const status=isMine?'mine':(booked?'booked':'open');
+    const past=end<now;
+    const timeLabel=formatRange(slot.start,slot.end);
+    let title=timeLabel;
+    if(!booked) title+=' • '+(slot.userId||t('scheduleManagerLabel'));
+    else if(isMine) title+=' • '+t('scheduleLegendMine');
+    else title+=' • '+t('scheduleBookedLabel');
+    const classes=['booking-event'];
+    if(status==='open') classes.push('booking-open');
+    if(status==='booked') classes.push('booking-booked');
+    if(status==='mine') classes.push('booking-mine');
+    if(past) classes.push('booking-past');
+    calendar.addEvent({
+      id:String(slot.id),
+      start,
+      end,
+      title,
+      classNames:classes,
+      extendedProps:{slot,status,past}
+    });
+  });
+}
+function renderBookingSummary(slots){
+  const list=document.getElementById('bookingList');
+  const empty=document.getElementById('bookingEmpty');
+  if(!list||!empty) return;
+  list.innerHTML='';
+  const myId=user?user.userId:null;
+  if(!myId){
+    empty.classList.remove('hidden');
+    return;
+  }
+  const upcoming=(slots||[])
+    .filter(s=>s.employeeId===myId)
+    .filter(s=>new Date(s.end)>new Date())
+    .sort((a,b)=>new Date(a.start)-new Date(b.start));
+  if(upcoming.length===0){
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+  upcoming.slice(0,2).forEach(slot=>{
+    const details=formatSlotDetails(slot);
+    const item=document.createElement('div');
+    item.className='booking-item';
+    const title=document.createElement('h4');
+    title.textContent=t('scheduleUpcomingLabel');
+    item.appendChild(title);
+    const timeEl=document.createElement('time');
+    timeEl.dateTime=slot.start;
+    timeEl.textContent=details.dateLabel;
+    item.appendChild(timeEl);
+    const range=document.createElement('span');
+    range.textContent=details.timeLabel;
+    item.appendChild(range);
+    const manager=document.createElement('span');
+    manager.textContent=`${t('scheduleManagerLabel')}: ${details.managerLabel}`;
+    item.appendChild(manager);
+    list.appendChild(item);
+  });
 }
 function renderSlotList(slots){
+  const tools=document.getElementById('managerTools');
   const list=document.getElementById('slotList');
-  const card=document.getElementById('slotCard');
-  if(!list||!card) return;
+  const slotCard=document.getElementById('slotCard');
+  const empty=document.getElementById('managerNoSlots');
+  if(!tools||!list||!slotCard) return;
+  if(!user) return;
+  const role=getRole();
+  const isManager=role==='MANAGER'||role==='DEV';
+  tools.classList.toggle('hidden',!isManager);
+  if(!isManager) return;
   list.innerHTML='';
-  let count=0;
-  slots.forEach(s=>{
-    if(s.userId!==user.userId) return;
-    count++;
+  slotCard.classList.remove('hidden');
+  const mine=(slots||[])
+    .filter(s=>s.userId===user.userId)
+    .sort((a,b)=>new Date(a.start)-new Date(b.start));
+  if(mine.length===0){
+    if(empty) empty.classList.remove('hidden');
+    return;
+  }
+  slotCard.classList.remove('hidden');
+  if(empty) empty.classList.add('hidden');
+  mine.forEach(slot=>{
+    const details=formatSlotDetails(slot);
     const row=document.createElement('div');
     row.className='slot-row';
-    const span=document.createElement('span');
-    span.className='slot-range';
-    span.textContent=formatRange(s.start,s.end);
-    row.appendChild(span);
-    const inp=document.createElement('input');
-    inp.type='text';
-    inp.className='slot-assign';
-    inp.value=s.employeeId||'';
-    if(s.employeeId){
-      inp.disabled=true;
-      row.classList.add('slot-row-booked');
-    }
-    row.appendChild(inp);
-    if(!s.employeeId){
+    if(slot.employeeId) row.classList.add('slot-row-booked');
+    const range=document.createElement('span');
+    range.className='slot-range';
+    range.textContent=details.shortDate+' · '+details.timeLabel;
+    row.appendChild(range);
+    const status=document.createElement('span');
+    status.className='slot-status';
+    status.textContent=slot.employeeId?`${t('scheduleBookedBy')} ${slot.employeeId}`:t('scheduleAvailableLabel');
+    row.appendChild(status);
+    if(!slot.employeeId){
+      const inp=document.createElement('input');
+      inp.type='text';
+      inp.className='slot-assign';
+      inp.placeholder=t('userId');
+      row.appendChild(inp);
       const btn=document.createElement('button');
       btn.type='button';
       btn.textContent=t('saveSlotBtn');
       btn.className='primary slot-save';
-      btn.onclick=()=>saveSlot(s.id,inp.value,inp);
+      btn.onclick=()=>saveSlot(slot.id,inp.value.trim(),inp);
       row.appendChild(btn);
     }
     list.appendChild(row);
   });
-  card.classList.toggle('hidden',count===0);
 }
 function saveSlot(id,val,inputEl){
-  if(!val) return;
-  google.script.run.withSuccessHandler(()=>{loadAvailability();loadSlots();}).withFailureHandler(err=>alert(err.message)).bookSlot({slotId:id,employeeId:val});
+  if(!val){
+    showSnackbar(t('scheduleAssignError'));
+    if(inputEl) inputEl.focus();
+    return;
+  }
+  google.script.run
+    .withSuccessHandler(()=>{
+      showSnackbar(t('scheduleBookSuccess'));
+      loadAvailability();
+    })
+    .withFailureHandler(err=>{
+      showSnackbar(mapError(err));
+    })
+    .bookSlot({slotId:id,employeeId:val});
+}
+function formatSlotDetails(slot){
+  const locale=lang==='es'?'es':'en';
+  const start=new Date(slot.start);
+  const end=new Date(slot.end);
+  const dateLabel=isNaN(start)?'':start.toLocaleDateString(locale,{weekday:'long',month:'long',day:'numeric'});
+  const shortDate=isNaN(start)?'':start.toLocaleDateString(locale,{weekday:'short',month:'short',day:'numeric'});
+  const timeLabel=formatRange(slot.start,slot.end);
+  return {dateLabel,shortDate,timeLabel,managerLabel:slot.userId||t('scheduleManagerLabel')};
+}
+function updateCalendarView(){
+  if(!calendar) return;
+  const desired=window.innerWidth<768?'timeGridDay':'timeGridWeek';
+  if(calendar.view && calendar.view.type!==desired){
+    calendar.changeView(desired);
+  }
+}
+function onCalendarEventClick(info){
+  if(!user){
+    show('schedule');
+    return;
+  }
+  const slot=info.event.extendedProps.slot;
+  if(!slot) return;
+  const role=getRole();
+  if(slot.employeeId){
+    if(slot.employeeId===user.userId){
+      showSnackbar(t('scheduleLegendMine'));
+    }else{
+      showSnackbar(t('scheduleViewOnly'));
+    }
+    return;
+  }
+  if(role==='MANAGER'||role==='DEV'){
+    const val=prompt(t('scheduleAssignPrompt'));
+    if(val===null) return;
+    const trimmed=val.trim();
+    if(!trimmed){
+      showSnackbar(t('scheduleAssignError'));
+      return;
+    }
+    google.script.run
+      .withSuccessHandler(res=>{
+        if(res.status==='ok') showSnackbar(t('scheduleBookSuccess'));
+        else if(res.status==='taken') showSnackbar(t('scheduleBookConflict'));
+        else showSnackbar(t('error'));
+        loadAvailability();
+      })
+      .withFailureHandler(err=>{
+        showSnackbar(mapError(err));
+        loadAvailability();
+      })
+      .bookSlot({slotId:slot.id,employeeId:trimmed});
+    return;
+  }
+  const details=formatSlotDetails(slot);
+  const confirmMsg=t('scheduleBookConfirm')
+    .replace('{date}',details.dateLabel)
+    .replace('{time}',details.timeLabel)
+    .replace('{manager}',details.managerLabel);
+  if(!confirm(confirmMsg)) return;
+  google.script.run
+    .withSuccessHandler(res=>{
+      if(res.status==='ok') showSnackbar(t('scheduleBookSuccess'));
+      else showSnackbar(t('scheduleBookConflict'));
+      loadAvailability();
+    })
+    .withFailureHandler(err=>{
+      showSnackbar(mapError(err));
+      loadAvailability();
+    })
+    .bookSlot({slotId:slot.id,employeeId:user.userId});
 }
 function formatRange(start,end){
   const opts={hour:'numeric',minute:'2-digit'};
@@ -1439,33 +1695,62 @@ document.addEventListener('DOMContentLoaded',init);
     </form>
   </section>
   <section id="schedule" class="hidden" data-view>
-    <div data-i18n-key="scheduleGuide" data-i18n-html></div>
-    <div id="scheduleFlex">
-      <div class="schedule-form">
-        <div id="availForm" class="card hidden">
-          <div class="card-title" data-i18n-key="addSlotTitle">Set Availability</div>
-          <label><span data-i18n-key="fromDate">Start Date</span>
-            <input type="date" id="availFromDate">
-          </label>
-          <label><span data-i18n-key="fromTime">Start Time</span>
-            <input type="time" id="availFromTime" step="1800">
-          </label>
-          <label><span data-i18n-key="toDate">End Date</span>
-            <input type="date" id="availToDate">
-          </label>
-          <label><span data-i18n-key="toTime">End Time</span>
-            <input type="time" id="availToTime" step="1800">
-          </label>
-          <button class="primary" type="button" onclick="addAvailability()" data-i18n-key="addSlotBtn">Add Slot</button>
-          <div id="availMsg"></div>
-        </div>
-        <div id="slotCard" class="card hidden">
-          <div class="card-title" data-i18n-key="slotListTitle">Slots</div>
-          <div id="slotList"></div>
-        </div>
+    <div class="schedule-layout">
+      <div class="card schedule-hero">
+        <h2 data-i18n-key="scheduleHeroTitle">Book your review</h2>
+        <p data-i18n-key="scheduleHeroSubtitle">Choose a 30-minute slot that works for both you and your manager.</p>
       </div>
-      <div id="calendarWrapper" class="card">
-        <div id="calendar"></div>
+      <div class="schedule-columns">
+        <aside class="schedule-sidebar">
+          <div class="card" id="bookingSummary">
+            <h3 data-i18n-key="scheduleNextBookingTitle">Your review is booked</h3>
+            <div id="bookingList" class="booking-list"></div>
+            <p id="bookingEmpty" class="booking-empty" data-i18n-key="scheduleNoBooking">You haven’t reserved a review yet. Choose an available time on the calendar to lock it in.</p>
+            <p class="booking-help" data-i18n-key="scheduleBookingHelp">Need to make a change? Contact your manager or HR for help.</p>
+          </div>
+          <div class="card" id="guideCard">
+            <div data-i18n-key="scheduleGuide" data-i18n-html></div>
+          </div>
+          <div id="managerTools" class="card hidden manager-tools">
+            <div>
+              <div class="card-title" data-i18n-key="scheduleManagerToolsTitle">Manager availability tools</div>
+            </div>
+            <div id="availForm" class="availability-form">
+              <div class="card-title" data-i18n-key="addSlotTitle">Set Availability</div>
+              <label><span data-i18n-key="fromDate">Start Date</span>
+                <input type="date" id="availFromDate">
+              </label>
+              <label><span data-i18n-key="fromTime">Start Time</span>
+                <input type="time" id="availFromTime" step="1800">
+              </label>
+              <label><span data-i18n-key="toDate">End Date</span>
+                <input type="date" id="availToDate">
+              </label>
+              <label><span data-i18n-key="toTime">End Time</span>
+                <input type="time" id="availToTime" step="1800">
+              </label>
+              <button class="primary" type="button" onclick="addAvailability()" data-i18n-key="addSlotBtn">Add Slot</button>
+              <div id="availMsg"></div>
+            </div>
+            <div id="slotCard" class="manager-slots hidden">
+              <div class="card-title" data-i18n-key="scheduleManagerSlotsTitle">Posted availability</div>
+              <div id="slotList"></div>
+              <p id="managerNoSlots" class="booking-empty hidden" data-i18n-key="scheduleManagerNoSlots">You haven’t shared any availability yet. Use the form above to add 30-minute blocks.</p>
+            </div>
+          </div>
+        </aside>
+        <div id="calendarWrapper" class="card calendar-card">
+          <div class="calendar-head">
+            <h3 data-i18n-key="scheduleCalendarTitle">Pick a time that works</h3>
+            <p data-i18n-key="scheduleCalendarSubtitle">Tap any green slot to instantly reserve it. Gray slots are already taken.</p>
+            <div class="booking-legend">
+              <span><span class="booking-dot available"></span><span data-i18n-key="scheduleLegendAvailable">Open slot</span></span>
+              <span><span class="booking-dot mine"></span><span data-i18n-key="scheduleLegendMine">Booked by you</span></span>
+              <span><span class="booking-dot booked"></span><span data-i18n-key="scheduleLegendBooked">Booked</span></span>
+            </div>
+          </div>
+          <div id="calendar" class="booking-calendar"></div>
+        </div>
       </div>
     </div>
   </section>
