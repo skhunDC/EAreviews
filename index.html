@@ -309,6 +309,7 @@ button.primary{
   color:#fff;
   padding:0.7rem 1.6rem;
   font-weight:600;
+  line-height:1;
   cursor:pointer;
   box-shadow:0 16px 28px rgba(15,118,110,0.18);
   transition:transform .2s ease,box-shadow .2s ease,background .2s ease;
@@ -1962,9 +1963,17 @@ document.addEventListener('DOMContentLoaded',init);
         <input type="text" id="mgrSignDate" class="sign-date" readonly data-i18n-key="signDate" data-i18n-placeholder placeholder="Date">
       </div>
       <div class="form-actions">
-        <button class="primary" type="submit" data-i18n-key="submitReview">Submit Review</button>
-        <button id="btnSchedule" class="primary secondary" type="button" onclick="show('schedule')" data-i18n-key="scheduleBtn"></button>
-        <span id="submitMsg"></span>
+        <div class="form-actions__buttons">
+          <button class="primary" type="submit">
+            <span class="material-icons" aria-hidden="true">check_circle</span>
+            <span data-i18n-key="submitReview">Submit Review</span>
+          </button>
+          <button id="btnSchedule" class="primary secondary" type="button" onclick="show('schedule')">
+            <span class="material-icons" aria-hidden="true">event_available</span>
+            <span data-i18n-key="scheduleBtn">Schedule Review Meeting</span>
+          </button>
+        </div>
+        <span id="submitMsg" role="status" aria-live="polite"></span>
       </div>
       <div class="form-footnote"><small data-i18n-key="contactQuestions">Please contact Sea Khun HR/IT Manager with any questions or concerns.</small></div>
     </form>
