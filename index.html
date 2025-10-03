@@ -1299,19 +1299,23 @@ function fillSavedAnswers(){
     }
     if(fe.notes) document.getElementById('finalNotes').value=fe.notes;
     if(fe.empSign){
-      document.getElementById('empSign').value=fe.empSign.name||'';
-      if(fe.empSign.ts){
-        const d=new Date(fe.empSign.ts);
+      const empSignName=typeof fe.empSign==='object'?fe.empSign.name:fe.empSign;
+      document.getElementById('empSign').value=empSignName||'';
+      const empSignTs=typeof fe.empSign==='object'?fe.empSign.ts:null;
+      if(empSignTs){
+        const d=new Date(empSignTs);
         document.getElementById('empSignDate').value=d.toLocaleString();
-        document.getElementById('empSignDate').dataset.iso=fe.empSign.ts;
+        document.getElementById('empSignDate').dataset.iso=empSignTs;
       }
     }
     if(fe.mgrSign){
-      document.getElementById('mgrSign').value=fe.mgrSign.name||'';
-      if(fe.mgrSign.ts){
-        const d=new Date(fe.mgrSign.ts);
+      const mgrSignName=typeof fe.mgrSign==='object'?fe.mgrSign.name:fe.mgrSign;
+      document.getElementById('mgrSign').value=mgrSignName||'';
+      const mgrSignTs=typeof fe.mgrSign==='object'?fe.mgrSign.ts:null;
+      if(mgrSignTs){
+        const d=new Date(mgrSignTs);
         document.getElementById('mgrSignDate').value=d.toLocaleString();
-        document.getElementById('mgrSignDate').dataset.iso=fe.mgrSign.ts;
+        document.getElementById('mgrSignDate').dataset.iso=mgrSignTs;
       }
     }
   }
