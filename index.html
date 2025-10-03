@@ -470,8 +470,6 @@ input[type=radio],input[type=checkbox]{width:auto;padding:0;border-radius:999px;
 .list-disc{list-style:disc;padding-left:1.25rem;}
 .badge-green{background:var(--emerald-600);}
 .badge-gold{background:var(--gold-400);color:#1f2937;}
-.process{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;font-size:0.95rem;color:#374151;}
-.process svg{width:12px;height:12px;stroke:var(--emerald-700);stroke-width:2;}
 #review-intro{
   background:linear-gradient(135deg,rgba(255,255,255,0.95),rgba(235,250,243,0.95));
   border-radius:1.5rem;
@@ -482,13 +480,40 @@ input[type=radio],input[type=checkbox]{width:auto;padding:0;border-radius:999px;
 }
 #review-intro h1{text-align:center;color:var(--emerald-700);font-weight:700;}
 #review-intro .intro-cards{display:flex;flex-direction:column;gap:1.25rem;}
-#review-intro .info-card{background:#fff;border-radius:1rem;box-shadow:0 12px 30px rgba(6,55,31,0.08);padding:clamp(1.25rem,3vw,1.75rem);display:flex;flex-direction:column;gap:1rem;}
-#review-intro .info-card--combined{gap:1.25rem;}
-#review-intro .info-card--combined .info-section{display:flex;flex-direction:column;gap:0.75rem;}
-#review-intro .info-card--combined hr{border:none;height:1px;background:linear-gradient(90deg,rgba(10,92,48,0),rgba(10,92,48,0.3),rgba(10,92,48,0));}
-#review-intro .info-card--combined h3{font-size:1.05rem;color:var(--emerald-700);margin:0;}
+#review-intro .info-card{background:#fff;border-radius:1rem;box-shadow:0 12px 30px rgba(6,55,31,0.08);padding:clamp(1.25rem,3vw,1.75rem);display:flex;flex-direction:column;gap:1.25rem;}
+#review-intro .info-card--combined{gap:clamp(1.25rem,2.5vw,1.75rem);}
+#review-intro .info-card__header{display:flex;flex-direction:column;gap:0.65rem;}
+#review-intro .info-card__header p{margin:0;color:var(--gray-600);font-size:1rem;max-width:62ch;line-height:1.7;}
+#review-intro .info-card__grid{display:grid;grid-template-columns:1fr;gap:clamp(1.25rem,2.5vw,1.75rem);}
+#review-intro .info-section{display:flex;flex-direction:column;gap:0.75rem;}
+#review-intro .info-section h3{font-size:1.05rem;color:var(--emerald-700);margin:0;font-weight:600;letter-spacing:0.01em;}
+#review-intro .info-section--wide{grid-column:1/-1;}
+#review-intro .info-section p{margin:0;color:var(--gray-600);line-height:1.7;max-width:65ch;}
+#review-intro .info-section p + p{margin-top:0.35rem;}
+#review-intro .info-section .info-footnote{font-size:0.95rem;}
+#review-intro .info-section .info-footnote--highlight{background:linear-gradient(90deg,rgba(201,161,74,0.12),rgba(201,161,74,0));border-radius:0.75rem;padding:0.65rem 0.85rem;color:var(--emerald-700);}
+#review-intro .info-section .info-subtitle{font-size:1rem;color:var(--emerald-600);text-transform:uppercase;letter-spacing:0.08em;margin-top:0.75rem;}
 .values-list{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:0.5rem;}
-.values-list li{background:var(--emerald-600);color:#fff;padding:0.35rem 0.9rem;border-radius:999px;font-size:0.85rem;}
+.values-list li{background:var(--emerald-600);color:#fff;padding:0.35rem 0.9rem;border-radius:999px;font-size:0.85rem;letter-spacing:0.02em;}
+#review-intro .rating-badges{display:flex;flex-wrap:wrap;gap:0.5rem;}
+#review-intro .rating-badges .badge{padding:0.4rem 0.85rem;font-size:0.85rem;letter-spacing:0.02em;}
+#review-intro .info-meta{display:grid;gap:0.65rem;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin:0;}
+#review-intro .info-meta__item{background:var(--emerald-50);border-radius:0.9rem;padding:0.75rem 1rem;display:flex;flex-direction:column;gap:0.25rem;box-shadow:inset 0 0 0 1px rgba(10,92,48,0.08);}
+#review-intro .info-meta__item dt{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--emerald-700);font-weight:600;}
+#review-intro .info-meta__item dd{margin:0;font-weight:500;color:var(--emerald-800);line-height:1.5;}
+#review-intro .process-steps{counter-reset:step;list-style:none;padding:0;margin:0;display:grid;gap:0.75rem;}
+#review-intro .process-steps li{counter-increment:step;display:flex;align-items:flex-start;gap:0.75rem;background:#fff;border-radius:0.9rem;padding:0.75rem 1rem;box-shadow:0 10px 20px rgba(6,55,31,0.08);border:1px solid rgba(10,92,48,0.08);}
+#review-intro .process-steps li::before{content:counter(step);flex:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--emerald-600);color:#fff;font-weight:600;box-shadow:0 6px 12px rgba(10,92,48,0.2);margin-top:0.1rem;}
+#review-intro .process-steps span{display:block;font-weight:500;color:var(--emerald-800);line-height:1.5;}
+#review-intro .info-callout{background:linear-gradient(120deg,rgba(10,92,48,0.08),rgba(10,92,48,0));border-radius:1rem;padding:0.85rem 1rem;color:var(--emerald-800);font-size:0.95rem;font-weight:500;}
+@media (min-width:768px){
+  #review-intro .info-card__header{flex-direction:row;align-items:center;justify-content:space-between;gap:1.5rem;}
+  #review-intro .info-card__header h2{margin:0;}
+  #review-intro .info-card__header p{max-width:55ch;}
+}
+@media (min-width:900px){
+  #review-intro .info-card__grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
 button.primary{
   background:var(--emerald-600);
   color:#fff;
@@ -740,47 +765,55 @@ const translations={
       <h1>Your Opportunity to Shine</h1>
       <div class="intro-cards">
         <div class="info-card info-card--combined">
-          <div class="info-section">
+          <div class="info-card__header">
             <h2>Purpose</h2>
             <p>Highlight achievements, live our core values, and explain why you deserve a pay increase while receiving growth feedback.</p>
           </div>
-          <hr>
-          <div class="info-section">
-            <h3>Core Values</h3>
-            <ul class="values-list">
-              <li>Accountable</li>
-              <li>Attention to Details</li>
-              <li>Team Player</li>
-              <li>Tactical Risk Taker</li>
-              <li>Better than Yesterday</li>
-              <li>Value Reputation</li>
-            </ul>
-          </div>
-          <hr>
-          <div class="info-section">
-            <h3>Rating System &amp; Process</h3>
-            <p><strong>Rating System:</strong> For each question, please select a rating using the scale below:</p>
-            <div class="rating-badges">
-              <span class="badge badge-gray">1 = Below Expectations</span>
-              <span class="badge badge-green">2 = Meets Expectations</span>
-              <span class="badge badge-gold">3 = Exceeds Expectations</span>
+          <div class="info-card__grid">
+            <div class="info-section info-section--values">
+              <h3>Core Values</h3>
+              <ul class="values-list">
+                <li>Accountable</li>
+                <li>Attention to Details</li>
+                <li>Team Player</li>
+                <li>Tactical Risk Taker</li>
+                <li>Better than Yesterday</li>
+                <li>Value Reputation</li>
+              </ul>
             </div>
-            <p>Important: Attendance and punctuality (Question&nbsp;1) carry significant weight in determining your overall score.</p>
-            <h3 class="mt-2 font-semibold">Review Process</h3>
-            <p><strong>When:</strong> Reviews will be held throughout July.</p>
-            <p><strong>How to Schedule:</strong></p>
-            <div class="process">
-              <span>Complete this form &amp;</span>
-              <svg viewBox="0 0 16 16"><path d="M5 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-              <span>Submit to your Department Manager</span>
-              <svg viewBox="0 0 16 16"><path d="M5 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-              <span>Schedule an appointment w/ your Manager through this site.</span>
+            <div class="info-section">
+              <h3>Rating System</h3>
+              <p>For each question, please select a rating using the scale below:</p>
+              <div class="rating-badges">
+                <span class="badge badge-gray">1 = Below Expectations</span>
+                <span class="badge badge-green">2 = Meets Expectations</span>
+                <span class="badge badge-gold">3 = Exceeds Expectations</span>
+              </div>
+              <p class="info-footnote">Attendance and punctuality (Question&nbsp;1) carry significant weight in determining your overall score.</p>
             </div>
-            <p><strong>Timing:</strong> Each review lasts approximately 20 minutes, starting every half hour.</p>
-            <p>Submit your form at least one week before your scheduled appointment.</p>
-            <p><strong>Important Note:</strong> Please schedule your review outside of your regular working hours. If you attend on your day off or outside your scheduled shift, you will be compensated—just make sure to message HR or your manager with the times so it can be added to payroll.</p>
-            <h3 class="mt-2 font-semibold">Review Questions</h3>
-            <p>Please answer clearly and concisely. Select your rating for each question.</p>
+            <div class="info-section info-section--wide">
+              <h3>Review Process</h3>
+              <dl class="info-meta">
+                <div class="info-meta__item">
+                  <dt>When</dt>
+                  <dd>Reviews will be held throughout July.</dd>
+                </div>
+                <div class="info-meta__item">
+                  <dt>Duration</dt>
+                  <dd>Each review lasts ~20 minutes and begins on the half hour.</dd>
+                </div>
+              </dl>
+              <h3 class="info-subtitle">How to Schedule</h3>
+              <ol class="process-steps">
+                <li><span>Complete this form</span></li>
+                <li><span>Submit to your Department Manager</span></li>
+                <li><span>Book a review time with your Manager on this site</span></li>
+              </ol>
+              <p class="info-footnote">Submit your form at least one week before your scheduled appointment.</p>
+              <div class="info-callout"><strong>Important:</strong> Schedule outside your regular working hours. If you attend on your day off or outside your scheduled shift, message HR or your manager so payroll can add the time.</div>
+              <h3 class="info-subtitle">Review Questions</h3>
+              <p>Please answer clearly and concisely. Select your rating for each question.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -875,47 +908,55 @@ const translations={
       <h1>Tu oportunidad para destacar</h1>
       <div class="intro-cards">
         <div class="info-card info-card--combined">
-          <div class="info-section">
+          <div class="info-card__header">
             <h2>Propósito</h2>
             <p>Destacar logros, vivir nuestros valores fundamentales y explicar por qué mereces un aumento mientras recibes comentarios para crecer.</p>
           </div>
-          <hr>
-          <div class="info-section">
-            <h3>Valores fundamentales</h3>
-            <ul class="values-list">
-              <li>Responsabilidad</li>
-              <li>Atención al detalle</li>
-              <li>Trabajo en equipo</li>
-              <li>Tomador de riesgos táctico</li>
-              <li>Mejor que ayer</li>
-              <li>Valorar la reputación</li>
-            </ul>
-          </div>
-          <hr>
-          <div class="info-section">
-            <h3>Sistema de calificación y Proceso</h3>
-            <p><strong>Sistema de calificación:</strong> Para cada pregunta, seleccione una calificación usando la escala a continuación:</p>
-            <div class="rating-badges">
-              <span class="badge badge-gray">1 = Por debajo de las expectativas</span>
-              <span class="badge badge-green">2 = Cumple con las expectativas</span>
-              <span class="badge badge-gold">3 = Supera las expectativas</span>
+          <div class="info-card__grid">
+            <div class="info-section info-section--values">
+              <h3>Valores fundamentales</h3>
+              <ul class="values-list">
+                <li>Responsabilidad</li>
+                <li>Atención al detalle</li>
+                <li>Trabajo en equipo</li>
+                <li>Tomador de riesgos táctico</li>
+                <li>Mejor que ayer</li>
+                <li>Valorar la reputación</li>
+              </ul>
             </div>
-            <p>Importante: La asistencia y la puntualidad (Pregunta&nbsp;1) tienen un peso significativo en su puntaje general.</p>
-            <h3 class="mt-2 font-semibold">Proceso de revisión</h3>
-            <p><strong>Cuándo:</strong> Las revisiones se realizarán durante todo julio.</p>
-            <p><strong>Cómo programar:</strong></p>
-            <div class="process">
-              <span>Complete este formulario</span>
-              <svg viewBox="0 0 16 16"><path d="M5 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-              <span>Entregue el formulario completo a su gerente de departamento (en persona o por correo electrónico)</span>
-              <svg viewBox="0 0 16 16"><path d="M5 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-              <span>Agende una cita con Sea Khun</span>
+            <div class="info-section">
+              <h3>Sistema de calificación</h3>
+              <p>Para cada pregunta, seleccione una calificación usando la escala a continuación:</p>
+              <div class="rating-badges">
+                <span class="badge badge-gray">1 = Por debajo de las expectativas</span>
+                <span class="badge badge-green">2 = Cumple con las expectativas</span>
+                <span class="badge badge-gold">3 = Supera las expectativas</span>
+              </div>
+              <p class="info-footnote">La asistencia y la puntualidad (Pregunta&nbsp;1) tienen un peso significativo en su puntaje general.</p>
             </div>
-            <p><strong>Tiempo:</strong> Cada revisión dura aproximadamente 20 minutos y comienza cada media hora.</p>
-            <p>Envíe su formulario al menos una semana antes de su cita programada.</p>
-            <p><strong>Nota importante:</strong> Programe su revisión fuera de su horario de trabajo habitual. Si asiste en su día libre o fuera de su turno programado, se le compensará; solo asegúrese de enviar un mensaje a Recursos Humanos o a su gerente con las horas para que puedan agregarse a la nómina.</p>
-            <h3 class="mt-2 font-semibold">Preguntas de revisión</h3>
-            <p>Responda de forma clara y concisa. Seleccione su calificación para cada pregunta.</p>
+            <div class="info-section info-section--wide">
+              <h3>Proceso de revisión</h3>
+              <dl class="info-meta">
+                <div class="info-meta__item">
+                  <dt>Cuándo</dt>
+                  <dd>Las revisiones se realizarán durante todo julio.</dd>
+                </div>
+                <div class="info-meta__item">
+                  <dt>Duración</dt>
+                  <dd>Cada revisión dura ~20 minutos e inicia en la media hora.</dd>
+                </div>
+              </dl>
+              <h3 class="info-subtitle">Cómo programar</h3>
+              <ol class="process-steps">
+                <li><span>Complete este formulario</span></li>
+                <li><span>Entregue el formulario completo a su gerente de departamento</span></li>
+                <li><span>Agende una cita con su gerente en este sitio</span></li>
+              </ol>
+              <p class="info-footnote">Envíe su formulario al menos una semana antes de su cita programada.</p>
+              <div class="info-callout"><strong>Importante:</strong> Programe su revisión fuera de su horario laboral habitual. Si asiste en su día libre o fuera de su turno, avise a RR. HH. o a su gerente para que se agregue el tiempo a la nómina.</div>
+              <h3 class="info-subtitle">Preguntas de revisión</h3>
+              <p>Responda de forma clara y concisa. Seleccione su calificación para cada pregunta.</p>
+            </div>
           </div>
         </div>
       </div>

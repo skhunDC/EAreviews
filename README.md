@@ -2,6 +2,10 @@
 
 This project contains a simple Google Apps Script web application used to collect annual employee reviews.
 
+## Design Guidelines
+- Code like an experienced web designer: prioritize balanced whitespace, consistent typography, and responsive layouts that stay polished on every screen size.
+- When introducing new UI, consider accessibility first—maintain clear hierarchy, adequate contrast, and intuitive interaction states.
+
 ## Features
 - Google Apps Script backend (`Code.gs`) manages user authentication, review data, and language preference storage. Review submissions are stored as JSON files in a private Drive folder instead of a spreadsheet, and user passwords are stored as salted SHA-256 hashes.
 - HTML/JavaScript frontend (`index.html`) displays the review form and includes a small EN/ES switch to change languages. All visible text uses `data-i18n-key` attributes so the entire interface switches language.
